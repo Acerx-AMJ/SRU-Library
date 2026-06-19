@@ -1,0 +1,3 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/srulibTargets.cmake")
+check_required_components(srulib)

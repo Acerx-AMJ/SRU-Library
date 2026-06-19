@@ -1,0 +1,9 @@
+/.cache
+/.vs
+/.vscode
+/.clangd
+/build
+/test
+/*.a
+/*.dll
+/*.py
