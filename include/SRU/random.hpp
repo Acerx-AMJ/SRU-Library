@@ -26,7 +26,7 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return (rand() % 100 + 1) <= percent;
+   return (rand() % 100) < percent;
 }
 
 #else
@@ -58,7 +58,7 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return randomInt(1, 100) <= percent;
+   return randomInt(0, 99) < percent;
 }
 
 #endif // #ifdef SRU_LIB_USE_RAND

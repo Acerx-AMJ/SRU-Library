@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
+// Vector2 construction utility
 template<typename T, typename Y>
 constexpr inline Vector2 V2(T x, Y y) {
    return {static_cast<float>(x), static_cast<float>(y)};
@@ -27,6 +28,7 @@ constexpr inline Vector2 V2() {
    return {0.0f, 0.0f};
 }
 
+// Vector3 construction utility
 template<typename T, typename Y, typename U>
 constexpr inline Vector3 V3(T x, Y y, U z) {
    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
@@ -40,7 +42,7 @@ constexpr inline Vector3 V3(float x, float y, float z) {
 template<typename T>
 constexpr inline Vector3 V3(T value) {
    float v = static_cast<float>(value);
-   return {value, value, value};
+   return {v, v, v};
 }
 
 template<>
@@ -52,6 +54,7 @@ constexpr inline Vector3 V3() {
    return {0.0f, 0.0f, 0.0f};
 }
 
+// Vector4 construction utility
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Vector4 V4(T x, Y y, U z, I w) {
    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)};
@@ -65,7 +68,7 @@ constexpr inline Vector4 V4(float x, float y, float z, float w) {
 template<typename T>
 constexpr inline Vector4 V4(T value) {
    float v = static_cast<float>(value);
-   return {value, value, value, value};
+   return {v, v, v, v};
 }
 
 template<>
@@ -77,18 +80,40 @@ constexpr inline Vector4 V4() {
    return {0.0f, 0.0f, 0.0f, 0.0f};
 }
 
+// Rectangle construction utility
 template<typename T, typename Y, typename U, typename I>
-constexpr inline Rectangle R4(T x, Y y, U h, I w) {
+constexpr inline Rectangle R4(T x, Y y, U w, I h) {
    return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h)};
 }
 
 template<>
-constexpr inline Rectangle R4(float x, float y, float h, float w) {
-   return {x, y, h, w};
+constexpr inline Rectangle R4(float x, float y, float w, float h) {
+   return {x, y, w, h};
 }
 
 constexpr inline Rectangle R4() {
    return {0.0f, 0.0f, 0.0f, 0.0f};
+}
+
+constexpr inline Rectangle R4(Vector2 position, Vector2 size) {
+   return {position.x, position.y, size.x, size.y};
+}
+
+// Constexpr color fade
+constexpr inline Color fadeColor(Color color, float a) {
+   color.a = a * 255.0f;
+   return color;
+}
+
+// Color construction utility
+template<typename T, typename Y, typename U>
+constexpr inline Color RGB(T r, Y g, U b) {
+   return {static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b), 255};
+}
+
+template<>
+constexpr inline Color RGB(unsigned char r, unsigned char g, unsigned char b) {
+   return {r, g, b, 255};
 }
 
 template<typename T, typename Y, typename U, typename I>
@@ -101,14 +126,8 @@ constexpr inline Color RGBA(unsigned char r, unsigned char g, unsigned char b, u
    return {r, g, b, a};
 }
 
-template<typename T, typename Y, typename U>
-constexpr inline Color RGB(T r, Y g, U b) {
-   return {static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b), 255};
-}
-
-template<>
-constexpr inline Color RGB(unsigned char r, unsigned char g, unsigned char b) {
-   return {r, g, b, 255};
+constexpr inline Color RGBA(Color rgb, unsigned char a) {
+   return {rgb.r, rgb.g, rgb.b, a};
 }
 
 constexpr inline Color HEX(const char *hex) {
@@ -148,4 +167,56 @@ constexpr inline Color HEX(const char *hex) {
 
       return RGBA(red1 * 16 + red2, green1 * 16 + green2, blue1 * 16 + blue2, alpha1 * 16 + alpha2);
    }
+}
+
+constexpr inline Color HSL(float h, float s, float l) {
+   h /= 360.0f;
+   if (s == 0) {
+      float v = l * 255.0f;
+      return RGB(v, v, v);
+   }
+
+   auto hue = [](float p, float q, float t) {
+      if (t < 0.0f) t += 1.0f;
+      if (t > 1.0f) t -= 1.0f;
+      if (t < 1.0f / 6.0f) return p + (q - p) * 6.0f * t;
+      if (t < 1.0f / 2.0f) return q;
+      if (t < 2.0f / 3.0f) return p + (q - p) * (2.0f / 3.0f - t) * 6.0f;
+      return p;
+   };
+
+   float q = (l < 0.5f ? l * (s + 1.0f) : l + s - l * s);
+   float p = 2.0f * l - q;
+   return RGB(
+      hue(p, q, h + 1.0f / 3.0f) * 255.0f,
+      hue(p, q, h) * 255.0f,
+      hue(p, q, h - 1.0f / 3.0f) * 255.0f
+   );
+}
+
+constexpr inline Color HSLA(float h, float s, float l, float a) {
+   return fadeColor(HSL(h, s, l), a);
+}
+
+constexpr inline Color HSV(float h, float s, float v) {
+   h /= 360.0f;
+   int i = floor(h * 6.0f);
+   float f = h * 6.0f - i;
+   float p = v * (1.0f - s);
+   float q = v * (1.0f - f * s);
+   float t = v * (1.0f - (1.0f - f) * s);
+
+   switch (i % 6) {
+      case 0: return RGB(v * 255.0f, t * 255.0f, p * 255.0f);
+      case 1: return RGB(q * 255.0f, v * 255.0f, p * 255.0f);
+      case 2: return RGB(p * 255.0f, v * 255.0f, t * 255.0f);
+      case 3: return RGB(p * 255.0f, q * 255.0f, v * 255.0f);
+      case 4: return RGB(t * 255.0f, p * 255.0f, v * 255.0f);
+      case 5: return RGB(v * 255.0f, p * 255.0f, q * 255.0f);
+      default: return {};
+   }
+}
+
+constexpr inline Color HSVA(float h, float s, float v, float a) {
+   return fadeColor(HSV(h, s, v), a);
 }
