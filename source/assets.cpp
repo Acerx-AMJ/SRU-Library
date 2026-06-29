@@ -6,6 +6,7 @@ static std::unordered_map<std::string, Font> fonts;
 static std::unordered_map<std::string, Shader> shaders;
 static std::unordered_map<std::string, Model> models;
 
+// Load asset functions
 Texture &loadTexture(const std::string &name, const std::string &path) {
    if (auto it = textures.find(name); it != textures.end()) {
       return it->second;
@@ -197,6 +198,7 @@ void loadAssets(const std::string &path) {
    }
 }
 
+// Unload asset functions
 void unloadTexture(const std::string &name) {
    if (auto it = textures.find(name); it != textures.end()) {
       UnloadTexture(it->second);
@@ -258,6 +260,23 @@ void unloadAssets() {
    unloadFonts();
    unloadShaders();
    unloadModels();
+}
+
+// Asset getter functions
+bool textureExists(const std::string &name) {
+   return textures.find(name) != textures.end();
+}
+
+bool fontExists(const std::string &name) {
+   return fonts.find(name) != fonts.end();
+}
+
+bool shaderExists(const std::string &name) {
+   return shaders.find(name) != shaders.end();
+}
+
+bool modelExists(const std::string &name) {
+   return models.find(name) != models.end();
 }
 
 Texture &getTexture(const std::string &name) {

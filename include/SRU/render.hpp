@@ -3,21 +3,21 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#ifndef SRU_LIB_BASE_WIDTH
-#define SRU_LIB_BASE_WIDTH 1920.0f
-#endif // #ifndef SRU_LIB_BASE_WIDTH
+#ifndef SRULIB_BASE_WIDTH
+#define SRULIB_BASE_WIDTH 1920.0f
+#endif // #ifndef SRULIB_BASE_WIDTH
 
-#ifndef SRU_LIB_BASE_HEIGHT
-#define SRU_LIB_BASE_HEIGHT 1080.0f
-#endif // #ifndef SRU_LIB_BASE_HEIGHT
+#ifndef SRULIB_BASE_HEIGHT
+#define SRULIB_BASE_HEIGHT 1080.0f
+#endif // #ifndef SRULIB_BASE_HEIGHT
 
 // Window size/ratio utility
 inline float getWidthRatio() {
-   return GetScreenWidth() / SRU_LIB_BASE_WIDTH;
+   return GetScreenWidth() / SRULIB_BASE_WIDTH;
 }
 
 inline float getHeightRatio() {
-   return GetScreenHeight() / SRU_LIB_BASE_HEIGHT;
+   return GetScreenHeight() / SRULIB_BASE_HEIGHT;
 }
 
 inline float getMinimumRatio() {

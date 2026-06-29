@@ -1,7 +1,7 @@
 #pragma once
 #include <raylib.h>
 
-#ifdef SRU_LIB_USE_RAND
+#ifdef SRULIB_USE_RAND
 #include <cstdlib>
 #include <ctime>
 
@@ -26,7 +26,11 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return (rand() % 100) < percent;
+   return (rand() % 101) <= percent;
+}
+
+inline bool chancePrecise(float percent) {
+   return (float)rand() / (float)RAND_MAX <= percent;
 }
 
 #else
@@ -58,10 +62,14 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return randomInt(0, 99) < percent;
+   return randomInt(0, 100) <= percent;
 }
 
-#endif // #ifdef SRU_LIB_USE_RAND
+inline bool chancePrecise(float percent) {
+   return randomFloat(0.0f, 1.0f) <= percent;
+}
+
+#endif // #ifdef SRULIB_USE_RAND
 
 inline Vector2 randomV2(Vector2 min, Vector2 max) {
    return {randomFloat(min.x, max.x), randomFloat(min.y, max.y)};

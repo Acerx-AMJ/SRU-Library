@@ -28,6 +28,11 @@ void unloadModels();
 void unloadAssets();
 
 // Asset getter functions
+bool textureExists(const std::string &name);
+bool fontExists(const std::string &name);
+bool shaderExists(const std::string &name);
+bool modelExists(const std::string &name);
+
 Texture &getTexture(const std::string &name);
 Font &getFont(const std::string &name);
 Shader &getShader(const std::string &name);
