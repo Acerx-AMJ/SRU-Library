@@ -1,6 +1,5 @@
 #include "SRU/assets.hpp"
 #include <filesystem>
-#include <unordered_map>
 
 static std::unordered_map<std::string, Texture> textures;
 static std::unordered_map<std::string, Font> fonts;
@@ -291,4 +290,20 @@ Model &getModel(const std::string &name) {
    }
    printf("srulib::getModel: Model '%s' does not exist.\n", name.c_str());
    exit(EXIT_FAILURE);
+}
+
+std::unordered_map<std::string, Texture> &getTextureMap() {
+   return textures;
+}
+
+std::unordered_map<std::string, Font> &getFontMap() {
+   return fonts;
+}
+
+std::unordered_map<std::string, Shader> &getShaderMap() {
+   return shaders;
+}
+
+std::unordered_map<std::string, Model> &getModelMap() {
+   return models;
 }

@@ -130,6 +130,7 @@ constexpr inline Color RGBA(Color rgb, unsigned char a) {
    return {rgb.r, rgb.g, rgb.b, a};
 }
 
+// String must be in one of the formats: #rgb, #rgba, #rrggbb or #rrggbbaa, where symbols are 0-9, a-f or A-F.
 constexpr inline Color HEX(const char *hex) {
    size_t len = 0;
    while (hex[len] != '\0') len += 1;
