@@ -5,6 +5,7 @@ static std::unordered_map<std::string, Texture> textures;
 static std::unordered_map<std::string, Font> fonts;
 static std::unordered_map<std::string, Shader> shaders;
 static std::unordered_map<std::string, Model> models;
+static std::unordered_map<std::string, SoundPool> sounds;
 
 // Load asset functions
 Texture &loadTexture(const std::string &name, const std::string &path) {
@@ -63,6 +64,18 @@ Model &loadModel(const std::string &name, const std::string &path) {
    }
    models.insert({name, model});
    return models[name];
+}
+
+SoundPool &loadSoundIntoPool(const std::string &name, const std::string &path) {
+   Sound newSound = LoadSound(path.c_str());
+   if (newSound.frameCount == 0) {
+      printf("srulib::loadSoundIntoPool: Failed to load sound from file '%s'.\n", path.c_str());
+      exit(EXIT_FAILURE);
+   }
+
+   SoundPool &pool = sounds[name];
+   pool.push_back(newSound);
+   return pool;
 }
 
 void loadTextures(const std::string &path) {
@@ -135,8 +148,28 @@ void loadModels(const std::string &path) {
    }
 }
 
+void loadSounds(const std::string &path) {
+   if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
+      printf("srulib::loadSounds: Path '%s' is not a directory.\n", path.c_str());
+      exit(EXIT_FAILURE);
+   }
+
+   std::filesystem::create_directories(path);
+   for (const auto &file: std::filesystem::recursive_directory_iterator(path)) {
+      if (!file.is_regular_file()) {
+         continue;
+      }
+
+      std::string stem = file.path().stem().string();
+      if (isdigit(stem.back())) {
+         stem = stem.substr(0, stem.find_last_not_of("1234567890") + 1);
+      }
+      loadSoundIntoPool(stem, file.path().string());
+   }
+}
+
 void loadAssets(const std::string &path) {
-   enum class FileType: char { texture, font, shader, model };
+   enum class FileType: char { texture, font, shader, model, sound };
    static std::unordered_map<std::string, FileType> fileTypeExtensions {{
       // Supported textures by Raylib
       {".png", FileType::texture}, {".bmp", FileType::texture}, {".tga", FileType::texture}, {".jpg", FileType::texture},
@@ -151,7 +184,11 @@ void loadAssets(const std::string &path) {
       {".fs", FileType::shader}, {".vs", FileType::shader},
 
       // Supported models by Raylib
-      {".obj", FileType::model}, {".iqm", FileType::model}, {".gltf", FileType::model}, {".vox", FileType::model}, {".m3d", FileType::model}
+      {".obj", FileType::model}, {".iqm", FileType::model}, {".gltf", FileType::model}, {".vox", FileType::model}, {".m3d", FileType::model},
+
+      // Supported audio by Raylib
+      {".wav", FileType::sound}, {".ogg", FileType::sound}, {".mp3", FileType::sound}, {".flac", FileType::sound}, {".xm", FileType::sound},
+      {".mod", FileType::sound}, {".qoa", FileType::sound}
    }};
 
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
@@ -189,11 +226,19 @@ void loadAssets(const std::string &path) {
                std::filesystem::path fragmentPath = file.path().parent_path() / (filename + ".fs");
                loadShader(filename, file.path().string(), (std::filesystem::exists(fragmentPath) ? fragmentPath.string() : std::string()));
             }
+            break;
          }
          case FileType::model:
             loadModel(file.path().stem().string(), file.path().string());
             break;
-         }
+         case FileType::sound: {
+            std::string stem = file.path().stem().string();
+            if (isdigit(stem.back())) {
+               stem = stem.substr(0, stem.find_last_not_of("1234567890") + 1);
+            }
+            loadSoundIntoPool(stem, file.path().string());
+            break;
+         }}
       }
    }
 }
@@ -227,6 +272,15 @@ void unloadModel(const std::string &name) {
    }
 }
 
+void unloadSound(const std::string &name) {
+   if (auto it = sounds.find(name); it != sounds.end()) {
+      for (Sound &sound: it->second) {
+         UnloadSound(sound);
+      }
+      sounds.erase(it);
+   }
+}
+
 void unloadTextures() {
    for (auto &[_, texture]: textures) {
       UnloadTexture(texture);
@@ -255,11 +309,21 @@ void unloadModels() {
    models.clear();
 }
 
+void unloadSounds() {
+   for (auto &[_, soundPool]: sounds) {
+      for (Sound &sound: soundPool) {
+         UnloadSound(sound);
+      }
+   }
+   sounds.clear();
+}
+
 void unloadAssets() {
    unloadTextures();
    unloadFonts();
    unloadShaders();
    unloadModels();
+   unloadSounds();
 }
 
 // Asset getter functions
@@ -277,6 +341,10 @@ bool shaderExists(const std::string &name) {
 
 bool modelExists(const std::string &name) {
    return models.find(name) != models.end();
+}
+
+bool soundExists(const std::string &name) {
+   return sounds.find(name) != sounds.end();
 }
 
 Texture &getTexture(const std::string &name) {
@@ -311,6 +379,14 @@ Model &getModel(const std::string &name) {
    exit(EXIT_FAILURE);
 }
 
+SoundPool &getSoundPool(const std::string &name) {
+   if (auto it = sounds.find(name); it != sounds.end()) {
+      return it->second;
+   }
+   printf("srulib::getSoundPool: Sound '%s' does not exist.\n", name.c_str());
+   exit(EXIT_FAILURE);
+}
+
 std::unordered_map<std::string, Texture> &getTextureMap() {
    return textures;
 }
@@ -325,4 +401,8 @@ std::unordered_map<std::string, Shader> &getShaderMap() {
 
 std::unordered_map<std::string, Model> &getModelMap() {
    return models;
+}
+
+std::unordered_map<std::string, SoundPool> &getSoundPoolMap() {
+   return sounds;
 }

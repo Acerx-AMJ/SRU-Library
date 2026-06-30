@@ -5,6 +5,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - [Usage](#usage)
 - [Documentation](#documentation)
 - - [assets.hpp](#assetshpp)
+- - [audio.hpp](#audiohpp)
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
 - - [util.hpp](#utilhpp)
@@ -71,6 +72,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
 ## Documentation
 Here you will find the documentation of all headers, functions and structures found in the library. Select by header:
 - [assets.hpp](#assetshpp)
+- [audio.hpp](#audiohpp)
 - [random.hpp](#randomhpp)
 - [render.hpp](#renderhpp)
 - [util.hpp](#utilhpp)
@@ -80,12 +82,19 @@ Responsible for asset loading, unloading and retrieval. Handles textures, fonts,
 
 ---
 ```cpp
+using SoundPool = std::vector<Sound>;
+```
+Pool of sounds. If loaded automatically, sounds with the same names but different numbering will be loaded into the same pool (e.g. sound, sound1, sound2 and so on will be put in the same pool).
+
+---
+```cpp
 Texture &loadTexture(const std::string &name, const std::string &path);
 Font &loadFont(const std::string &name, const std::string &path);
 Shader &loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath);
 Model &loadModel(const std::string &name, const std::string &path);
+SoundPool &loadSoundIntoPool(const std::string &name, const std::string &path);
 ```
-Loads an asset from the given path and saves it in an internal asset map. Returns the asset if it already exists. Terminates if the asset failed to load. *loadShader* skips loading vertex or fragment shader if an empty string is supplied.
+Loads an asset from the given path and saves it in an internal asset map. Returns the asset if it already exists. Terminates if the asset failed to load. *loadShader* skips loading vertex or fragment shader if an empty string is supplied. *loadSoundIntoPool* instead loads the sound in the pool with the given name and returns the pool.
 
 ---
 ```cpp
@@ -93,14 +102,15 @@ void loadTextures(const std::string &path);
 void loadFonts(const std::string &path);
 void loadShaders(const std::string &path);
 void loadModels(const std::string &path);
+void loadSounds(const std::string &path);
 ```
-Loads all files as assets recursively from the given path. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load. *loadShader* automatically groups vertex (.vs) and fragment (.fs) shaders together.
+Loads all files as assets recursively from the given path. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load. *loadShader* automatically groups vertex (.vs) and fragment (.fs) shaders together. *loadSounds* automatically groups sounds with the same name but different numbering (e.g. sound, sound1, sound2, ...).
 
 ---
 ```cpp
 void loadAssets(const std::string &path);
 ```
-Loads all files recursively as assets based on the file extension. Only loads file types supported by Raylib (see [here](https://github.com/raysan5/raylib/blob/master/FAQ.md#what-file-formats-are-supported-by-raylib)) and .vs and .fs files. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load.
+Loads all files recursively as assets based on the file extension. Only loads file types supported by Raylib (see [here](https://github.com/raysan5/raylib/blob/master/FAQ.md#what-file-formats-are-supported-by-raylib)) and .vs and .fs files. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load. Automatically groups sounds with the same name but different numbering (e.g. sound, sound1, sound2, ...).
 
 ---
 ```cpp
@@ -108,6 +118,7 @@ void unloadTexture(const std::string &name);
 void unloadFont(const std::string &name);
 void unloadShader(const std::string &name);
 void unloadModel(const std::string &name);
+void unloadSound(const std::string &name);
 ```
 Unloads an asset if it exists.
 
@@ -117,6 +128,7 @@ void unloadTextures();
 void unloadFonts();
 void unloadShaders();
 void unloadModels();
+void unloadSounds();
 ```
 Unloads all assets from the specified container.
 
@@ -124,7 +136,7 @@ Unloads all assets from the specified container.
 ```cpp
 void unloadAssets();
 ```
-Unloads all assets - textures, fonts, shaders and models.
+Unloads all assets - textures, fonts, shaders, models and sounds.
 
 ---
 ```cpp
@@ -132,8 +144,9 @@ bool textureExists(const std::string &name);
 bool fontExists(const std::string &name);
 bool shaderExists(const std::string &name);
 bool modelExists(const std::string &name);
+bool soundExists(const std::string &name);
 ```
-Returns whether or not asset by the given name exists. 
+Returns whether or not asset by the given name exists.
 
 ---
 ```cpp
@@ -141,6 +154,7 @@ Texture &getTexture(const std::string &name);
 Font &getFont(const std::string &name);
 Shader &getShader(const std::string &name);
 Model &getModel(const std::string &name);
+SoundPool &getSoundPool(const std::string &name);
 ```
 Returns asset by name if it exists. Terminates if it does not.
 
@@ -150,8 +164,48 @@ std::unordered_map<std::string, Texture> &getTextureMap();
 std::unordered_map<std::string, Font> &getFontMap();
 std::unordered_map<std::string, Shader> &getShaderMap();
 std::unordered_map<std::string, Model> &getModelMap();
+std::unordered_map<std::string, SoundPool> &getSoundPoolMap();
 ```
 Returns a reference to the specified map.
+
+## audio.hpp
+Responsible for playing audio.
+
+---
+```cpp
+#define SRULIB_MIN_PITCH 0.925f
+```
+Defines the default minimum pitch used in *playSound*. Default is 0.925.
+
+---
+```cpp
+#define SRULIB_MAX_PITCH 1.075f
+```
+Defines the default maximum pitch used in *playSound*. Default is 1.075.
+
+---
+```cpp
+void playSound(const std::string &name, float volume = 1.0f);
+```
+Retrives the sound pool from the asset manager, selects a random sound from the pool and plays it. Assigns the sound a random pitch based on macros.
+
+---
+```cpp
+void playSoundPure(const std::string &name, float pitch = 1.0f, float volume = 1.0f);
+```
+Retrieves the sound pool from the asset manager, selects a random sound from the pool and plays it.
+
+---
+```cpp
+void playRawSound(Sound sound, float volume = 1.0f);
+```
+Plays the sound. Assigns the sound a random pitch based on macros.
+
+---
+```cpp
+void playRawSoundPure(Sound sound, float pitch = 1.0f, float volume = 1.0f);
+```
+Plays the sound.
 
 ## random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.

@@ -4,11 +4,11 @@
 #include <raymath.h>
 
 #ifndef SRULIB_BASE_WIDTH
-#define SRULIB_BASE_WIDTH 1920.0f
+   #define SRULIB_BASE_WIDTH 1920.0f
 #endif // #ifndef SRULIB_BASE_WIDTH
 
 #ifndef SRULIB_BASE_HEIGHT
-#define SRULIB_BASE_HEIGHT 1080.0f
+   #define SRULIB_BASE_HEIGHT 1080.0f
 #endif // #ifndef SRULIB_BASE_HEIGHT
 
 // Window size/ratio utility

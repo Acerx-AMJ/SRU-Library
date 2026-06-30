@@ -10,6 +10,7 @@ endif()
 
 add_library(srulib STATIC
    source/assets.cpp
+   source/audio.cpp
 )
 
 target_include_directories(srulib PUBLIC
