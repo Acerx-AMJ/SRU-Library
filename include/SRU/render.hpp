@@ -1,39 +1,13 @@
 #pragma once
-#include <cmath>
 #include <raylib.h>
 #include <raymath.h>
 
-#ifndef SRULIB_BASE_WIDTH
-   #define SRULIB_BASE_WIDTH 1920.0f
-#endif // #ifndef SRULIB_BASE_WIDTH
-
-#ifndef SRULIB_BASE_HEIGHT
-   #define SRULIB_BASE_HEIGHT 1080.0f
-#endif // #ifndef SRULIB_BASE_HEIGHT
-
-// Window size/ratio utility
-inline float getWidthRatio() {
-   return GetScreenWidth() / SRULIB_BASE_WIDTH;
-}
-
-inline float getHeightRatio() {
-   return GetScreenHeight() / SRULIB_BASE_HEIGHT;
-}
-
-inline float getMinimumRatio() {
-   return fminf(getWidthRatio(), getHeightRatio());
-}
-
-inline float getMaximumRatio() {
-   return fmaxf(getWidthRatio(), getHeightRatio());
-}
-
-inline float getAspectRatio() {
-   return (float)GetScreenWidth() / GetScreenHeight();
-}
-
 inline float getFontSizeScaled(float fontSize) {
-   return fontSize * getMinimumRatio();
+   return fontSize * fminf(GetScreenWidth(), GetScreenHeight()) / 1000.0f;
+}
+
+inline float getSpacingScaled(float spacing = 1.0f) {
+   return spacing * fminf(GetScreenWidth(), GetScreenHeight()) / 1000.0f;
 }
 
 inline float getWindowWidth() {
@@ -60,8 +34,16 @@ inline Vector2 translateRatioToScreen(Vector2 ratio) {
    return ratio * getWindowSize();
 }
 
+inline Vector2 translateRatioToScreen(float ratioX, float ratioY) {
+   return {ratioX * GetScreenWidth(), ratioY * GetScreenHeight()};
+}
+
 inline Vector2 translateScreenToRatio(Vector2 screen) {
    return screen / getWindowSize();
+}
+
+inline Vector2 translateScreenToRatio(float screenX, float screenY) {
+   return {screenX / GetScreenWidth(), screenY / GetScreenHeight()};
 }
 
 // Origin/source utility

@@ -40,7 +40,7 @@ constexpr inline Vector3 V3(float x, float y, float z) {
 }
 
 constexpr inline Vector3 V3(Color color) {
-   return V3(color.r, color.g, color.b) / 255.0f;
+   return V3(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f);
 }
 
 template<typename T>
@@ -70,7 +70,7 @@ constexpr inline Vector4 V4(float x, float y, float z, float w) {
 }
 
 constexpr inline Vector4 V4(Color color) {
-   return V4(color.r, color.g, color.b, color.a) / 255.0f;
+   return V4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
 }
 
 template<typename T>

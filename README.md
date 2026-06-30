@@ -302,47 +302,16 @@ Responsible for providing screen, size and position math utilities as well as dr
 
 ---
 ```cpp
-#define SRULIB_BASE_WIDTH 1920.0f
-```
-Defines the width of the screen used for designing responsive UI layouts. Used in functions like *getWidthRatio()* and *getMinimumRatio()*. By default it is 1920. This is not the screen width of the consumer but of the developer.
-
----
-```cpp
-#define SRULIB_BASE_HEIGHT 1080.0f
-```
-Defines the height of the screen used for designing responsive UI layouts. Used in functions like *getHeightRatio()* and *getMinimumRatio()*. By default it is 1080. This is not the screen height of the consumer but of the developer.
-
----
-```cpp
-inline float getWidthRatio();
-inline float getHeightRatio();
-```
-Returns how many times bigger the width/height of the screen of the user is than the base screen size. Used for responsive UI layouts.
-
----
-```cpp
-inline float getMinimumRatio();
-inline float getMaximumRatio();
-```
-Returns the minimum/maximum ratio from *getWidthRatio()* and *getHeightRatio()*. The minimum ratio is usually used for UI elements whose aspect ratio should not change and for fonts to avoid overflowing. Ratio received from *getMaximumRatio()* is prone to UI overflows.
-
----
-```cpp
-inline float getAspectRatio();
-```
-Returns the aspect ratio of the user's window.
-
----
-```cpp
 inline float getFontSizeScaled(float fontSize);
+inline float getSpacingScaled(float spacing = 1.0f);
 ```
 Returns the font size scaled responsively based on the window size. Safe from UI overflows.
 
 ---
 ```cpp
-inline float getWindowWidth();   
-inline float getWindowHeight();     
-inline Vector2 getWindowSize();     
+inline float getWindowWidth();
+inline float getWindowHeight();
+inline Vector2 getWindowSize();
 ```   
 Returns the size of the window.
 
@@ -361,12 +330,14 @@ Returns the position of the center of the window with the added offset.
 ---
 ```cpp
 inline Vector2 translateRatioToScreen(Vector2 ratio);
+inline Vector2 translateRatioToScreen(float ratioX, float ratioY);
 ```
 Translates ratio where X and Y are [0; 1] to screen position where X is [0; width] and Y is [0; height].
 
 ---
 ```cpp
 inline Vector2 translateScreenToRatio(Vector2 screen);
+inline Vector2 translateScreenToRatio(float screeX, float screenY);
 ```
 Translates screen position where X is [0; width] and Y is [0; height] to a ratio where X and Y are [0; 1].
 
@@ -525,8 +496,8 @@ Returns a HSVA color. H must be in range [0; 360], S in range [0; 1], V in range
 This section will document all macros present and their usage in one place. There are two ways to use these macros - either define them before including a header or define them in CMake. Defining them in CMake is safer since it protects you from ODR violations. You can include any macro in your project with this CMake function:
 ```cmake
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-   "SRULIB_BASE_WIDTH=1280.0f"
-   "SRULIB_BASE_HEIGHT=720.0f" # macro with a value
+   "SRULIB_MIN_PITCH=0.9f"
+   "SRULIB_MAX_PITCH=1.1f" # macro with a value
    "SRULIB_USE_RAND" # macro without a value
    # define as many as needed
 )
@@ -549,15 +520,3 @@ Defines the default maximum pitch used in *playSound*. Default is 1.075. Used in
 #define SRULIB_USE_RAND
 ```
 If defined, C *rand()* function will be used instead of *std::mt19937*. When defined, the random must be seeded manually. Used in [random.hpp](#randomhpp).
-
----
-```cpp
-#define SRULIB_BASE_WIDTH 1920.0f
-```
-Defines the width of the screen used for designing responsive UI layouts. Used in functions like *getWidthRatio()* and *getMinimumRatio()*. By default it is 1920. This is not the screen width of the consumer but of the developer. Used in [render.hpp](#renderhpp).
-
----
-```cpp
-#define SRULIB_BASE_HEIGHT 1080.0f
-```
-Defines the height of the screen used for designing responsive UI layouts. Used in functions like *getHeightRatio()* and *getMinimumRatio()*. By default it is 1080. This is not the screen height of the consumer but of the developer. Used in [render.hpp](#renderhpp).
