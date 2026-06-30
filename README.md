@@ -8,6 +8,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [audio.hpp](#audiohpp)
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
+- - [timer.hpp](#timerhpp)
 - - [util.hpp](#utilhpp)
 - - [Macros](#macros)
 
@@ -76,6 +77,7 @@ Here you will find the documentation of all headers, functions and structures fo
 - [audio.hpp](#audiohpp)
 - [random.hpp](#randomhpp)
 - [render.hpp](#renderhpp)
+- [timer.hpp](#timerhpp)
 - [util.hpp](#utilhpp)
 
 Or browse miscellaneous documentation:
@@ -364,6 +366,107 @@ Returns the origin/center of the size.
 constexpr inline Rectangle getSource(Texture texture);
 ```
 Returns the full texture source - *{0, 0, width, height}*.
+
+## timer.hpp
+Responsible for handling various timers and time.
+
+---
+```cpp
+inline bool wait(float seconds);
+```
+Blocks the current thread for that many seconds.
+
+---
+```cpp
+struct Timer {
+   Timer() = default;
+   Timer(float duration);
+
+   void update(float dt);
+   void reset();
+   bool isDone() const;
+   float progress() const;
+
+public:
+   float duration = 0.0f;
+   float timer = 0.0f;
+   bool paused = false;
+};
+```
+Basic pausable timer.
+
+---
+```cpp
+void Timer::update(float dt);
+```
+Update the timer if it is not paused.
+
+---
+```cpp
+void Timer::reset();
+```
+Reset the timer to the original state.
+
+---
+```cpp
+bool Timer::isDone() const;
+```
+Returns true if the time has passed.
+
+---
+```cpp
+float Timer::progress() const;
+```
+Returns the progress of the timer [0; 1].
+
+---
+```cpp
+struct BasicTimer {
+   BasicTimer() = default;
+   BasicTimer(float duration);
+
+   void update(float dt);
+   bool isDone() const;
+
+public:
+   float timer = 0.0f;
+};
+```
+Basic unpausable and unresetable timer.
+
+---
+```cpp
+void BasicTimer::update(float dt);
+```
+Update the timer.
+
+---
+```cpp
+bool BasicTimer::isDone() const;
+```
+Returns true if the time has passed.
+
+---
+```cpp
+struct Interval {
+   Interval() = default;
+   Interval(float duration);
+   
+   bool tick(float dt);
+
+public:
+   float duration = 0.0f;
+   float timer = 0.0f;
+   bool paused = false;
+};
+```
+Interval timer for repeated actions.
+
+---
+```cpp
+bool Interval::tick(float dt);
+```
+Updates the timer and returns true every time *duration* seconds have passed.
 
 ## util.hpp
 Responsible for vector and color utility functions.
