@@ -77,6 +77,9 @@ Here you will find the documentation of all headers, functions and structures fo
 - [render.hpp](#renderhpp)
 - [util.hpp](#utilhpp)
 
+Or browse miscellaneous documentation:
+- [Macros](#macros)
+
 ## assets.hpp
 Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot.
 
@@ -497,3 +500,44 @@ Returns a HSV color. H must be in range [0; 360], S in range [0; 1] and V in ran
 constexpr inline Color HSVA(float h, float s, float v, float a);
 ```
 Returns a HSVA color. H must be in range [0; 360], S in range [0; 1], V in range [0; 1] and A in range [0; 1].
+
+## Macros
+This section will document all macros present and their usage in one place. There are two ways to use these macros - either define them before including a header or define them in CMake. Defining them in CMake is safer since it protects you from ODR violations. You can include any macro in your project with this CMake function:
+```cmake
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+   "SRULIB_BASE_WIDTH=1280.0f"
+   "SRULIB_BASE_HEIGHT=720.0f" # macro with a value
+   "SRULIB_USE_RAND" # macro without a value
+   # define as many as needed
+)
+```
+
+---
+```cpp
+#define SRULIB_MIN_PITCH 0.925f
+```
+Defines the default minimum pitch used in *playSound*. Default is 0.925. Used in [audio.hpp](#audiohpp).
+
+---
+```cpp
+#define SRULIB_MAX_PITCH 1.075f
+```
+Defines the default maximum pitch used in *playSound*. Default is 1.075. Used in [audio.hpp](#audiohpp).
+
+---
+```cpp
+#define SRULIB_USE_RAND
+```
+If defined, C *rand()* function will be used instead of *std::mt19937*. When defined, the random must be seeded manually. Used in [random.hpp](#randomhpp).
+
+---
+```cpp
+#define SRULIB_BASE_WIDTH 1920.0f
+```
+Defines the width of the screen used for designing responsive UI layouts. Used in functions like *getWidthRatio()* and *getMinimumRatio()*. By default it is 1920. This is not the screen width of the consumer but of the developer. Used in [render.hpp](#renderhpp).
+
+---
+```cpp
+#define SRULIB_BASE_HEIGHT 1080.0f
+```
+Defines the height of the screen used for designing responsive UI layouts. Used in functions like *getHeightRatio()* and *getMinimumRatio()*. By default it is 1080. This is not the screen height of the consumer but of the developer. Used in [render.hpp](#renderhpp).

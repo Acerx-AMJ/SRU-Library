@@ -69,7 +69,7 @@ inline bool chancePrecise(float percent) {
    return randomFloat(0.0f, 1.0f) <= percent;
 }
 
-#endif // #ifdef SRULIB_USE_RAND
+#endif // SRULIB_USE_RAND
 
 inline Vector2 randomV2(Vector2 min, Vector2 max) {
    return {randomFloat(min.x, max.x), randomFloat(min.y, max.y)};
