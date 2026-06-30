@@ -39,6 +39,10 @@ constexpr inline Vector3 V3(float x, float y, float z) {
    return {x, y, z};
 }
 
+constexpr inline Vector3 V3(Color color) {
+   return V3(color.r, color.g, color.b) / 255.0f;
+}
+
 template<typename T>
 constexpr inline Vector3 V3(T value) {
    float v = static_cast<float>(value);
@@ -63,6 +67,10 @@ constexpr inline Vector4 V4(T x, Y y, U z, I w) {
 template<>
 constexpr inline Vector4 V4(float x, float y, float z, float w) {
    return {x, y, z, w};
+}
+
+constexpr inline Vector4 V4(Color color) {
+   return V4(color.r, color.g, color.b, color.a) / 255.0f;
 }
 
 template<typename T>
@@ -116,6 +124,10 @@ constexpr inline Color RGB(unsigned char r, unsigned char g, unsigned char b) {
    return {r, g, b, 255};
 }
 
+constexpr inline Color RGB(Vector3 color) {
+   return RGB(color.x * 255.0f, color.y * 255.0f, color.z * 255.0f);
+}
+
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Color RGBA(T r, Y g, U b, I a) {
    return {static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b), static_cast<unsigned char>(a)};
@@ -124,6 +136,10 @@ constexpr inline Color RGBA(T r, Y g, U b, I a) {
 template<>
 constexpr inline Color RGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
    return {r, g, b, a};
+}
+
+constexpr inline Color RGBA(Vector4 color) {
+   return RGBA(color.x * 255.0f, color.y * 255.0f, color.z * 255.0f, color.w * 255.0f);
 }
 
 constexpr inline Color RGBA(Color rgb, unsigned char a) {

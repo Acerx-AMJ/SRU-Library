@@ -9,6 +9,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
 - - [util.hpp](#utilhpp)
+- - [Macros](#macros)
 
 ## Usage
 SRU-Lib is meant to be used together with CMake's FetchContent module and can be imported as follows:
@@ -432,6 +433,13 @@ Returns a zero-initialized vector.
 
 ---
 ```cpp
+constexpr inline Vector3 V3(Color color);
+constexpr inline Vector4 V4(Color color);
+```
+Converts the color to a vector. Changes all values from [0; 255] to [0; 1].
+
+---
+```cpp
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Rectangle R4(T x, Y y, U w, I h);
 ```
@@ -464,12 +472,24 @@ Returns an RGB color.
 
 ---
 ```cpp
+constexpr inline Color RGB(Vector3 color);
+```
+Converts vector to RGB color. Changes all values from [0; 1] to [0; 255].
+
+---
+```cpp
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Color RGBA(T r, Y g, U b, I a);
 
 constexpr inline Color RGBA(Color rgb, unsigned char a);
 ```
 Returns an RGBA color.
+
+---
+```cpp
+constexpr inline Color RGBA(Vector4 color);
+```
+Converts vector to RGBA color. Changes all values from [0; 1] to [0; 255].
 
 ---
 ```cpp
