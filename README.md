@@ -8,7 +8,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [audio.hpp](#audiohpp)
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
-- - [timer.hpp](#timerhpp)
+- - [text.hpp](#texthpp)
 - - [util.hpp](#utilhpp)
 - - [Macros](#macros)
 
@@ -77,7 +77,7 @@ Here you will find the documentation of all headers, functions and structures fo
 - [audio.hpp](#audiohpp)
 - [random.hpp](#randomhpp)
 - [render.hpp](#renderhpp)
-- [timer.hpp](#timerhpp)
+- [text.hpp](#texthpp)
 - [util.hpp](#utilhpp)
 
 Or browse miscellaneous documentation:
@@ -367,106 +367,73 @@ constexpr inline Rectangle getSource(Texture texture);
 ```
 Returns the full texture source - *{0, 0, width, height}*.
 
-## timer.hpp
-Responsible for handling various timers and time.
+## text.hpp
+Responsible for modifying text.
 
 ---
 ```cpp
-inline bool wait(float seconds);
+std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
 ```
-Blocks the current thread for that many seconds.
+Wrap the text to fit in the width.
 
 ---
 ```cpp
-struct Timer {
-   Timer() = default;
-   Timer(float duration);
-
-   void update(float dt);
-   void reset();
-   bool isDone() const;
-   float progress() const;
-
-public:
-   float duration = 0.0f;
-   float timer = 0.0f;
-   bool paused = false;
-};
+std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
 ```
-Basic pausable timer.
+Truncate the text to fit in the width.
 
 ---
 ```cpp
-void Timer::update(float dt);
+std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
 ```
-Update the timer if it is not paused.
+Wrap and then truncate the text to fit in the bounds.
 
 ---
 ```cpp
-void Timer::reset();
+std::string toRomanNumeral(size_t number);
 ```
-Reset the timer to the original state.
+Convert the number to a roman numeral. Highest numeral is M - 1000.
 
 ---
 ```cpp
-bool Timer::isDone() const;
+std::string toUpper(const std::string &string);
 ```
-Returns true if the time has passed.
+Convert the string to uppercase.
 
 ---
 ```cpp
-float Timer::progress() const;
+std::string toLower(const std::string &string);
 ```
-Returns the progress of the timer [0; 1].
+Convert the string to lowercase.
 
 ---
 ```cpp
-struct BasicTimer {
-   BasicTimer() = default;
-   BasicTimer(float duration);
-
-   void update(float dt);
-   bool isDone() const;
-
-public:
-   float timer = 0.0f;
-};
+std::string trim(const std::string &string);
+std::string trimLeft(const std::string &string);
+std::string trimRight(const std::string &string);
 ```
-Basic unpausable and unresetable timer.
+Trim leading/trailing spaces from the string.
 
 ---
 ```cpp
-void BasicTimer::update(float dt);
+void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
+void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
+void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
+void toRomanNumeralInPlace(std::string &string, size_t number);
+void toUpperInPlace(std::string &string);
+void toLowerInPlace(std::string &string);
+void trimInPlace(std::string &string);
+void trimLeftInPlace(std::string &string);
+void trimRightInPlace(std::string &string);
 ```
-Update the timer.
+Same as the previous functions but operates directly on the string.
 
 ---
 ```cpp
-bool BasicTimer::isDone() const;
+float fitFontSize(const char *string, Font font, float maxWidth, float spacing);
+float fitFontSize(const std::string &string, Font font, float maxWidth, float spacing);
 ```
-Returns true if the time has passed.
-
----
-```cpp
-struct Interval {
-   Interval() = default;
-   Interval(float duration);
-   
-   bool tick(float dt);
-
-public:
-   float duration = 0.0f;
-   float timer = 0.0f;
-   bool paused = false;
-};
-```
-Interval timer for repeated actions.
-
----
-```cpp
-bool Interval::tick(float dt);
-```
-Updates the timer and returns true every time *duration* seconds have passed.
+Returns a font size that will fit as closely to the width as possible.
 
 ## util.hpp
 Responsible for vector and color utility functions.
