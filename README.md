@@ -304,54 +304,79 @@ Responsible for providing screen, size and position math utilities as well as dr
 
 ---
 ```cpp
-inline float getFontSizeScaled(float fontSize);
-inline float getSpacingScaled(float spacing = 1.0f);
-```
-Returns the font size scaled responsively based on the window size. Safe from UI overflows.
-
----
-```cpp
-inline float getWindowWidth();
-inline float getWindowHeight();
-inline Vector2 getWindowSize();
+float getWindowWidth();
+float getWindowHeight();
+Vector2 getWindowSize();
 ```   
 Returns the size of the window.
 
 ---
 ```cpp
-inline Vector2 getWindowCenter();
+Vector2 getWindowCenter();
 ```
 Returns the position of the center of the window.
 
 ---
 ```cpp
-inline Vector2 getWindowCenterOffset(Vector2 offset);
+Vector2 getWindowCenterOffset(Vector2 offset);
 ```
 Returns the position of the center of the window with the added offset.
 
 ---
 ```cpp
-inline Vector2 translateRatioToScreen(Vector2 ratio);
-inline Vector2 translateRatioToScreen(float ratioX, float ratioY);
+Vector2 mapRatioToScreen(Vector2 ratio);
+Vector2 mapRatioToScreen(float ratioX, float ratioY);
 ```
-Translates ratio where X and Y are [0; 1] to screen position where X is [0; width] and Y is [0; height].
+Maps ratio where X and Y are [0; 1] to screen position where X is [0; width] and Y is [0; height].
 
 ---
 ```cpp
-inline Vector2 translateScreenToRatio(Vector2 screen);
-inline Vector2 translateScreenToRatio(float screeX, float screenY);
+Vector2 mapScreenToRatio(Vector2 screen);
+Vector2 mapScreenToRatio(float screeX, float screenY);
 ```
-Translates screen position where X is [0; width] and Y is [0; height] to a ratio where X and Y are [0; 1].
+Maps screen position where X is [0; width] and Y is [0; height] to a ratio where X and Y are [0; 1].
 
 ---
 ```cpp
-inline Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
+Vector2 mapCubicRatioToScreen(Vector2 ratio);
+Vector2 mapCubicRatioToScreen(float ratioX, float ratioY);
+Vector2 mapScreenToCubicRatio(Vector2 screen);
+Vector2 mapScreenToCubicRatio(float screenX, float screenY);
+```
+Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the screen - width or height.
+
+---
+```cpp
+Vector2 mapRatioToRectangle(Rectangle rect, Vector2 ratio);
+Vector2 mapRatioToRectangle(Rectangle rect, float ratioX, float ratioY);
+```
+Maps ratio where X and Y are [0; 1] to a position in the rectangle where X is [rect.x; rect.width] and Y is [rect.y; rect.height].
+
+---
+```cpp
+Vector2 mapRectangleToRatio(Rectangle rect, Vector2 position);
+Vector2 mapRectangleToRatio(Rectangle rect, float positionX, float positionY);
+```
+Maps position in the rectangle where X is [rect.x; rect.width] and Y is [rect.y; rect.height] to a ratio where X and Y are [0; 1].
+
+---
+```cpp
+Vector2 mapCubicRatioToRectangle(Rectangle rect, Vector2 ratio);
+Vector2 mapCubicRatioToRectangle(Rectangle rect, float ratioX, float ratioY);
+Vector2 mapRectangleToCubicRatio(Rectangle rect, Vector2 position);
+Vector2 mapRectangleToCubicRatio(Rectangle rect, float positionX, float positionY);
+```
+Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size fieldof the rectangle - width or height.
+
+---
+```cpp
+Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
 ```
 Returns the size of the text based on parameters.
 
 ---
 ```cpp
-inline Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing);
+Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing);
 ```
 Returns the center position of the text based on parameters.
 
@@ -366,6 +391,74 @@ Returns the origin/center of the size.
 constexpr inline Rectangle getSource(Texture texture);
 ```
 Returns the full texture source - *{0, 0, width, height}*.
+
+---
+```cpp
+void drawText(Font font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCentered(Font font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOrigin(Font font, Vector2 position, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+```
+Draw text with the specified origin. *drawText* assumes top-left position, *drawTextCentered* assumes center position and *drawTextOrigin* takes custom origin. Fits spacing using *fitSpacing*.
+
+---
+```cpp
+void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCenteredResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOriginResponsive(Font font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+```
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Also scales font size and spacing automatically based on screen size.
+
+---
+```cpp
+void drawRect(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectCentered(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectOrigin(Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+```
+Draw rectangle with the specified origin. *drawRect* assumes top-left position, *drawRectCentered* assumes center position and *drawRectOrigin* takes custom origin.
+
+---
+```cpp
+void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawRectCenteredResponsive(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawRectOriginResponsive(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawRectResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawRectCenteredResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawRectOriginResponsiveCubic(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+```
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the rectangle.
+
+---
+```cpp
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+```
+Draw texture with the specified origin. *drawRect* assumes top-left position, *drawRectCentered* assumes center position and *drawRectOrigin* takes custom origin. Draws the entire texture.
+
+---
+```cpp
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+```
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the texture.
+
+---
+```cpp
+void drawTextureSource(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceCentered(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceOrigin(Texture texture, Rectangle source, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+```
+Custom source variations of the previous functions. Instead of drawing the whole texture draw a specific region. Includes responsive functions.
 
 ## text.hpp
 Responsible for modifying text.
@@ -450,10 +543,22 @@ Same as the previous functions but operate directly on the output.
 
 ---
 ```cpp
-float fitFontSize(const char *string, Font font, float maxWidth, float spacing);
-float fitFontSize(const std::string &string, Font font, float maxWidth, float spacing);
+float fitSpacing(float fontSize);
+```
+Returns spacing that fits the font size.
+
+---
+```cpp
+float fitFontSize(const char *string, Font font, float maxWidth);
+float fitFontSize(const std::string &string, Font font, float maxWidth);
 ```
 Returns a font size that will fit as closely to the width as possible.
+
+---
+```cpp
+inline float getFontSizeScaled(float fontSize);
+```
+Returns the font size scaled responsively based on the window size. Safe from UI overflows.
 
 ## util.hpp
 Responsible for vector and color utility functions.

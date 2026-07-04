@@ -3,6 +3,7 @@
 #include <iterator>
 #include <sstream>
 
+// Text altering functions
 std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize, float spacing) {
    std::string wrappedString = string;
    wrapInPlace(wrappedString, font, maxWidth, fontSize, spacing);
@@ -88,6 +89,7 @@ std::string join(const std::vector<std::string> &parts) {
    return joinedString;
 }
 
+// Text altering in place functions
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing) {
    auto shouldWrap = [font, maxWidth, fontSize, spacing](const std::string &s) -> bool {
       return MeasureTextEx(font, s.c_str(), fontSize, spacing).x > maxWidth;
@@ -378,14 +380,19 @@ void joinInPlace(std::string &output, const std::vector<std::string> &parts) {
    }
 }
 
-float fitFontSize(const char *string, Font font, float maxWidth, float spacing) {
+// Fit font size
+float fitSpacing(float fontSize) {
+   return fontSize / 10.0f;
+}
+
+float fitFontSize(const char *string, Font font, float maxWidth) {
    float low = 1.0f;
    float high = maxWidth;
    float best = 1.0f;
 
    while (high - low > 0.1f) {
       float mid = (low + high) / 2.0f;
-      float width = MeasureTextEx(font, string, mid, spacing).x;
+      float width = MeasureTextEx(font, string, mid, fitSpacing(mid)).x;
 
       if (width <= maxWidth) {
          best = mid;
@@ -397,6 +404,10 @@ float fitFontSize(const char *string, Font font, float maxWidth, float spacing) 
    return best;
 }
 
-float fitFontSize(const std::string &string, Font font, float maxWidth, float spacing) {
-   return fitFontSize(string.c_str(), font, maxWidth, spacing);
+float fitFontSize(const std::string &string, Font font, float maxWidth) {
+   return fitFontSize(string.c_str(), font, maxWidth);
+}
+
+float getFontSizeScaled(float fontSize) {
+   return fontSize * std::min(GetScreenWidth(), GetScreenHeight()) / 1000.0f;
 }

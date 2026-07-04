@@ -40,5 +40,7 @@ void joinInPlace(std::string &output, const std::vector<std::string> &parts, con
 void joinInPlace(std::string &output, const std::vector<std::string> &parts);
 
 // Fit font size
-float fitFontSize(const char *string, Font font, float maxWidth, float spacing);
-float fitFontSize(const std::string &string, Font font, float maxWidth, float spacing);
+float fitSpacing(float fontSize);
+float fitFontSize(const char *string, Font font, float maxWidth);
+float fitFontSize(const std::string &string, Font font, float maxWidth);
+float getFontSizeScaled(float fontSize);

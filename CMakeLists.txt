@@ -11,6 +11,8 @@ endif()
 add_library(srulib STATIC
    source/assets.cpp
    source/audio.cpp
+   source/render.cpp
+   source/text.cpp
 )
 
 target_include_directories(srulib PUBLIC
