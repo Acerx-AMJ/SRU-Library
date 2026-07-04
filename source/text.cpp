@@ -1,5 +1,7 @@
 #include "SRU/text.hpp"
 #include <algorithm>
+#include <iterator>
+#include <sstream>
 
 std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize, float spacing) {
    std::string wrappedString = string;
@@ -54,6 +56,36 @@ std::string trimRight(const std::string &string) {
    std::string trimmedString = string;
    trimRightInPlace(trimmedString);
    return trimmedString;
+}
+
+std::vector<std::string> split(const std::string &string, char delimiter) {
+   std::vector<std::string> pieces;
+   splitInPlace(pieces, string, delimiter);
+   return pieces;
+}
+
+std::vector<std::string> split(const std::string &string, const std::string &delimiter) {
+   std::vector<std::string> pieces;
+   splitInPlace(pieces, string, delimiter);
+   return pieces;
+}
+
+std::vector<std::string> splitOnWhiteSpace(const std::string &string) {
+   std::vector<std::string> pieces;
+   splitOnWhiteSpaceInPlace(pieces, string);
+   return pieces;
+}
+
+std::string join(const std::vector<std::string> &parts, const std::string &delimiter) {
+   std::string joinedString;
+   joinInPlace(joinedString, parts, delimiter);
+   return joinedString;
+}
+
+std::string join(const std::vector<std::string> &parts) {
+   std::string joinedString;
+   joinInPlace(joinedString, parts);
+   return joinedString;
 }
 
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing) {
@@ -250,7 +282,7 @@ void toUpperInPlace(std::string &string) {
 }
 
 void toLowerInPlace(std::string &string) {
-   std::transform(string.begin(), string.end(), string.begin(), ::toupper);
+   std::transform(string.begin(), string.end(), string.begin(), ::tolower);
 }
 
 void trimInPlace(std::string &string) {
@@ -263,7 +295,87 @@ void trimLeftInPlace(std::string &string) {
 }
 
 void trimRightInPlace(std::string &string) {
-   string.erase(string.find_last_not_of(" \n\r\t\v\f"));
+   string.erase(string.find_last_not_of(" \n\r\t\v\f") + 1);
+}
+
+void splitInPlace(std::vector<std::string> &output, const std::string &string, char delimiter) {
+   size_t delimiterCount = std::count(string.begin(), string.end(), delimiter);
+   output.reserve(output.size() + delimiterCount + 1);
+
+   std::stringstream stream (string);
+   std::string piece;
+
+   while (std::getline(stream, piece, delimiter)) {
+      output.push_back(piece);
+   }
+
+   if (string.back() == delimiter) {
+      output.push_back("");
+   }
+}
+
+void splitInPlace(std::vector<std::string> &output, const std::string &string, const std::string &delimiter) {
+   size_t delimiterCount = 0;
+   for (size_t offset = string.find(delimiter); offset != std::string::npos; offset = string.find(delimiter, offset + delimiter.length())) {
+      delimiterCount += 1;
+   }
+   output.reserve(output.size() + delimiterCount + 1);
+
+   size_t last = 0;
+   for (size_t pos = string.find(delimiter); pos != std::string::npos; pos = string.find(delimiter, last)) {
+      output.emplace_back(string.begin() + last, string.begin() + pos);
+      last = pos + delimiter.size();
+   }
+   
+   if (last != string.size()) {
+      output.emplace_back(string.begin() + last, string.end());
+   }
+   else {
+      output.push_back("");
+   }
+}
+
+void splitOnWhiteSpaceInPlace(std::vector<std::string> &output, const std::string &string) {
+   std::string input = string;
+   trimInPlace(input);
+
+   std::stringstream stream (input);
+   size_t delimiterCount = std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
+   output.reserve(output.size() + delimiterCount + 1);
+   stream.clear();
+   stream.str(input);
+
+   std::string piece;
+   while (stream >> piece) {
+      output.push_back(piece);
+   }
+}
+
+void joinInPlace(std::string &output, const std::vector<std::string> &parts, const std::string &delimiter) {
+   size_t size = delimiter.size() * (parts.empty() ? 0 : parts.size() - 1);
+   for (const std::string &string: parts) {
+      size += string.size();
+   }
+   output.reserve(size);
+
+   for (size_t i = 0; i < parts.size(); ++i) {
+      output += parts[i];
+      if (i + 1 < parts.size()) {
+         output += delimiter;
+      }
+   }
+}
+
+void joinInPlace(std::string &output, const std::vector<std::string> &parts) {
+   size_t size = 0;
+   for (const std::string &string: parts) {
+      size += string.size();
+   }
+   output.reserve(size);
+
+   for (const std::string &string: parts) {
+      output += string;   
+   }
 }
 
 float fitFontSize(const char *string, Font font, float maxWidth, float spacing) {

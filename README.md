@@ -416,6 +416,21 @@ Trim leading/trailing spaces from the string.
 
 ---
 ```cpp
+std::vector<std::string> split(const std::string &string, char delimiter);
+std::vector<std::string> split(const std::string &string, const std::string &delimiter);
+std::vector<std::string> splitOnWhiteSpace(const std::string &string);
+```
+Split string into pieces based on the delimeter. *splitOnWhiteSpace* handles all white space including tabs, new lines and some others. Will start or end with an empty string if the string respectively starts or ends with the delimeter except for in *splitOnWhiteSpace*.
+
+---
+```cpp
+std::string join(const std::vector<std::string> &parts, const std::string &delimiter);
+std::string join(const std::vector<std::string> &parts);
+```
+Joins all of the strings into one. Separates with delimiter if it is specified.
+
+---
+```cpp
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
 void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
 void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
@@ -425,8 +440,13 @@ void toLowerInPlace(std::string &string);
 void trimInPlace(std::string &string);
 void trimLeftInPlace(std::string &string);
 void trimRightInPlace(std::string &string);
+void splitInPlace(std::vector<std::string> &output, const std::string &string, char delimiter);
+void splitInPlace(std::vector<std::string> &output, const std::string &string, const std::string &delimiter);
+void splitOnWhiteSpaceInPlace(std::vector<std::string> &output, const std::string &string);
+void joinInPlace(std::string &output, const std::vector<std::string> &parts, const std::string &delimiter);
+void joinInPlace(std::string &output, const std::vector<std::string> &parts);
 ```
-Same as the previous functions but operates directly on the string.
+Same as the previous functions but operate directly on the output.
 
 ---
 ```cpp
