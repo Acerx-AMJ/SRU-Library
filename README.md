@@ -6,8 +6,10 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - [Documentation](#documentation)
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
+- - [file.hpp](#filehpp)
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
+- - [sru.hpp](#sruhpp)
 - - [text.hpp](#texthpp)
 - - [util.hpp](#utilhpp)
 - - [Macros](#macros)
@@ -75,8 +77,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
 Here you will find the documentation of all headers, functions and structures found in the library. Select by header:
 - [assets.hpp](#assetshpp)
 - [audio.hpp](#audiohpp)
+- [file.hpp](#filehpp)
 - [random.hpp](#randomhpp)
 - [render.hpp](#renderhpp)
+- [sru.hpp](#sruhpp)
 - [text.hpp](#texthpp)
 - [util.hpp](#utilhpp)
 
@@ -85,12 +89,6 @@ Or browse miscellaneous documentation:
 
 ## assets.hpp
 Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot.
-
----
-```cpp
-using SoundPool = std::vector<Sound>;
-```
-Pool of sounds. If loaded automatically, sounds with the same names but different numbering will be loaded into the same pool (e.g. sound, sound1, sound2 and so on will be put in the same pool).
 
 ---
 ```cpp
@@ -212,6 +210,74 @@ Plays the sound. Assigns the sound a random pitch based on macros.
 void playRawSoundPure(Sound sound, float pitch = 1.0f, float volume = 1.0f);
 ```
 Plays the sound.
+
+## file.hpp
+Responsible for providing common file I/O utilities.
+
+---
+```cpp
+std::vector<std::string> getLinesFromFile(const std::string &path);
+std::vector<std::string> getRawLinesFromFile(const std::string &path);
+std::vector<std::string> getLinesFromFileIgnoringComments(const std::string &path, const std::string &comment);
+```
+Get all lines from a file. *getRawLinesFromFile* returns raw lines, *getLinesFromFile* trims lines and ignores empty lines and *getLinesFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+
+---
+```cpp
+std::string getRandomLineFromFile(const std::string &path);
+std::string getRandomRawLineFromFile(const std::string &path);
+std::string getRandomLineFromFileIgnoringComments(const std::string &path, const std::string &comment);
+```
+Get a random line from a file. *getRandomRawLineFromFile* returns raw lines, *getRandomLineFromFile* trims lines and ignores empty lines and *getRandomLineFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+
+---
+```cpp
+std::unordered_map<std::string, std::string> getKeyValuePairFromFile(const std::string &path, const std::string &delimiter);
+std::unordered_map<std::string, std::string> getRawKeyValuePairFromFile(const std::string &path, const std::string &delimiter);
+std::unordered_map<std::string, std::string> getKeyValuePairFromFileIgnoringComments(const std::string &path, const std::string &delimiter, const std::string &comment);
+```
+Get a key value pair from a file. *getRawKeyValuePairFromFile* returns raw lines, *getKeyValuePairFromFile* trims lines and ignores empty lines and *getKeyValuePairFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Lines are expected to be in the format: key delimiter value (e.g. `color=red`). If a line does not contain the delimiter the line will be used as a key with an empty value. For both functions except *getRawKeyValuePairFromFile* empty keys are ignored. All functions allow empty values (e.g. `color=` or `color`). Throws a warning if the file couldn't be opened. In that case the output will be empty.
+
+---
+```cpp
+std::string getFileContents(const std::string &path);
+```
+Reads entire contents of the file into a string. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+
+---
+```cpp
+void getLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path);
+void getRawLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path);
+void getLinesFromFileIgnoringCommentsInPlace(std::vector<std::string> &output, const std::string &path, const std::string &comment);
+void getRandomLineFromFileInPlace(std::string &output, const std::string &path);
+void getRandomRawLineFromFileInPlace(std::string &output, const std::string &path);
+void getRandomLineFromFileIgnoringCommentsInPlace(std::string &output, const std::string &path, const std::string &comment);
+void getKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter);
+void getRawKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter);
+void getKeyValuePairFromFileIgnoringCommentsInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter, const std::string &comment);
+void getFileContentsInPlace(std::string &output, const std::string &path);
+```
+Same as the previous functions but store output directly in a variable.
+
+---
+```cpp
+bool writeKeyValuePairToFile(const std::string &path, const std::unordered_map<std::string, std::string> &map, const std::string &delimiter);
+```
+Writes the map to a file in the format: key delimiter value (e.g. `color=red`). Throws a warning if the file couldn't be opened. Returns the success of the operation.
+
+---
+```cpp
+bool writeFile(const std::string &path, const std::string &contents);
+bool writeFileLines(const std::string &path, const std::vector<std::string> &lines);
+```
+Writes the contents to the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
+
+---
+```cpp
+bool appendFile(const std::string &path, const std::string &contents);
+bool appendFileLines(const std::string &path, const std::vector<std::string> &lines);
+```
+Appends the contents to the existing contents of the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
 
 ## random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
@@ -459,6 +525,9 @@ void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source,
 void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 ```
 Custom source variations of the previous functions. Instead of drawing the whole texture draw a specific region. Includes responsive functions.
+
+## sru.hpp
+Includes all headers provided by the library.
 
 ## text.hpp
 Responsible for modifying text.

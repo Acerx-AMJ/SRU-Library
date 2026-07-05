@@ -5,7 +5,7 @@ static std::unordered_map<std::string, Texture> textures;
 static std::unordered_map<std::string, Font> fonts;
 static std::unordered_map<std::string, Shader> shaders;
 static std::unordered_map<std::string, Model> models;
-static std::unordered_map<std::string, SoundPool> sounds;
+static std::unordered_map<std::string, std::vector<Sound>> sounds;
 
 // Load asset functions
 Texture &loadTexture(const std::string &name, const std::string &path) {
@@ -66,14 +66,14 @@ Model &loadModel(const std::string &name, const std::string &path) {
    return models[name];
 }
 
-SoundPool &loadSoundIntoPool(const std::string &name, const std::string &path) {
+std::vector<Sound> &loadSoundIntoPool(const std::string &name, const std::string &path) {
    Sound newSound = LoadSound(path.c_str());
    if (newSound.frameCount == 0) {
       printf("srulib::loadSoundIntoPool: Failed to load sound from file '%s'.\n", path.c_str());
       exit(EXIT_FAILURE);
    }
 
-   SoundPool &pool = sounds[name];
+   std::vector<Sound> &pool = sounds[name];
    pool.push_back(newSound);
    return pool;
 }
@@ -379,7 +379,7 @@ Model &getModel(const std::string &name) {
    exit(EXIT_FAILURE);
 }
 
-SoundPool &getSoundPool(const std::string &name) {
+std::vector<Sound> &getSoundPool(const std::string &name) {
    if (auto it = sounds.find(name); it != sounds.end()) {
       return it->second;
    }
@@ -403,6 +403,6 @@ std::unordered_map<std::string, Model> &getModelMap() {
    return models;
 }
 
-std::unordered_map<std::string, SoundPool> &getSoundPoolMap() {
+std::unordered_map<std::string, std::vector<Sound>> &getSoundPoolMap() {
    return sounds;
 }
