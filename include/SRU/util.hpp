@@ -107,6 +107,22 @@ constexpr inline Rectangle R4(Vector2 position, Vector2 size) {
    return {position.x, position.y, size.x, size.y};
 }
 
+constexpr inline Vector2 R4pos(Rectangle rect) {
+   return {rect.x, rect.y};
+}
+
+constexpr inline Vector2 R4size(Rectangle rect) {
+   return {rect.width, rect.height};
+}
+
+constexpr inline Vector2 R4center(Rectangle rect) {
+   return {rect.x + rect.width / 2.0f, rect.y + rect.height / 2.0f};
+}
+
+constexpr inline Vector2 R4origin(Rectangle rect) {
+   return {rect.width / 2.0f, rect.height / 2.0f};
+}
+
 // Constexpr color fade
 constexpr inline Color fadeColor(Color color, float a) {
    color.a = a * 255.0f;

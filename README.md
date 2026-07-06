@@ -491,7 +491,7 @@ void drawRectResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color = WHI
 void drawRectCenteredResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawRectOriginResponsiveCubic(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the rectangle.
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size.
 
 ---
 ```cpp
@@ -510,7 +510,7 @@ void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRati
 void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the texture.
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size.
 
 ---
 ```cpp
@@ -525,6 +525,120 @@ void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source,
 void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 ```
 Custom source variations of the previous functions. Instead of drawing the whole texture draw a specific region. Includes responsive functions.
+
+---
+```cpp
+using AnimationID = size_t;
+```
+Animation ID of a specific animation config instance.
+
+---
+```cpp
+struct AnimationConfig {
+public:
+   AnimationConfig() = default;
+   AnimationConfig(Texture texture, size_t frameWidth, size_t frameHeight, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
+   AnimationConfig(Texture texture, size_t frameSize, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
+   AnimationConfig(Texture texture, size_t frameSize, size_t frameCount, float frameTime, bool loop = true);
+
+   Texture texture;
+   size_t frameWidth = 0;
+   size_t frameHeight = 0;
+   size_t gapX = 0;
+   size_t gapY = 0;
+   size_t frameY = 0;
+   size_t frameCount = 0;
+   float frameTime = 0.0f;
+   bool loop = true;
+};
+```
+Animation config instance responsible for saving common animation data between different animated objects.
+
+---
+```cpp
+struct Animation {
+   Animation() = default;
+   Animation(size_t ID, bool paused, bool flipX, bool flipY, bool randomStart = false);
+   Animation(size_t ID, bool randomStart = false);
+
+   size_t ID = 0;
+   size_t frame = 0;
+   float timer = 0.0f;
+   bool paused = false;
+   bool flipX = false;
+   bool flipY = false;
+   bool finished = false;
+};
+```
+Animated object instance.
+
+---
+```cpp
+AnimationID pushAnimation(AnimationConfig config);
+```
+Create a new config instance and return its ID.
+
+---
+```cpp
+AnimationConfig &getAnimation(AnimationID ID);
+```
+Get animation config instance by its ID. Terminates if ID is invalid.
+
+---
+```cpp
+std::vector<AnimationConfig> &getAnimationContainer();
+```
+Get animation config container.
+
+---
+```cpp
+Rectangle getAnimationSource(Animation animation);
+Rectangle getAnimationSource(Animation animation, AnimationConfig config);
+```
+Get calculated animation frame source based on animation's state. Terminates if animation's config ID is invalid.
+
+---
+```cpp
+bool isAnimationPlaying(Animation &animation, AnimationID ID);
+```
+Returns true if animation is playing and isn't finished. Looping animations will never finish.
+
+---
+```cpp
+void setAnimationState(Animation &animation, AnimationID ID);
+```
+Sets animation's state to the given config if the same config isn't already being used and resets animation to default.
+
+---
+```cpp
+void forceAnimationState(Animation &animation, AnimationID ID);
+```
+Sets animation's state to the given config and resets animation to default.
+
+---
+```cpp
+void animate(Animation &animation, float DT);
+```
+Update animation if it isn't paused and isn't finished playing.
+
+---
+```cpp
+void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCentered(Animation animation, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOrigin(Animation animation, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+```
+Draw animated texture with the specified origin. *drawTextureAnimated* assumes top-left position, *drawTextureAnimatedCentered* assumes center position and *drawTextureAnimatedOrigin* takes custom origin.
+
+---
+```cpp
+void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCenteredResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOriginResponsive(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOriginResponsiveCubic(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+```
+Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size.
 
 ## sru.hpp
 Includes all headers provided by the library.
@@ -691,6 +805,15 @@ Returns a zero-initialized rectangle.
 constexpr inline Rectangle R4(Vector2 position, Vector2 size);
 ```
 Constructs a rectangle from position and size.
+
+---
+```cpp
+constexpr inline Vector2 R4pos(Rectangle rect);
+constexpr inline Vector2 R4size(Rectangle rect);
+constexpr inline Vector2 R4center(Rectangle rect);
+constexpr inline Vector2 R4origin(Rectangle rect);
+```
+Returns the position/size/center/origin of the rectangle respectively.
 
 ---
 ```cpp

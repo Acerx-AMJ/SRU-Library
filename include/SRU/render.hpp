@@ -1,9 +1,9 @@
 #pragma once
 #include <raylib.h>
 #include <raymath.h>
+#include <vector>
 
 // Screen utilities
-
 float getWindowWidth();
 float getWindowHeight();
 
@@ -79,3 +79,58 @@ void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector
 void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+
+// Animation render utility
+using AnimationID = size_t;
+
+struct AnimationConfig {
+   AnimationConfig() = default;
+   AnimationConfig(Texture texture, size_t frameWidth, size_t frameHeight, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
+   AnimationConfig(Texture texture, size_t frameSize, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
+   AnimationConfig(Texture texture, size_t frameSize, size_t frameCount, float frameTime, bool loop = true);
+
+   Texture texture;
+   size_t frameWidth = 0;
+   size_t frameHeight = 0;
+   size_t gapX = 0;
+   size_t gapY = 0;
+   size_t frameY = 0;
+   size_t frameCount = 0;
+   float frameTime = 0.0f;
+   bool loop = true;
+};
+
+struct Animation {
+   Animation() = default;
+   Animation(size_t ID, bool paused, bool flipX, bool flipY, bool randomStart = false);
+   Animation(size_t ID, bool randomStart = false);
+
+   size_t ID = 0;
+   size_t frame = 0;
+   float timer = 0.0f;
+   bool paused = false;
+   bool flipX = false;
+   bool flipY = false;
+   bool finished = false;
+};
+
+AnimationID pushAnimation(AnimationConfig config);
+AnimationConfig &getAnimation(AnimationID ID);
+std::vector<AnimationConfig> &getAnimationContainer();
+Rectangle getAnimationSource(Animation animation);
+Rectangle getAnimationSource(Animation animation, AnimationConfig config);
+
+bool isAnimationPlaying(Animation &animation, AnimationID ID);
+void setAnimationState(Animation &animation, AnimationID ID);
+void forceAnimationState(Animation &animation, AnimationID ID);
+void animate(Animation &animation, float DT);
+
+void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCentered(Animation animation, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOrigin(Animation animation, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCenteredResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOriginResponsive(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedOriginResponsiveCubic(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);

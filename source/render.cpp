@@ -1,4 +1,5 @@
 #include "SRU/render.hpp"
+#include "SRU/random.hpp"
 #include "SRU/text.hpp"
 #include "SRU/util.hpp"
 
@@ -242,4 +243,152 @@ void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source,
 
 void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawTexturePro(texture, source, R4(mapCubicRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+// Animation render utility
+static std::vector<AnimationConfig> animationConfig;
+
+AnimationConfig::AnimationConfig(Texture texture, size_t frameWidth, size_t frameHeight, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop)
+   : texture(texture), frameWidth(frameWidth), frameHeight(frameHeight), gapX(gap), gapY(gap), frameY(frameY), frameCount(frameCount), frameTime(frameTime), loop(loop) {}
+
+AnimationConfig::AnimationConfig(Texture texture, size_t frameSize, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop)
+   : texture(texture), frameWidth(frameSize), frameHeight(frameSize), gapX(gap), gapY(gap), frameY(frameY), frameCount(frameCount), frameTime(frameTime), loop(loop) {}
+
+AnimationConfig::AnimationConfig(Texture texture, size_t frameSize, size_t frameCount, float frameTime, bool loop)
+   : texture(texture), frameWidth(frameSize), frameHeight(frameSize), gapX(0), gapY(0), frameY(0), frameCount(frameCount), frameTime(frameTime), loop(loop) {}
+
+Animation::Animation(size_t ID, bool paused, bool flipX, bool flipY, bool randomStart)
+   : ID(ID), frame(0), timer(0.0f), paused(paused), flipX(flipX), flipY(flipY), finished(false) {
+   if (randomStart) {
+      AnimationConfig &config = getAnimation(ID);
+      timer = randomFloat(0.0f, config.frameTime);
+   }
+}
+
+Animation::Animation(size_t ID, bool randomStart)
+   : ID(ID), frame(0), timer(0.0f), paused(false), flipX(false), flipY(false), finished(false) {
+   if (randomStart) {
+      AnimationConfig &config = getAnimation(ID);
+      timer = randomFloat(0.0f, config.frameTime);
+   }
+}
+
+AnimationID pushAnimation(AnimationConfig config) {
+   animationConfig.push_back(config);
+   return animationConfig.size() - 1;
+}
+
+AnimationConfig &getAnimation(AnimationID ID) {
+   if (ID >= animationConfig.size()) {
+      printf("srulib::getAnimation: ID out of bounds. ID is %llu and animation config count is %llu.\n", ID, animationConfig.size());
+   }
+   return animationConfig[ID];
+}
+
+std::vector<AnimationConfig> &getAnimationContainer() {
+   return animationConfig;
+}
+
+Rectangle getAnimationSource(Animation animation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   return R4(
+      (config.frameWidth + config.gapX) * animation.frame,
+      (config.frameHeight + config.gapY) * config.frameY,
+      config.frameWidth * (animation.flipX ? -1 : 1),
+      config.frameHeight * (animation.flipY ? -1 : 1)
+   );
+}
+
+Rectangle getAnimationSource(Animation animation, AnimationConfig config) {
+   return R4(
+      (config.frameWidth + config.gapX) * animation.frame,
+      (config.frameHeight + config.gapY) * config.frameY,
+      config.frameWidth * (animation.flipX ? -1 : 1),
+      config.frameHeight * (animation.flipY ? -1 : 1)
+   );
+}
+
+bool isAnimationPlaying(Animation &animation, AnimationID ID) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   return animation.ID == ID && !(animation.finished && !config.loop);
+}
+
+void setAnimationState(Animation &animation, AnimationID ID) {
+   if (animation.ID == ID) {
+      return;
+   }
+   animation.ID = ID;
+   animation.frame = 0;
+   animation.timer = 0.0f;
+   animation.finished = false;
+}
+
+void forceAnimationState(Animation &animation, AnimationID ID) {
+   animation.ID = ID;
+   animation.frame = 0;
+   animation.timer = 0.0f;
+   animation.finished = false;
+}
+
+void animate(Animation &animation, float DT) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   if (animation.paused || (animation.finished && !config.loop)) {
+      return;
+   }
+
+   animation.timer += DT;
+   if (animation.timer >= config.frameTime) {
+      animation.timer -= config.frameTime;
+      animation.frame = (animation.frame + 1) % config.frameCount;
+      if (animation.frame == 0) {
+         animation.finished = true;
+      }
+   }
+}
+
+void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(position, size), V2(), rotation, color);
+}
+
+void drawTextureAnimatedCentered(Animation animation, Vector2 position, Vector2 size, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(position, size), getOrigin(size), rotation, color);
+}
+
+void drawTextureAnimatedOrigin(Animation animation, Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(position, size), origin, rotation, color);
+}
+
+void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawTextureAnimatedCenteredResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   Vector2 size = mapRatioToScreen(sizeRatio);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureAnimatedOriginResponsive(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   Vector2 size = mapCubicRatioToScreen(sizeRatio);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureAnimatedOriginResponsiveCubic(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
 }
