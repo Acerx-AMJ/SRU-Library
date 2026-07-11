@@ -281,6 +281,7 @@ AnimationID pushAnimation(AnimationConfig config) {
 AnimationConfig &getAnimation(AnimationID ID) {
    if (ID >= animationConfig.size()) {
       printf("srulib::getAnimation: ID out of bounds. ID is %llu and animation config count is %llu.\n", ID, animationConfig.size());
+      exit(EXIT_FAILURE);
    }
    return animationConfig[ID];
 }
