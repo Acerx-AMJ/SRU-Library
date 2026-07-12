@@ -39,6 +39,11 @@ void splitOnWhiteSpaceInPlace(std::vector<std::string> &output, const std::strin
 void joinInPlace(std::string &output, const std::vector<std::string> &parts, const std::string &delimiter);
 void joinInPlace(std::string &output, const std::vector<std::string> &parts);
 
+// Non-altering text functions
+bool contains(const std::string &string, const std::string &substring);
+bool startsWith(const std::string &string, const std::string &substring);
+bool endsWith(const std::string &string, const std::string &substring);
+
 // Fit font size
 float fitSpacing(float fontSize);
 float fitFontSize(const char *string, Font font, float maxWidth);

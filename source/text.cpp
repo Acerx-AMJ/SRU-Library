@@ -380,6 +380,20 @@ void joinInPlace(std::string &output, const std::vector<std::string> &parts) {
    }
 }
 
+// Non-altering text functions
+
+bool contains(const std::string &string, const std::string &substring) {
+   return string.find(substring) != std::string::npos;
+}
+
+bool startsWith(const std::string &string, const std::string &substring) {
+   return string.find(substring) == 0;
+}
+
+bool endsWith(const std::string &string, const std::string &substring) {
+   return string.find(substring) == string.size() - substring.size();
+}
+
 // Fit font size
 float fitSpacing(float fontSize) {
    return fontSize / 10.0f;

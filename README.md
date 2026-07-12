@@ -926,6 +926,14 @@ Same as the previous functions but operate directly on the output.
 
 ---
 ```cpp
+bool contains(const std::string &string, const std::string &substring);
+bool startsWith(const std::string &string, const std::string &substring);
+bool endsWith(const std::string &string, const std::string &substring);
+```
+Returns true if the string contains the given substring in a specific location.
+
+---
+```cpp
 float fitSpacing(float fontSize);
 ```
 Returns spacing that fits the font size.
