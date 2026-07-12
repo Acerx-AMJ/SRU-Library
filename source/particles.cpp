@@ -72,7 +72,6 @@ void drawParticles() {
 }
 
 void drawParticleCluster(ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
    for (Particle &particle: particleClusters[ID]) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
@@ -93,7 +92,6 @@ void drawResponsiveParticles() {
 }
 
 void drawResponsiveParticleCluster(ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
    for (Particle &particle: particleClusters[ID]) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
@@ -114,7 +112,6 @@ void drawResponsiveCubicParticles() {
 }
 
 void drawResponsiveCubicParticleCluster(ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
    for (Particle &particle: particleClusters[ID]) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
@@ -230,8 +227,9 @@ void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Part
 void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Vector2 position, ParticleID ID) {
    std::vector<Particle> &cluster = particleClusters[ID];
    ParticleConfig &config = particleConfig[ID];
+   size_t N = splitWidth * splitHeight;
 
-   for (size_t i = 0; i < splitWidth * splitHeight; ++i) {
+   for (size_t i = 0; i < N; ++i) {
       cluster.emplace_back(
          texture,
          position,
