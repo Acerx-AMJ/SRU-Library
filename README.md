@@ -7,6 +7,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
 - - [file.hpp](#filehpp)
+- - [particles.hpp](#particleshpp)
 - - [random.hpp](#randomhpp)
 - - [render.hpp](#renderhpp)
 - - [sru.hpp](#sruhpp)
@@ -78,6 +79,7 @@ Here you will find the documentation of all headers, functions and structures fo
 - [assets.hpp](#assetshpp)
 - [audio.hpp](#audiohpp)
 - [file.hpp](#filehpp)
+- [particles.hpp](#particleshpp)
 - [random.hpp](#randomhpp)
 - [render.hpp](#renderhpp)
 - [sru.hpp](#sruhpp)
@@ -278,6 +280,147 @@ bool appendFile(const std::string &path, const std::string &contents);
 bool appendFileLines(const std::string &path, const std::vector<std::string> &lines);
 ```
 Appends the contents to the existing contents of the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
+
+## particles.hpp
+Responsible for providing a particle manager.
+
+---
+```cpp
+using ParticleID = size_t;
+```
+Particle ID of a specific particle config instance/particle cluster.
+
+---
+```cpp
+struct Particle {
+   Particle() = default;
+   Particle(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime);
+   Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime);
+   Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime, int splitX, int splitY, int splitWidth, int splitHeight);
+
+   Texture2D *texture = nullptr;
+   Vector2 position, velocity, acceleration;
+   Vector2 size;
+   float scale = 1.0f;
+   float rotation = 0.0f;
+   float rotationVelocity = 0.0f;
+   float friction = 0.0f;
+   float lifetime = 0.0f;
+   float age = 0.0f;
+   int splitX = 0;
+   int splitY = 0;
+   int splitWidth = 0;
+   int splitHeight = 0;
+};
+```
+A single particle.
+- *texture* - texture of the particle.
+- *position* - position of the particle. Does not need to be set in the config if particles are to be spawned in specific locations.
+- *velocity* - the velocity of the particle - how much it moves per second.
+- *acceleration* - the acceleration of the particle - how much faster velocity gets per second.
+- *size* - the size of the particle.
+- *scale* - how much should the particle scale per second.
+- *rotation* - rotation of the particle.
+- *rotationVelocity* - the velocity of the rotation - how much it rotates per second.
+- *friction* - how quickly the velocity slows down.
+- *lifetime* - lifetime of the particle in seconds.
+- *age* - the age of the particle in seconds. Should not be edited manually.
+- *splitX* - the split position X of the particle when calling *spawnSplitParticles()*. Should not be edited manually.
+- *splitY* - the split position Y of the particle when calling *spawnSplitParticles()*. Should not be edited manually.
+- *splitWidth* - in how many pieces should the texture be split on X axis when calling *spawnSplitParticles()*.
+- *splitHeight* - in how many pieces should the texture be split on Y axis when calling *spawnSplitParticles()*.
+
+---
+```cpp
+struct ParticleConfig {
+   Texture2D *texture = nullptr;
+   Particle minimum, maximum;
+   size_t count = 0;
+   bool cubic = false;
+};
+```
+Particle config instance responsible for saving common particle data.
+
+---
+```cpp
+ParticleID pushParticleConfig(ParticleConfig config);
+```
+Create a new config instance and return its ID. Automatically creates a particle cluster with the same ID.
+
+---
+```cpp
+ParticleConfig &getParticleConfig(ParticleID ID);
+```
+Get particle config instance by its ID. Terminates if ID is invalid.
+
+---
+```cpp
+std::vector<ParticleConfig> &getParticleConfigContainer();
+```
+Get particle config container.
+
+---
+```cpp
+std::vector<std::vector<Particle>> &getParticleClusters();
+```
+Get particle cluster container.
+
+---
+```cpp
+std::vector<Particle> &getParticleCluster(ParticleID ID);
+```
+Get a specific particle cluster by ID.
+
+---
+```cpp
+void updateParticles(float DT);
+void updateParticleCluster(ParticleID ID, float DT);
+```
+Update a specific particle cluster or all active clusters at once.
+
+---
+```cpp
+void drawParticles();
+void drawParticleCluster(ParticleID ID);
+void drawResponsiveParticles();
+void drawResponsiveParticleCluster(ParticleID ID);
+void drawResponsiveCubicParticles();
+void drawResponsiveCubicParticleCluster(ParticleID ID);
+```
+Draw a specific particle cluster or all active clusters at once. *drawResponsiveParticles*, *drawResponsiveParticleCluster*, *drawResponsiveCubicParticles* and *drawResponsiveCubicParticleCluster* draws using ratios instead of position, meaning all config values need to be changed to ratios if these were to be used. Cubic versions preserve the aspect ratio of particles on all screen sizes and is most likely preferable to non-cubic responsive functions.
+
+---
+```cpp
+void clearParticles();
+void clearParticleCluster(ParticleID ID);
+```
+Clear all particles of a specific particle cluster or all particles at once.
+
+---
+```cpp
+void spawnParticles(ParticleID ID);
+void spawnParticles(Vector2 position, ParticleID ID);
+void spawnParticles(size_t count, ParticleID ID);
+void spawnParticles(size_t count, Vector2 position, ParticleID ID);
+void spawnParticles(Texture *texture, ParticleID ID);
+void spawnParticles(Texture *texture, Vector2 position, ParticleID ID);
+void spawnParticles(Texture *texture, size_t count, ParticleID ID);
+void spawnParticles(Texture *texture, size_t count, Vector2 position, ParticleID ID);
+```
+Spawn particles with the given parameters. If a parameter is not supplied then the one from the config is assumed.
+
+---
+```cpp
+void spawnSplitParticles(ParticleID ID);
+void spawnSplitParticles(Vector2 position, ParticleID ID);
+void spawnSplitParticles(int splitWidth, int splitHeight, ParticleID ID);
+void spawnSplitParticles(int splitWidth, int splitHeight, Vector2 position, ParticleID ID);
+void spawnSplitParticles(Texture *texture, ParticleID ID);
+void spawnSplitParticles(Texture *texture, Vector2 position, ParticleID ID);
+void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, ParticleID ID);
+void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Vector2 position, ParticleID ID);
+```
+Cut the texture into `splitWidth * splitHeight` pieces and spawn the particles with the given parameters. If a parameter is not supplied then the one from the config is assumed.
 
 ## random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
