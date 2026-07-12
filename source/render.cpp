@@ -28,6 +28,32 @@ Vector2 getWindowCenterOffset(Vector2 offset) {
    return getWindowSize() / 2.0f + offset;
 }
 
+Rectangle mapArea(Vector2 ratio, Vector2 sizeRatio) {
+   return R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio));
+}
+
+Rectangle mapAreaPoints(Vector2 startRatio, Vector2 endRatio) {
+   return R4(mapRatioToScreen(startRatio), mapRatioToScreen(endRatio - startRatio));
+}
+
+Rectangle mapAreaCentered(Vector2 centerRatio, Vector2 sizeRatio) {
+   return R4(mapRatioToScreen(centerRatio - sizeRatio / 2.0f), mapRatioToScreen(sizeRatio));
+}
+
+Rectangle mapCubicArea(Vector2 ratio, Vector2 sizeRatio) {
+   return R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio));
+}
+
+Rectangle mapCubicAreaPoints(Vector2 startRatio, Vector2 endRatio) {
+   return R4(mapRatioToScreen(startRatio), mapCubicRatioToScreen(endRatio - startRatio));
+}
+
+Rectangle mapCubicAreaCentered(Vector2 centerRatio, Vector2 sizeRatio) {
+   Vector2 size = mapCubicRatioToScreen(sizeRatio);
+   Vector2 center = mapRatioToScreen(centerRatio);
+   return R4(center - size / 2.0f, size);
+}
+
 Vector2 mapRatioToScreen(Vector2 ratio) {
    return ratio * getWindowSize();
 }
@@ -44,20 +70,20 @@ Vector2 mapScreenToRatio(float screenX, float screenY) {
    return V2(screenX, screenY) / getWindowSize();
 }
 
-Vector2 mapRatioToRectangle(Rectangle rect, Vector2 ratio) {
-   return ratio * V2(rect.width, rect.height) + V2(rect.x, rect.y);
+Vector2 mapRatioToArea(Rectangle area, Vector2 ratio) {
+   return ratio * V2(area.width, area.height) + V2(area.x, area.y);
 }
 
-Vector2 mapRatioToRectangle(Rectangle rect, float ratioX, float ratioY) {
-   return V2(ratioX, ratioY) * V2(rect.width, rect.height) + V2(rect.x, rect.y);
+Vector2 mapRatioToArea(Rectangle area, float ratioX, float ratioY) {
+   return V2(ratioX, ratioY) * V2(area.width, area.height) + V2(area.x, area.y);
 }
 
-Vector2 mapRectangleToRatio(Rectangle rect, Vector2 position) {
-   return V2(position.x - rect.x, position.y - rect.y) / V2(rect.width, rect.height);
+Vector2 mapAreaToRatio(Rectangle area, Vector2 position) {
+   return V2(position.x - area.x, position.y - area.y) / V2(area.width, area.height);
 }
 
-Vector2 mapRectangleToRatio(Rectangle rect, float positionX, float positionY) {
-   return V2(positionX - rect.x, positionY - rect.y) / V2(rect.width, rect.height);
+Vector2 mapAreaToRatio(Rectangle area, float positionX, float positionY) {
+   return V2(positionX - area.x, positionY - area.y) / V2(area.width, area.height);
 }
 
 Vector2 mapCubicRatioToScreen(Vector2 ratio) {
@@ -76,20 +102,36 @@ Vector2 mapScreenToCubicRatio(float screenX, float screenY) {
    return V2(screenX, screenY) / getMinimumWindowSize();
 }
 
-Vector2 mapCubicRatioToRectangle(Rectangle rect, Vector2 ratio) {
-   return ratio * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
+Vector2 mapCubicRatioToArea(Rectangle area, Vector2 ratio) {
+   return ratio * V2(fminf(area.width, area.height)) + V2(area.x, area.y);
 }
 
-Vector2 mapCubicRatioToRectangle(Rectangle rect, float ratioX, float ratioY) {
-   return V2(ratioX, ratioY) * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
+Vector2 mapCubicRatioToArea(Rectangle area, float ratioX, float ratioY) {
+   return V2(ratioX, ratioY) * V2(fminf(area.width, area.height)) + V2(area.x, area.y);
 }
 
-Vector2 mapRectangleToCubicRatio(Rectangle rect, Vector2 position) {
-   return V2(position.x - rect.x, position.y - rect.y) / V2(fminf(rect.width, rect.height));
+Vector2 mapAreaToCubicRatio(Rectangle area, Vector2 position) {
+   return V2(position.x - area.x, position.y - area.y) / V2(fminf(area.width, area.height));
 }
 
-Vector2 mapRectangleToCubicRatio(Rectangle rect, float positionX, float positionY) {
-   return V2(positionX - rect.x, positionY - rect.y) / V2(fminf(rect.width, rect.height));
+Vector2 mapAreaToCubicRatio(Rectangle area, float positionX, float positionY) {
+   return V2(positionX - area.x, positionY - area.y) / V2(fminf(area.width, area.height));
+}
+
+Vector2 mapSizeRatioToArea(Rectangle area, Vector2 ratio) {
+   return ratio * V2(area.width, area.height);
+}
+
+Vector2 mapSizeRatioToArea(Rectangle area, float ratioX, float ratioY) {
+   return V2(ratioX * area.width, ratioY * area.height);
+}
+
+Vector2 mapCubicSizeRatioToArea(Rectangle area, Vector2 ratio) {
+   return ratio * V2(fminf(area.width, area.height));
+}
+
+Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY) {
+   return V2(ratioX, ratioY) * V2(fminf(area.width, area.height));
 }
 
 // Origin/source utility
@@ -119,16 +161,37 @@ void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSi
    DrawTextPro(font, text, mapRatioToScreen(ratio), V2(), rotation, fontSizeScaled, fitSpacing(fontSizeScaled), color);
 }
 
+void drawTextResponsive(Font font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   DrawTextPro(font, text, mapRatioToArea(area, ratio), V2(), rotation, fontSizeScaled, fitSpacing(fontSizeScaled), color);
+}
+
 void drawTextCenteredResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
    float fontSizeScaled = getFontSizeScaled(fontSize);
    float spacingScaled = fitSpacing(fontSizeScaled);
    DrawTextPro(font, text, mapRatioToScreen(ratio), getTextOrigin(font, text, fontSizeScaled, spacingScaled), rotation, fontSizeScaled, spacingScaled, color);
 }
 
+void drawTextCenteredResponsive(Font font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(font, text, mapRatioToArea(area, ratio), getTextOrigin(font, text, fontSizeScaled, spacingScaled), rotation, fontSizeScaled, spacingScaled, color);
+}
+
 void drawTextOriginResponsive(Font font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color, float rotation) {
    float fontSizeScaled = getFontSizeScaled(fontSize);
    float spacingScaled = fitSpacing(fontSizeScaled);
    DrawTextPro(font, text, mapRatioToScreen(ratio), origin, rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawTextOriginResponsive(Font font, Rectangle area, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color, float rotation) {
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(font, text, mapRatioToArea(area, ratio), origin, rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawRect(Rectangle rect, Color color, float rotation) {
+   DrawRectanglePro(rect, V2(), rotation, color);
 }
 
 void drawRect(Vector2 position, Vector2 size, Color color, float rotation) {
@@ -147,17 +210,34 @@ void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Color color, float rot
    DrawRectanglePro(R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
+void drawRectResponsive(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+}
+
 void drawRectCenteredResponsive(Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    Vector2 size = mapRatioToScreen(sizeRatio);
    DrawRectanglePro(R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawRectCenteredResponsive(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapSizeRatioToArea(area, sizeRatio);
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
 void drawRectOriginResponsive(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawRectanglePro(R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
+void drawRectOriginResponsive(Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+}
+
 void drawRectResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    DrawRectanglePro(R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawRectResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
 void drawRectCenteredResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
@@ -165,8 +245,17 @@ void drawRectCenteredResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Color col
    DrawRectanglePro(R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
+void drawRectCenteredResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+}
+
 void drawRectOriginResponsiveCubic(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawRectanglePro(R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+void drawRectOriginResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawRectanglePro(R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
 void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color, float rotation) {
@@ -185,17 +274,34 @@ void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Co
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
+void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+}
+
 void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    Vector2 size = mapRatioToScreen(sizeRatio);
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
 void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
+void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+}
+
 void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
 void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
@@ -203,8 +309,17 @@ void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
+void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+}
+
 void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
 void drawTextureSource(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color, float rotation) {
@@ -223,26 +338,52 @@ void drawTextureSourceResponsive(Texture texture, Rectangle source, Vector2 rati
    DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
+void drawTextureSourceResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+}
+
 void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    Vector2 size = mapRatioToScreen(sizeRatio);
    DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
 void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
+void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+}
+
 void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapCubicRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
 void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    Vector2 size = mapCubicRatioToScreen(sizeRatio);
-   DrawTexturePro(texture, source, R4(mapCubicRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
 void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapCubicRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
 // Animation render utility
@@ -367,10 +508,21 @@ void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 s
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
+void drawTextureAnimatedResponsive(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+}
+
 void drawTextureAnimatedCenteredResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    AnimationConfig &config = getAnimation(animation.ID);
    Vector2 size = mapRatioToScreen(sizeRatio);
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+}
+
+void drawTextureAnimatedCenteredResponsive(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   Vector2 size = mapSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
 void drawTextureAnimatedOriginResponsive(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
@@ -378,9 +530,19 @@ void drawTextureAnimatedOriginResponsive(Animation animation, Vector2 ratio, Vec
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
+void drawTextureAnimatedOriginResponsive(Animation animation, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+}
+
 void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
    AnimationConfig &config = getAnimation(animation.ID);
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+}
+
+void drawTextureAnimatedResponsiveCubic(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
 void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
@@ -389,7 +551,18 @@ void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Vector2 rat
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
+void drawTextureAnimatedCenteredResponsiveCubic(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+}
+
 void drawTextureAnimatedOriginResponsiveCubic(Animation animation, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
    AnimationConfig &config = getAnimation(animation.ID);
    DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+}
+
+void drawTextureAnimatedOriginResponsiveCubic(Animation animation, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
+   AnimationConfig &config = getAnimation(animation.ID);
+   DrawTexturePro(config.texture, getAnimationSource(animation, config), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
