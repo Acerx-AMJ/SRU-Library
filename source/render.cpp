@@ -29,67 +29,67 @@ Vector2 getWindowCenterOffset(Vector2 offset) {
 }
 
 Vector2 mapRatioToScreen(Vector2 ratio) {
-   return Vector2ClampValue(ratio, 0.0f, 1.0f) * getWindowSize();
+   return ratio * getWindowSize();
 }
 
 Vector2 mapRatioToScreen(float ratioX, float ratioY) {
-   return Vector2ClampValue({ratioX, ratioY}, 0.0f, 1.0f) * getWindowSize();
+   return V2(ratioX, ratioY) * getWindowSize();
 }
 
 Vector2 mapScreenToRatio(Vector2 screen) {
-   return Vector2ClampValue(screen / getWindowSize(), 0.0f, 1.0f);
+   return screen / getWindowSize();
 }
 
 Vector2 mapScreenToRatio(float screenX, float screenY) {
-   return Vector2ClampValue(V2(screenX, screenY) / getWindowSize(), 0.0f, 1.0f);
+   return V2(screenX, screenY) / getWindowSize();
 }
 
 Vector2 mapRatioToRectangle(Rectangle rect, Vector2 ratio) {
-   return Vector2ClampValue(ratio, 0.0f, 1.0f) * V2(rect.width, rect.height) + V2(rect.x, rect.y);
+   return ratio * V2(rect.width, rect.height) + V2(rect.x, rect.y);
 }
 
 Vector2 mapRatioToRectangle(Rectangle rect, float ratioX, float ratioY) {
-   return Vector2ClampValue({ratioX, ratioY}, 0.0f, 1.0f) * V2(rect.width, rect.height) + V2(rect.x, rect.y);
+   return V2(ratioX, ratioY) * V2(rect.width, rect.height) + V2(rect.x, rect.y);
 }
 
 Vector2 mapRectangleToRatio(Rectangle rect, Vector2 position) {
-   return Vector2ClampValue(V2(position.x - rect.x, position.y - rect.y) / V2(rect.width, rect.height), 0.0f, 1.0f);
+   return V2(position.x - rect.x, position.y - rect.y) / V2(rect.width, rect.height);
 }
 
 Vector2 mapRectangleToRatio(Rectangle rect, float positionX, float positionY) {
-   return Vector2ClampValue(V2(positionX - rect.x, positionY - rect.y) / V2(rect.width, rect.height), 0.0f, 1.0f);
+   return V2(positionX - rect.x, positionY - rect.y) / V2(rect.width, rect.height);
 }
 
 Vector2 mapCubicRatioToScreen(Vector2 ratio) {
-   return Vector2ClampValue(ratio, 0.0f, 1.0f) * getMinimumWindowSize();
+   return ratio * getMinimumWindowSize();
 }
 
 Vector2 mapCubicRatioToScreen(float ratioX, float ratioY) {
-   return Vector2ClampValue({ratioX, ratioY}, 0.0f, 1.0f) * getMinimumWindowSize();
+   return V2(ratioX, ratioY) * getMinimumWindowSize();
 }
 
 Vector2 mapScreenToCubicRatio(Vector2 screen) {
-   return Vector2ClampValue(screen / getMinimumWindowSize(), 0.0f, 1.0f);
+   return screen / getMinimumWindowSize();
 }
 
 Vector2 mapScreenToCubicRatio(float screenX, float screenY) {
-   return Vector2ClampValue(V2(screenX, screenY) / getMinimumWindowSize(), 0.0f, 1.0f);
+   return V2(screenX, screenY) / getMinimumWindowSize();
 }
 
 Vector2 mapCubicRatioToRectangle(Rectangle rect, Vector2 ratio) {
-   return Vector2ClampValue(ratio, 0.0f, 1.0f) * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
+   return ratio * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
 }
 
 Vector2 mapCubicRatioToRectangle(Rectangle rect, float ratioX, float ratioY) {
-   return Vector2ClampValue({ratioX, ratioY}, 0.0f, 1.0f) * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
+   return V2(ratioX, ratioY) * V2(fminf(rect.width, rect.height)) + V2(rect.x, rect.y);
 }
 
 Vector2 mapRectangleToCubicRatio(Rectangle rect, Vector2 position) {
-   return Vector2ClampValue(V2(position.x - rect.x, position.y - rect.y) / V2(fminf(rect.width, rect.height)), 0.0f, 1.0f);
+   return V2(position.x - rect.x, position.y - rect.y) / V2(fminf(rect.width, rect.height));
 }
 
 Vector2 mapRectangleToCubicRatio(Rectangle rect, float positionX, float positionY) {
-   return Vector2ClampValue(V2(positionX - rect.x, positionY - rect.y) / V2(fminf(rect.width, rect.height)), 0.0f, 1.0f);
+   return V2(positionX - rect.x, positionY - rect.y) / V2(fminf(rect.width, rect.height));
 }
 
 // Origin/source utility
