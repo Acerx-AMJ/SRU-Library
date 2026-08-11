@@ -846,9 +846,12 @@ Instead of passing a font, pass an identifier of a font found in the asset manag
 
 ---
 ```cpp
+void drawRect(Rectangle rect, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectCentered(Rectangle rect, Color color = WHITE, float rotation = 0.0f);
 void drawRectCentered(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
 void drawRectOrigin(Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectOrigin(Rectangle rect, Vector2 origin, Color color = WHITE, float rotation = 0.0f);
 ```
 Draw rectangle with the specified origin. *drawRect* assumes top-left position, *drawRectCentered* assumes center position and *drawRectOrigin* takes custom origin.
 

@@ -106,8 +106,10 @@ void drawTextOriginResponsive(const std::string &font, Rectangle area, Vector2 r
 
 void drawRect(Rectangle rect, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectCentered(Rectangle rect, Color color = WHITE, float rotation = 0.0f);
 void drawRectCentered(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
 void drawRectOrigin(Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawRectOrigin(Rectangle rect, Vector2 origin, Color color = WHITE, float rotation = 0.0f);
 void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawRectResponsive(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawRectCenteredResponsive(Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);

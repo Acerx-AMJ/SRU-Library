@@ -364,8 +364,16 @@ void drawRectCentered(Vector2 position, Vector2 size, Color color, float rotatio
    DrawRectanglePro(R4(position, size), getOrigin(size), rotation, color);
 }
 
+void drawRectCentered(Rectangle rect, Color color, float rotation) {
+   DrawRectanglePro(rect, R4origin(rect), rotation, color);
+}
+
 void drawRectOrigin(Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation) {
    DrawRectanglePro(R4(position, size), origin, rotation, color);
+}
+
+void drawRectOrigin(Rectangle rect, Vector2 origin, Color color, float rotation) {
+   DrawRectanglePro(rect, origin, rotation, color);
 }
 
 void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
