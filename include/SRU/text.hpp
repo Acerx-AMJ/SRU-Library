@@ -4,9 +4,10 @@
 #include <vector>
 
 // Text altering functions
-std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
+std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize);
+std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize);
+std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize);
+std::vector<std::string> divideText(const std::string &string, Font font, float maxWidth, float fontSize);
 std::string toRomanNumeral(size_t number);
 
 std::string toUpper(const std::string &string);
@@ -22,9 +23,10 @@ std::string join(const std::vector<std::string> &parts, const std::string &delim
 std::string join(const std::vector<std::string> &parts);
 
 // Text altering in place functions
-void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
+void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize);
+void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize);
+void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize);
+void divideTextInPlace(std::vector<std::string> &output, const std::string &string, Font font, float maxWidth, float fontSize);
 void toRomanNumeralInPlace(std::string &string, size_t number);
 
 void toUpperInPlace(std::string &string);

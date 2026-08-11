@@ -848,21 +848,27 @@ Responsible for modifying text.
 
 ---
 ```cpp
-std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
+std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize);
 ```
 Wrap the text to fit in the width.
 
 ---
 ```cpp
-std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize, float spacing);
+std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize);
 ```
 Truncate the text to fit in the width.
 
 ---
 ```cpp
-std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
+std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize);
 ```
 Wrap and then truncate the text to fit in the bounds.
+
+---
+```cpp
+std::vector<std::string> divideText(const std::string &string, Font font, float maxWidth, float fontSize);
+```
+Divides the text into lines to fit in the width. Works similarly to *wrap*.
 
 ---
 ```cpp
@@ -907,9 +913,10 @@ Joins all of the strings into one. Separates with delimiter if it is specified.
 
 ---
 ```cpp
-void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize, float spacing);
-void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize, float spacing);
+void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize);
+void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize);
+void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize);
+void divideTextInPlace(std::vector<std::string> &output, const std::string &string, Font font, float maxWidth, float fontSize);
 void toRomanNumeralInPlace(std::string &string, size_t number);
 void toUpperInPlace(std::string &string);
 void toLowerInPlace(std::string &string);
