@@ -45,7 +45,7 @@ std::vector<Particle> &getParticleCluster(ParticleID ID) {
 
 void updateParticles(float DT) {
    for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
-      updateParticleCluster(DT, ID);
+      updateParticleCluster(ID, DT);
    }
 }
 
