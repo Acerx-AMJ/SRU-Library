@@ -270,54 +270,49 @@ void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fon
 }
 
 void divideTextInPlace(std::vector<std::string> &output, const std::string &string, Font font, float maxWidth, float fontSize) {
+   std::string view (string), modstring (string);
    float spacing = fitSpacing(fontSize);
-   auto shouldWrap = [font, maxWidth, fontSize, spacing](const std::string &s) -> bool {
-      return MeasureTextEx(font, s.c_str(), fontSize, spacing).x > maxWidth;
+
+   auto shouldWrap = [&modstring, font, maxWidth, fontSize, spacing]() -> bool {
+      return MeasureTextEx(font, modstring.c_str(), fontSize, spacing).x > maxWidth;
    };
 
-   if (string.empty() || !shouldWrap(string)) {
-      return;
-   }
-
-   std::string original = string;
-   std::string_view split = original; // string cannot be viewed because it gets changed
-
-   while (!split.empty()) {
-      std::string current (split);
-      if (!shouldWrap(current)) {
-         output.push_back(std::string(split));
-         break;
-      }
-
+   while (shouldWrap()) {
       size_t left = 0;
-      size_t right = split.size();
+      size_t right = view.size();
+      std::string truncated;
 
       while (left < right) {
          size_t mid = (left + right) / 2;
-         std::string temp = std::string(split.substr(0, mid)) + "-";
+         truncated = view.substr(0, mid);
+         modstring = truncated + "-";
 
-         if (shouldWrap(temp)) {
+         if (shouldWrap()) {
             right = mid;
          } else {
             left = mid + 1;
          }
       }
 
-      size_t cut = left > 0 ? left - 1 : 0;
-      bool punctuation = (cut < split.size() && std::ispunct(split[cut]));
-      if (punctuation) cut += 1;
-
-      std::string_view truncated = split.substr(0, cut);
-      std::string_view remainder = split.substr(cut);
-
-      if (!remainder.empty() && std::isspace(remainder.front())) {
-         remainder = remainder.substr(1);
+      if (left <= 1) {
+         output.push_back(view.substr(0, 1) + "\n");
+         view = view.substr(1);
+         modstring = view;
+         continue;
       }
 
-      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
-      output.push_back(std::string(truncated) + (dash ? "-" : ""));
-      split = remainder;
+      bool punctuation = !std::ispunct(view[left - 1]);
+      truncated = view.substr(0, left - punctuation);
+      view = view.substr(left - punctuation);
+      
+      bool dash = std::isalpha(truncated.back()) && std::isalpha(view.front());
+      if (std::isspace(view.front())) {
+         view = view.substr(1);
+      }
+      output.push_back(truncated + (dash ? "-\n" : "\n"));
+      modstring = view;
    }
+   output.push_back(view);
 }
 
 void toRomanNumeralInPlace(std::string &string, size_t number) {
