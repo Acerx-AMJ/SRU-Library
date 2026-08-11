@@ -311,12 +311,15 @@ std::vector<Header> getHeadersFromConfig(const std::string &path, const std::str
       size_t start = line.find(headerStart);
       size_t end = line.find(headerEnd);
 
-      if (start == 0 && end == line.size() - headerEnd.size()) {
+      if ((headerStart.empty() || start == 0) && (headerEnd.empty() || end == line.size() - headerEnd.size())) {
          if (initialized) {
             headers.push_back(header);
             header = {};
          }
-         header.name = line.substr(start, end - start);
+
+         size_t nameStart = start + headerStart.size();
+         header.name = line.substr(nameStart, end - nameStart);
+         initialized = true;
          continue;
       }
 
