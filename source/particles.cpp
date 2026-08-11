@@ -77,7 +77,7 @@ void drawParticleCluster(ParticleID ID) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
          Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureSourceCentered(*particle.texture, source, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
+         drawTextureCentered(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
       }
       else if (particle.texture) {
          drawTextureCentered(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
@@ -97,7 +97,7 @@ void drawResponsiveParticleCluster(ParticleID ID) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
          Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureSourceCenteredResponsive(*particle.texture, source, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
+         drawTextureCenteredResponsive(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
       }
       else if (particle.texture) {
          drawTextureCenteredResponsive(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
@@ -117,7 +117,7 @@ void drawResponsiveCubicParticleCluster(ParticleID ID) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
          Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureSourceCenteredResponsiveCubic(*particle.texture, source, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
+         drawTextureCenteredResponsiveCubic(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
       }
       else if (particle.texture) {
          drawTextureCenteredResponsiveCubic(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
