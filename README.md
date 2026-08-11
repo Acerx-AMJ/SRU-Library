@@ -757,6 +757,38 @@ Maps size of the area [0; area.width], [0; area.height] or [0; min(area.width, a
 
 ---
 ```cpp
+Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+```
+Get position/ratio of a grid cell. *row* and *column* are 0-indexed. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+
+---
+```cpp
+Rectangle gridRectangle(Vector2 size, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+```
+Get position/ratio of a grid cell and combine it into a rectangle. *row* and *column* are 0-indexed. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+
+---
+```cpp
+Vector2 gridInvalidCell();
+```
+Returns an invalid grid cell constant used in *getGridCell*.
+
+---
+```cpp
+Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
+```
+Returns the grid cell that the position is currently in. Returns *gridInvalidCell()* if position is outside of the grid.
+
+---
+```cpp
+Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin = {0.5f, 0.5f});
+```
+Snaps the position to the grid. Returns position if position is outside of the grid. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+
+---
+```cpp
 Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
 ```
 Returns the size of the text based on parameters.

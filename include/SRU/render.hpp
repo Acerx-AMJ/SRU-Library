@@ -61,6 +61,16 @@ float mapAreaWidthToRatio(Rectangle area, float width);
 float mapAreaHeightToRatio(Rectangle area, float height);
 float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize);
 
+// Grid utility
+Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+Rectangle gridRectangle(Vector2 size, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = {0.5f, 0.5f});
+
+Vector2 gridInvalidCell();
+Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
+Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin = {0.5f, 0.5f});
+
 // Origin/source utility
 Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
 Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing);

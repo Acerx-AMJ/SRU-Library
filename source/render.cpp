@@ -204,6 +204,43 @@ float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize) {
    return cubicSize / fminf(area.width, area.height);
 }
 
+// Grid utility
+Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin) {
+   return V2((grid.width / columns) * (column + origin.x) + grid.x, (grid.height / rows) * (row + origin.y) + grid.y);
+}
+
+Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin) {
+   return mapScreenToRatio(gridPosition(grid, columns, rows, column, row, origin));
+}
+
+Rectangle gridRectangle(Vector2 size, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin) {
+   return R4(gridPosition(grid, columns, rows, column, row, origin), size);
+}
+
+Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin) {
+   return R4(gridRatio(grid, columns, rows, column, row, origin), sizeRatio);
+}
+
+Vector2 gridInvalidCell() {
+   return V2(-1.0f, -1.0f);
+}
+
+Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position) {
+   if (!CheckCollisionPointRec(position, grid)) {
+      return gridInvalidCell();
+   }
+   Vector2 local = position - R4pos(grid);
+   return V2(fminf(local.x / (grid.width / columns), columns - 1), fminf(local.y / (grid.height / rows), rows - 1));
+}
+
+Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin) {
+   Vector2 cell = getGridCell(grid, rows, columns, position);
+   if (cell == gridInvalidCell()) {
+      return position;
+   }
+   return gridPosition(grid, columns, rows, cell.x, cell.y, origin);
+}
+
 // Origin/source utility
 Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing) {
    return MeasureTextEx(font, text, fontSize, spacing);
