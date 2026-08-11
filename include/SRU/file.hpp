@@ -1,4 +1,5 @@
 #pragma once
+#include "raylib.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -39,3 +40,37 @@ bool writeFile(const std::string &path, const std::string &contents);
 bool writeFileLines(const std::string &path, const std::vector<std::string> &lines);
 bool appendFile(const std::string &path, const std::string &contents);
 bool appendFileLines(const std::string &path, const std::vector<std::string> &lines);
+
+// Utility parser
+struct Line {
+   Line() = default;
+   Line(const std::string &field, const std::string &value)
+      : field(field), value(value) {}
+
+   std::string field;
+   std::string value;
+};
+
+struct Header {
+   Header() = default;
+   Header(const std::string &name, const std::vector<Line> &lines)
+      : name(name), lines(lines) {}
+
+   std::string name;
+   std::vector<Line> lines;
+};
+
+std::vector<Header> getHeadersFromConfig(const std::string &path, const std::string &comment, const std::string &headerStart, const std::string &headerEnd, char delimiter);
+int getIntValue(const std::string &value);
+float getFloatValue(const std::string &value);
+bool getBoolValue(const std::string &value);
+std::string getStringValue(const std::string &value);
+Vector2 getV2Value(const std::string &value);
+Vector3 getV3Value(const std::string &value);
+Vector4 getV4Value(const std::string &value);
+Color getColorValue(const std::string &value);
+std::vector<int> getIntArrayValue(const std::string &value);
+std::vector<float> getFloatArrayValue(const std::string &value);
+std::vector<bool> getBoolArrayValue(const std::string &value);
+std::vector<std::string> getArrayValue(const std::string &value);
+std::vector<Line> getDictionaryValue(const std::string &value, char delimiter);

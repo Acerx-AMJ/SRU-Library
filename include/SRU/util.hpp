@@ -144,6 +144,10 @@ constexpr inline Color RGB(Vector3 color) {
    return RGB(color.x * 255.0f, color.y * 255.0f, color.z * 255.0f);
 }
 
+constexpr inline Color RGBF(float r, float g, float b) {
+   return {static_cast<unsigned char>(r * 255.0f), static_cast<unsigned char>(g * 255.0f), static_cast<unsigned char>(b * 255.0f), 255};
+}
+
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Color RGBA(T r, Y g, U b, I a) {
    return {static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b), static_cast<unsigned char>(a)};
@@ -160,6 +164,10 @@ constexpr inline Color RGBA(Vector4 color) {
 
 constexpr inline Color RGBA(Color rgb, unsigned char a) {
    return {rgb.r, rgb.g, rgb.b, a};
+}
+
+constexpr inline Color RGBAF(float r, float g, float b, float a) {
+   return {static_cast<unsigned char>(r * 255.0f), static_cast<unsigned char>(g * 255.0f), static_cast<unsigned char>(b * 255.0f), static_cast<unsigned char>(a * 255.0f)};
 }
 
 // String must be in one of the formats: #rgb, #rgba, #rrggbb or #rrggbbaa, where symbols are 0-9, a-f or A-F.

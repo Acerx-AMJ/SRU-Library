@@ -1,6 +1,7 @@
 #include "SRU/file.hpp"
 #include "SRU/random.hpp"
 #include "SRU/text.hpp"
+#include "SRU/util.hpp"
 #include <filesystem>
 #include <fstream>
 
@@ -295,4 +296,168 @@ bool appendFileLines(const std::string &path, const std::vector<std::string> &li
       file << line;
    }
    return true;
+}
+
+// Utility parser
+std::vector<Header> getHeadersFromConfig(const std::string &path, const std::string &comment, const std::string &headerStart, const std::string &headerEnd, char delimiter) {
+   std::vector<std::string> lines = getLinesFromFileIgnoringComments(path, comment);
+   std::vector<Header> headers;
+   headers.reserve(lines.size() / 8);
+
+   Header header;
+   bool initialized = false;
+   
+   for (const std::string &line: lines) {
+      size_t start = line.find(headerStart);
+      size_t end = line.find(headerEnd);
+
+      if (start == 0 && end == line.size() - headerEnd.size()) {
+         if (initialized) {
+            headers.push_back(header);
+            header = {};
+         }
+         header.name = line.substr(start, end - start);
+         continue;
+      }
+
+      size_t delim = line.find(delimiter);
+      if (delim == std::string::npos) {
+         printf("srulib::getHeadersFromConfig: Malformed line: '%s'. Expected 'FIELD%cVALUE' or '%sNAME%s'.\n", line.c_str(), delimiter, headerStart.c_str(), headerEnd.c_str());
+         continue;
+      }
+      std::string field = line.substr(0, delim);
+      std::string value = line.substr(delim + 1);
+      trimRightInPlace(field);
+      trimLeftInPlace(value);
+      header.lines.emplace_back(field, value);
+   }
+
+   if (initialized) {
+      headers.push_back(header);
+   }
+   return headers;
+}
+
+int getIntValue(const std::string &value) {
+   try {
+      return std::stoi(value);
+   } catch (...) {
+      printf("srulib::getIntValue: Expected integer, got '%s' instead. Returning default - %d.\n", value.c_str(), 0);
+      return 0;
+   }
+}
+
+float getFloatValue(const std::string &value) {
+   try {
+      return std::stof(value);
+   } catch (...) {
+      printf("srulib::getFloatValue: Expected float, got '%s' instead. Returning default - %f.\n", value.c_str(), 0.0f);
+      return 0.0f;
+   }
+}
+
+bool getBoolValue(const std::string &value) {
+   if (value != "true" && value != "false") {
+      printf("srulib::getBoolValue: Expected true/false, got '%s' instead. Returning default - %s.\n", value.c_str(), "false");
+      return false;
+   }
+   return value == "true";
+}
+
+std::string getStringValue(const std::string &value) {
+   return value;
+}
+
+Vector2 getV2Value(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   if (values.size() != 2) {
+      printf("srulib::getV2Value: Expected Vector2 {float,float}, got '%s' instead. Returning default - {%f, %f}.\n", value.c_str(), 0.0f, 0.0f);
+      return V2();
+   }
+   return V2(getFloatValue(values[0]), getFloatValue(values[1]));
+}
+
+Vector3 getV3Value(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   if (values.size() != 3) {
+      printf("srulib::getV3Value: Expected Vector3 {float,float,float}, got '%s' instead. Returning default - {%f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f);
+      return V3();
+   }
+   return V3(getFloatValue(values[0]), getFloatValue(values[1]), getFloatValue(values[2]));
+}
+
+Vector4 getV4Value(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   if (values.size() != 4) {
+      printf("srulib::getV4Value: Expected Vector4 {float,float,float,float}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 0.0f);
+      return V4();
+   }
+   return V4(getFloatValue(values[0]), getFloatValue(values[1]), getFloatValue(values[2]), getFloatValue(values[3]));
+}
+
+Color getColorValue(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   if (values.size() != 4 && values.size() != 3) {
+      printf("srulib::getColorValue: Expected Color {float,float,float,float?}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 1.0f);
+      return BLACK;
+   }
+   return RGBAF(getFloatValue(values[0]), getFloatValue(values[1]), getFloatValue(values[2]), values.size() == 3 ? 1.0 : getFloatValue(values[3]));
+}
+
+std::vector<int> getIntArrayValue(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   std::vector<int> intArray;
+   intArray.reserve(values.size());
+
+   for (const std::string &value: values) {
+      intArray.push_back(getIntValue(value));
+   }
+   return intArray;
+}
+
+std::vector<float> getFloatArrayValue(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   std::vector<float> floatArray;
+   floatArray.reserve(values.size());
+
+   for (const std::string &value: values) {
+      floatArray.push_back(getFloatValue(value));
+   }
+   return floatArray;
+}
+
+std::vector<bool> getBoolArrayValue(const std::string &value) {
+   std::vector<std::string> values = getArrayValue(value);
+   std::vector<bool> boolArray;
+   boolArray.reserve(values.size());
+
+   for (const std::string &value: values) {
+      boolArray.push_back(getBoolValue(value));
+   }
+   return boolArray;
+}
+
+std::vector<std::string> getArrayValue(const std::string &value) {
+   return clean(split(value, ','));
+}
+
+std::vector<Line> getDictionaryValue(const std::string &value, char delimiter) {
+   std::vector<std::string> values = getArrayValue(value);
+   std::vector<Line> lines;
+   lines.reserve(values.size());
+
+   for (const std::string &val: values) {
+      size_t equals = val.find(delimiter);
+      if (equals == std::string::npos) {
+         printf("srulib::getDictionaryValue: Expected dictionary, but there's no '%c' in '%s'.\n", delimiter, val.c_str());
+         continue;
+      }
+
+      std::string field = val.substr(0, equals);
+      std::string value = val.substr(equals + 1);
+      trimRightInPlace(field);
+      trimLeftInPlace(value);
+      lines.emplace_back(field, value);
+   }
+   return lines;
 }

@@ -95,6 +95,12 @@ std::string join(const std::vector<std::string> &parts) {
    return joinedString;
 }
 
+std::vector<std::string> clean(const std::vector<std::string> &strings) {
+   std::vector<std::string> cleaned = strings;
+   cleanInPlace(cleaned);
+   return cleaned;
+}
+
 // Text altering in place functions
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize) {
    float spacing = fitSpacing(fontSize);
@@ -438,6 +444,13 @@ void joinInPlace(std::string &output, const std::vector<std::string> &parts) {
    for (const std::string &string: parts) {
       output += string;   
    }
+}
+
+void cleanInPlace(std::vector<std::string> &strings) {
+   strings.erase(std::remove_if(strings.begin(), strings.end(), [](std::string &s) -> bool {
+      return s.empty();
+   }), strings.end());
+   std::for_each(strings.begin(), strings.end(), trimInPlace);
 }
 
 // Non-altering text functions

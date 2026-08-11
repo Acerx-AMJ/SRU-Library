@@ -281,6 +281,98 @@ bool appendFileLines(const std::string &path, const std::vector<std::string> &li
 ```
 Appends the contents to the existing contents of the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
 
+---
+```cpp
+struct Line {
+   Line() = default;
+   Line(const std::string &field, const std::string &value);
+
+   std::string field;
+   std::string value;
+};
+```
+A line containing a field and value.
+
+---
+```cpp
+struct Header {
+   Header() = default;
+   Header(const std::string &name, const std::vector<Line> &lines)
+      : name(name), lines(lines) {}
+
+   std::string name;
+   std::vector<Line> lines;
+};
+```
+A header containing its name and lines associated with it.
+
+---
+```cpp
+std::vector<Header> getHeadersFromConfig(const std::string &path, const std::string &comment, const std::string &headerStart, const std::string &headerEnd, char delimiter);
+```
+Returns headers with their following config based on following syntax, here's an example assuming *comment='#'*, *headerStart='['*, *headerEnd=']'*, *delimiter='='*:
+```python
+# Comments and empty lines are ignored
+[audio]
+sfx_volume=1
+music_volume=1
+
+[display]
+fullscreen=true
+resolution=1920,1080
+```
+This file would return the following:
+```
+std::vector<Header>{
+   Header{
+      name = "audio",
+      lines = {
+         Line{
+            field = "sfx_volume",
+            value = "1",
+         },
+         Line{
+            field = "music_volume",
+            value = "1",
+         },
+      },
+   },
+   Header{
+      name = "resolution",
+      lines = {
+         Line{
+            field = "fullscreen",
+            value = "true",
+         },
+         Line{
+            field = "resolution",
+            value = "1920,1080",
+         },
+      },
+   },
+}
+```
+And then the following values can be extracted using these functions:
+
+---
+```cpp
+int getIntValue(const std::string &value);
+float getFloatValue(const std::string &value);
+bool getBoolValue(const std::string &value);
+std::string getStringValue(const std::string &value);
+Vector2 getV2Value(const std::string &value);
+Vector3 getV3Value(const std::string &value);
+Vector4 getV4Value(const std::string &value);
+Color getColorValue(const std::string &value);
+std::vector<int> getIntArrayValue(const std::string &value);
+std::vector<float> getFloatArrayValue(const std::string &value);
+std::vector<bool> getBoolArrayValue(const std::string &value);
+std::vector<std::string> getArrayValue(const std::string &value);
+std::vector<Line> getDictionaryValue(const std::string &value, char delimiter);
+```
+Converts string to specified value. *getIntValue*, *getFloatValue*, *getBoolValue*, *getV2Value*, *getV3Value*, *getV4Value* throws warning on invalid type and returns 0 as fallback. *getColorValue* throws warning on invalid type and returns a black color as fallback. *getIntArrayValue*, *getFloatArrayValue*, *getBoolArrayValue*, *getArrayValue* returns values separated by commas and throw warnings on their sub-types being invalid. *getDictionaryValue* returns key, value pairs separated by commas and throws warning when delimiter is not found.
+
+
 ## particles.hpp
 Responsible for providing a particle manager.
 
@@ -913,6 +1005,12 @@ Joins all of the strings into one. Separates with delimiter if it is specified.
 
 ---
 ```cpp
+std::vector<std::string> clean(const std::vector<std::string> &strings);
+```
+Removes all empty strings from the vector and trims all strings.
+
+---
+```cpp
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize);
 void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize);
 void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fontSize);
@@ -928,6 +1026,7 @@ void splitInPlace(std::vector<std::string> &output, const std::string &string, c
 void splitOnWhiteSpaceInPlace(std::vector<std::string> &output, const std::string &string);
 void joinInPlace(std::string &output, const std::vector<std::string> &parts, const std::string &delimiter);
 void joinInPlace(std::string &output, const std::vector<std::string> &parts);
+void cleanInPlace(std::vector<std::string> &strings);
 ```
 Same as the previous functions but operate directly on the output.
 
@@ -1051,9 +1150,14 @@ Converts vector to RGB color. Changes all values from [0; 1] to [0; 255].
 
 ---
 ```cpp
+constexpr inline Color RGBF(float r, float g, float b);
+```
+Converts float values [0; 1] to RGB [0; 255].
+
+---
+```cpp
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Color RGBA(T r, Y g, U b, I a);
-
 constexpr inline Color RGBA(Color rgb, unsigned char a);
 ```
 Returns an RGBA color.
@@ -1063,6 +1167,12 @@ Returns an RGBA color.
 constexpr inline Color RGBA(Vector4 color);
 ```
 Converts vector to RGBA color. Changes all values from [0; 1] to [0; 255].
+
+---
+```cpp
+constexpr inline Color RGBAF(float r, float g, float b, float a);
+```
+Converts float values [0; 1] to RGB [0; 255].
 
 ---
 ```cpp

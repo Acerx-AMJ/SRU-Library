@@ -21,6 +21,7 @@ std::vector<std::string> split(const std::string &string, const std::string &del
 std::vector<std::string> splitOnWhiteSpace(const std::string &string);
 std::string join(const std::vector<std::string> &parts, const std::string &delimiter);
 std::string join(const std::vector<std::string> &parts);
+std::vector<std::string> clean(const std::vector<std::string> &strings);
 
 // Text altering in place functions
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize);
@@ -40,6 +41,7 @@ void splitInPlace(std::vector<std::string> &output, const std::string &string, c
 void splitOnWhiteSpaceInPlace(std::vector<std::string> &output, const std::string &string);
 void joinInPlace(std::string &output, const std::vector<std::string> &parts, const std::string &delimiter);
 void joinInPlace(std::string &output, const std::vector<std::string> &parts);
+void cleanInPlace(std::vector<std::string> &strings);
 
 // Non-altering text functions
 bool contains(const std::string &string, const std::string &substring);
