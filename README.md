@@ -667,7 +667,7 @@ Cubic ratio versions of the previous functions. Are meant for object sizes that 
 Vector2 mapRatioToArea(Rectangle area, Vector2 ratio);
 Vector2 mapRatioToArea(Rectangle area, float ratioX, float ratioY);
 ```
-Maps ratio where X and Y are [0; 1] to a position in the area where X is [rect.x; rect.width] and Y is [rect.y; rect.height].
+Maps ratio where X and Y are [0; 1] to a position in the area where X is [rect.x; rect.x + rect.width] and Y is [rect.y; rect.y + rect.height].
 
 ---
 ```cpp
@@ -698,6 +698,62 @@ Vector2 mapCubicSizeRatioToArea(Rectangle area, Vector2 ratio);
 Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
 ```
 Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the area - width or height.
+
+---
+```cpp
+float mapRatioToX(float ratioX);
+float mapRatioToY(float ratioY);
+```
+Maps ratio where X/Y are [0; 1] to screen size [0; width] or [0; height] depending on the function.
+
+---
+```cpp
+float mapRatioToCubicSize(float ratio);
+```
+Maps ratio where ratio is [0; 1] to [0; min(width, height)]. Is meant for object sizes that should preserve aspect ratio.
+
+---
+```cpp
+float mapRatioToAreaX(Rectangle area, float ratioX);
+float mapRatioToAreaY(Rectangle area, float ratioY);
+```
+Maps ratio where X/Y are [0; 1] to a position in the area where position is [area.x; area.x + area.width] or [area.y; area.y + area.height] depending on the function.
+
+---
+```cpp
+float mapRatioToAreaWidth(Rectangle area, float ratioX);
+float mapRatioToAreaHeight(Rectangle area, float ratioY);
+float mapRatioToAreaCubicSize(Rectangle area, float ratio);
+```
+Maps ratio where X/Y/Cubic are [0; 1] to a size of the area where size is [0; area.width], [0; area.height] or [0; min(area.width, area.height)] depending on the function. *mapRatioToAreaCubicSize* is meant for object sizes that should preserve aspect ratio.
+
+---
+```cpp
+float mapXToRatio(float width);
+float mapYToRatio(float height);
+```
+Maps screen size [0; width] or [0; height] depending on the function to ratio [0; 1].
+
+---
+```cpp
+float mapCubicSizeToRatio(float cubicSize);
+```
+Maps cubic size of the screen [0; min(width, height)] to ratio [0; 1]. Is meant for object sizes that should preserve aspect ratio.
+
+---
+```cpp
+float mapAreaXToRatio(Rectangle area, float x);
+float mapAreaYToRatio(Rectangle area, float y);
+```
+Maps a position in the area [area.x, area.x + area.width] or [area.y, area.y + area.heigt] depending on the function to a ratio [0; 1].
+
+---
+```cpp
+float mapAreaWidthToRatio(Rectangle area, float width);
+float mapAreaHeightToRatio(Rectangle area, float height);
+float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize);
+```
+Maps size of the area [0; area.width], [0; area.height] or [0; min(area.width, area.height)] depending on the function to a ratio [0; 1]. *mapRatioToAreaCubicSize* is meant for object sizes that should preserve aspect ratio.
 
 ---
 ```cpp
@@ -744,6 +800,20 @@ Responsive variations of the previous functions. Instead of passing screen posit
 
 ---
 ```cpp
+void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCentered(const std::string &font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOrigin(const std::string &font, Vector2 position, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCenteredResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCenteredResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOriginResponsive(const std::string &font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOriginResponsive(const std::string &font, Rectangle area, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+```
+Instead of passing a font, pass an identifier of a font found in the asset manager ([assets.hpp](#assetshpp)).
+
+---
+```cpp
 void drawRect(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
 void drawRectCentered(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
 void drawRectOrigin(Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
@@ -769,48 +839,48 @@ Responsive variations of the previous functions. Instead of passing screen posit
 
 ---
 ```cpp
-void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
 ```
 Draw texture with the specified origin. *drawTexturet* assumes top-left position, *drawTexturetCentered* assumes center position and *drawTexturetOrigin* takes custom origin. Draws the entire texture.
 
 ---
 ```cpp
-void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
 ```
 Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size. If area is passed then that's used for ratio instead of the window size, both for position and size.
 
 ---
 ```cpp
-void drawTextureSource(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCentered(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOrigin(Texture texture, Rectangle source, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCentered(const std::string &texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOrigin(const std::string &texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
 ```
-Custom source variations of the previous functions. Instead of drawing the whole texture draw a specific region. Includes responsive functions.
+Instead of passing a texture, pass an identifier to a texture in the asset manager ([assets.hpp](#assetshpp)).
 
 ---
 ```cpp
@@ -1128,6 +1198,13 @@ constexpr inline Vector2 R4center(Rectangle rect);
 constexpr inline Vector2 R4origin(Rectangle rect);
 ```
 Returns the position/size/center/origin of the rectangle respectively.
+
+---
+```cpp
+constexpr inline bool operator == (Rectangle lhs, Rectangle rhs);
+constexpr inline bool operator != (Rectangle lhs, Rectangle rhs);
+```
+Rectangle comparison functions.
 
 ---
 ```cpp

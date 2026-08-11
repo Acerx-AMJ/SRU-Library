@@ -1,6 +1,7 @@
 #pragma once
 #include <raylib.h>
 #include <raymath.h>
+#include <string>
 #include <vector>
 
 // Screen utilities
@@ -42,6 +43,24 @@ Vector2 mapSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
 Vector2 mapCubicSizeRatioToArea(Rectangle area, Vector2 ratio);
 Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
 
+float mapRatioToX(float ratioX);
+float mapRatioToY(float ratioY);
+float mapRatioToCubicSize(float ratio);
+float mapRatioToAreaX(Rectangle area, float ratioX);
+float mapRatioToAreaY(Rectangle area, float ratioY);
+float mapRatioToAreaWidth(Rectangle area, float ratioX);
+float mapRatioToAreaHeight(Rectangle area, float ratioY);
+float mapRatioToAreaCubicSize(Rectangle area, float ratio);
+
+float mapXToRatio(float width);
+float mapYToRatio(float height);
+float mapCubicSizeToRatio(float cubicSize);
+float mapAreaXToRatio(Rectangle area, float x);
+float mapAreaYToRatio(Rectangle area, float y);
+float mapAreaWidthToRatio(Rectangle area, float width);
+float mapAreaHeightToRatio(Rectangle area, float height);
+float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize);
+
 // Origin/source utility
 Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
 Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing);
@@ -65,6 +84,16 @@ void drawTextCenteredResponsive(Font font, Rectangle area, Vector2 ratio, const 
 void drawTextOriginResponsive(Font font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
 void drawTextOriginResponsive(Font font, Rectangle area, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
 
+void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCentered(const std::string &font, Vector2 position, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOrigin(const std::string &font, Vector2 position, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCenteredResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextCenteredResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOriginResponsive(const std::string &font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+void drawTextOriginResponsive(const std::string &font, Rectangle area, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color = WHITE, float rotation = 0.0f);
+
 void drawRect(Rectangle rect, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
 void drawRectCentered(Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
@@ -82,36 +111,37 @@ void drawRectCenteredResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 size
 void drawRectOriginResponsiveCubic(Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 void drawRectOriginResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
 
-void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSource(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCentered(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOrigin(Texture texture, Rectangle source, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f);
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+
+void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCentered(const std::string &texture, Vector2 position, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOrigin(const std::string &texture, Vector2 position, Vector2 origin, Vector2 size, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureOriginResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
 
 // Animation render utility
 using AnimationID = size_t;

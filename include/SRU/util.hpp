@@ -123,6 +123,16 @@ constexpr inline Vector2 R4origin(Rectangle rect) {
    return {rect.width / 2.0f, rect.height / 2.0f};
 }
 
+// rectangle comparison functions
+
+constexpr inline bool operator == (Rectangle lhs, Rectangle rhs) {
+   return lhs.x == rhs.x && lhs.y == rhs.y && lhs.width == rhs.width && lhs.height == rhs.height;
+}
+
+constexpr inline bool operator != (Rectangle lhs, Rectangle rhs) {
+   return !(lhs == rhs);
+}
+
 // Constexpr color fade
 constexpr inline Color fadeColor(Color color, float a) {
    color.a = a * 255.0f;

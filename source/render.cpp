@@ -1,7 +1,13 @@
 #include "SRU/render.hpp"
+#include "SRU/assets.hpp"
 #include "SRU/random.hpp"
 #include "SRU/text.hpp"
 #include "SRU/util.hpp"
+
+// helper functions
+Rectangle getSource(Rectangle source, Texture texture) {
+   return source == R4() ? getSource(texture) : source;
+}
 
 // Screen utilities
 float getWindowWidth() {
@@ -134,6 +140,70 @@ Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY) {
    return V2(ratioX, ratioY) * V2(fminf(area.width, area.height));
 }
 
+float mapRatioToX(float ratioX) {
+   return ratioX * GetScreenWidth();
+}
+
+float mapRatioToY(float ratioY) {
+   return ratioY * GetScreenHeight();
+}
+
+float mapRatioToCubicSize(float ratio) {
+   return ratio * fminf(GetScreenWidth(), GetScreenHeight());
+}
+
+float mapRatioToAreaX(Rectangle area, float ratioX) {
+   return area.x + area.width * ratioX;
+}
+
+float mapRatioToAreaY(Rectangle area, float ratioY) {
+   return area.y + area.height * ratioY;
+}
+
+float mapRatioToAreaWidth(Rectangle area, float ratioX) {
+   return area.width * ratioX;
+}
+
+float mapRatioToAreaHeight(Rectangle area, float ratioY) {
+   return area.height * ratioY;
+}
+
+float mapRatioToAreaCubicSize(Rectangle area, float ratio) {
+   return fminf(area.width, area.height) * ratio;
+}
+
+float mapXToRatio(float width) {
+   return width / GetScreenWidth();
+}
+
+float mapYToRatio(float height) {
+   return height / GetScreenHeight();
+}
+
+float mapCubicSizeToRatio(float cubicSize) {
+   return cubicSize / fminf(GetScreenWidth(), GetScreenHeight());
+}
+
+float mapAreaXToRatio(Rectangle area, float x) {
+   return (x - area.x) / area.width;
+}
+
+float mapAreaYToRatio(Rectangle area, float y) {
+   return (y - area.y) / area.height;
+}
+
+float mapAreaWidthToRatio(Rectangle area, float width) {
+   return width / area.width;
+}
+
+float mapAreaHeightToRatio(Rectangle area, float height) {
+   return height / area.height;
+}
+
+float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize) {
+   return cubicSize / fminf(area.width, area.height);
+}
+
 // Origin/source utility
 Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing) {
    return MeasureTextEx(font, text, fontSize, spacing);
@@ -188,6 +258,61 @@ void drawTextOriginResponsive(Font font, Rectangle area, Vector2 ratio, Vector2 
    float fontSizeScaled = getFontSizeScaled(fontSize);
    float spacingScaled = fitSpacing(fontSizeScaled);
    DrawTextPro(font, text, mapRatioToArea(area, ratio), origin, rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   DrawTextPro(fnt, text, position, V2(), rotation, fontSize, fitSpacing(fontSize), color);
+}
+
+void drawTextCentered(const std::string &font, Vector2 position, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   DrawTextPro(fnt, text, position, getTextOrigin(fnt, text, fontSize, fitSpacing(fontSize)), rotation, fontSize, fitSpacing(fontSize), color);
+}
+
+void drawTextOrigin(const std::string &font, Vector2 position, Vector2 origin, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   DrawTextPro(fnt, text, position, origin, rotation, fontSize, fitSpacing(fontSize), color);
+}
+
+void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   DrawTextPro(fnt, text, mapRatioToScreen(ratio), V2(), rotation, fontSizeScaled, fitSpacing(fontSizeScaled), color);
+}
+
+void drawTextResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   DrawTextPro(fnt, text, mapRatioToArea(area, ratio), V2(), rotation, fontSizeScaled, fitSpacing(fontSizeScaled), color);
+}
+
+void drawTextCenteredResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(fnt, text, mapRatioToScreen(ratio), getTextOrigin(fnt, text, fontSizeScaled, spacingScaled), rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawTextCenteredResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(fnt, text, mapRatioToArea(area, ratio), getTextOrigin(fnt, text, fontSizeScaled, spacingScaled), rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawTextOriginResponsive(const std::string &font, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(fnt, text, mapRatioToScreen(ratio), origin, rotation, fontSizeScaled, spacingScaled, color);
+}
+
+void drawTextOriginResponsive(const std::string &font, Rectangle area, Vector2 ratio, Vector2 origin, const char *text, float fontSize, Color color, float rotation) {
+   Font fnt = getFont(font);
+   float fontSizeScaled = getFontSizeScaled(fontSize);
+   float spacingScaled = fitSpacing(fontSizeScaled);
+   DrawTextPro(fnt, text, mapRatioToArea(area, ratio), origin, rotation, fontSizeScaled, spacingScaled, color);
 }
 
 void drawRect(Rectangle rect, Color color, float rotation) {
@@ -258,132 +383,147 @@ void drawRectOriginResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 origin
    DrawRectanglePro(R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
-void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(position, size), V2(), rotation, color);
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(position, size), V2(), rotation, color);
 }
 
-void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(position, size), getOrigin(size), rotation, color);
+void drawTextureCentered(Texture texture, Vector2 position, Vector2 size, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(position, size), getOrigin(size), rotation, color);
 }
 
-void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(position, size), origin, rotation, color);
+void drawTextureOrigin(Texture texture, Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(position, size), origin, rotation, color);
 }
 
-void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
    Vector2 size = mapRatioToScreen(sizeRatio);
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
    Vector2 size = mapSizeRatioToArea(area, sizeRatio);
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsive(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
    Vector2 size = mapCubicRatioToScreen(sizeRatio);
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
    Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsiveCubic(Texture texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, getSource(texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   DrawTexturePro(texture, getSource(source, texture), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureSource(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(position, size), V2(), rotation, color);
+void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(position, size), V2(), rotation, color);
 }
 
-void drawTextureSourceCentered(Texture texture, Rectangle source, Vector2 position, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(position, size), getOrigin(size), rotation, color);
+void drawTextureCentered(const std::string &texture, Vector2 position, Vector2 size, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(position, size), getOrigin(size), rotation, color);
 }
 
-void drawTextureSourceOrigin(Texture texture, Rectangle source, Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(position, size), origin, rotation, color);
+void drawTextureOrigin(const std::string &texture, Vector2 position, Vector2 origin, Vector2 size, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(position, size), origin, rotation, color);
 }
 
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
+void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureSourceResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+void drawTextureResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
    Vector2 size = mapRatioToScreen(sizeRatio);
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureSourceCenteredResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
    Vector2 size = mapSizeRatioToArea(area, sizeRatio);
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsive(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), mapRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureSourceOriginResponsive(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), mapSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
+void drawTextureResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureSourceResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
+void drawTextureResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), V2(), rotation, color);
 }
 
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
    Vector2 size = mapCubicRatioToScreen(sizeRatio);
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureSourceCenteredResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation) {
+void drawTextureCenteredResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
    Vector2 size = mapCubicSizeRatioToArea(area, sizeRatio);
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), size), getOrigin(size), rotation, color);
 }
 
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToScreen(ratio), mapCubicRatioToScreen(sizeRatio)), origin, rotation, color);
 }
 
-void drawTextureSourceOriginResponsiveCubic(Texture texture, Rectangle source, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation) {
-   DrawTexturePro(texture, source, R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
+void drawTextureOriginResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 origin, Vector2 sizeRatio, Color color, float rotation, Rectangle source) {
+   Texture tex = getTexture(texture);
+   DrawTexturePro(tex, getSource(source, tex), R4(mapRatioToArea(area, ratio), mapCubicSizeRatioToArea(area, sizeRatio)), origin, rotation, color);
 }
 
 // Animation render utility

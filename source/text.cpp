@@ -447,10 +447,10 @@ void joinInPlace(std::string &output, const std::vector<std::string> &parts) {
 }
 
 void cleanInPlace(std::vector<std::string> &strings) {
+   std::for_each(strings.begin(), strings.end(), trimInPlace);
    strings.erase(std::remove_if(strings.begin(), strings.end(), [](std::string &s) -> bool {
       return s.empty();
    }), strings.end());
-   std::for_each(strings.begin(), strings.end(), trimInPlace);
 }
 
 // Non-altering text functions

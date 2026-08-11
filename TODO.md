@@ -6,6 +6,5 @@ input manager
 tweening, easing
 positioning grids (not like CSS)
 collisions
-maybe some config loader. if not too much templating and meta programming
 examples
 documentation usage
