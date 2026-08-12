@@ -225,6 +225,14 @@ Vector2 getGridCellSize(Rectangle grid, int columns, int rows) {
    return V2(grid.width / columns, grid.height / rows);
 }
 
+Vector2 getGridCellRatio(Rectangle grid, int columns, int rows) {
+   return mapScreenToRatio(getGridCellSize(grid, columns, rows));
+}
+
+Vector2 getGridCellCubicRatio(Rectangle grid, int columns, int rows) {
+   return mapScreenToCubicRatio(getGridCellSize(grid, columns, rows));
+}
+
 Vector2 gridInvalidCell() {
    return V2(-1.0f, -1.0f);
 }

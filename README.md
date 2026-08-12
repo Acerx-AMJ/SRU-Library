@@ -773,7 +773,14 @@ Get position/ratio of a grid cell and combine it into a rectangle. *row* and *co
 ```cpp
 Vector2 getGridCellSize(Rectangle grid, int columns, int rows);
 ```
-Get grid cell size.
+Get grid cell size in grid coordinates.
+
+---
+```cpp
+Vector2 getGridCellRatio(Rectangle grid, int columns, int rows);
+Vector2 getGridCellCubicRatio(Rectangle grid, int columns, int rows);
+```
+Get grid cell size in ratio coordinates.
 
 ---
 ```cpp
