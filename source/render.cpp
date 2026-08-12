@@ -221,6 +221,10 @@ Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int
    return R4(gridRatio(grid, columns, rows, column, row, origin), sizeRatio);
 }
 
+Vector2 getGridCellSize(Rectangle grid, int columns, int rows) {
+   return V2(grid.width / columns, grid.height / rows);
+}
+
 Vector2 gridInvalidCell() {
    return V2(-1.0f, -1.0f);
 }
