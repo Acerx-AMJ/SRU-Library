@@ -7,5 +7,3 @@ tweening, easing
 collisions
 examples
 documentation usage
-
-render.hpp -> getwindowboundaries(), drawTexture with rect

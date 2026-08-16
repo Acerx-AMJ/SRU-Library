@@ -7,4 +7,5 @@
 #include "SRU/random.hpp"     // IWYU pragma: export
 #include "SRU/render.hpp"     // IWYU pragma: export
 #include "SRU/text.hpp"       // IWYU pragma: export
+#include "SRU/tween.hpp"      // IWYU pragma: export
 #include "SRU/util.hpp"       // IWYU pragma: export

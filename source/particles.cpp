@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <cstdio>
 
-static std::vector<ParticleConfig> particleConfig;
-static std::vector<std::vector<Particle>> particleClusters;
+static std::vector<ParticleConfig> particleConfig {{}};
+static std::vector<std::vector<Particle>> particleClusters {{}};
 
 Particle::Particle(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime)
    : position(position), velocity(velocity), acceleration(acceleration), size(size), scale(scale), rotation(rotation), rotationVelocity(rotationVelocity), friction(friction), lifetime(lifetime) {}
@@ -24,7 +24,7 @@ ParticleID pushParticleConfig(ParticleConfig config) {
 }
 
 ParticleConfig &getParticleConfig(ParticleID ID) {
-   if (ID >= particleConfig.size()) {
+   if (ID <= 0 || ID >= particleConfig.size()) {
       printf("srulib::getParticleConfig: ID out of bounds. ID is %llu and particle config count is %llu.\n", ID, particleConfig.size());
       exit(EXIT_FAILURE);
    }
@@ -44,7 +44,7 @@ std::vector<Particle> &getParticleCluster(ParticleID ID) {
 }
 
 void updateParticles(float DT) {
-   for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
+   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
       updateParticleCluster(ID, DT);
    }
 }
@@ -66,7 +66,7 @@ void updateParticleCluster(ParticleID ID, float DT) {
 }
 
 void drawParticles() {
-   for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
+   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
       drawParticleCluster(ID);
    }
 }
@@ -86,7 +86,7 @@ void drawParticleCluster(ParticleID ID) {
 }
 
 void drawResponsiveParticles(Rectangle area, int type) {
-   for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
+   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
       drawResponsiveParticleCluster(ID, area, type);
    }
 }
@@ -106,7 +106,7 @@ void drawResponsiveParticleCluster(ParticleID ID, Rectangle area, int type) {
 }
 
 void clearParticles() {
-   for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
+   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
       clearParticleCluster(ID);
    }
 }
