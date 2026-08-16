@@ -1,5 +1,5 @@
 #pragma once
-#include <raylib.h>
+#include "SRU/constants.hpp"
 #include <raymath.h>
 
 // Vector2 construction utility
@@ -107,6 +107,10 @@ constexpr inline Rectangle R4(Vector2 position, Vector2 size) {
    return {position.x, position.y, size.x, size.y};
 }
 
+constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER) {
+   return {rect.x - rect.width * origin.x, rect.y - rect.height * origin.y, rect.width, rect.height};
+}
+
 constexpr inline Vector2 R4pos(Rectangle rect) {
    return {rect.x, rect.y};
 }
@@ -119,8 +123,8 @@ constexpr inline Vector2 R4center(Rectangle rect) {
    return {rect.x + rect.width / 2.0f, rect.y + rect.height / 2.0f};
 }
 
-constexpr inline Vector2 R4origin(Rectangle rect) {
-   return {rect.width / 2.0f, rect.height / 2.0f};
+constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER) {
+   return {rect.width * origin.x, rect.height * origin.y};
 }
 
 // rectangle comparison functions

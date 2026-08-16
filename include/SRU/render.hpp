@@ -1,5 +1,5 @@
 #pragma once
-#include <raylib.h>
+#include "SRU/constants.hpp"
 #include <raymath.h>
 #include <string>
 #include <vector>
@@ -9,79 +9,44 @@ float getWindowWidth();
 float getWindowHeight();
 
 Vector2 getWindowSize();
-Vector2 getMinimumWindowSize();
+Vector2 getCubicWindowSize();
 Vector2 getWindowCenter();
-Vector2 getWindowCenterOffset(Vector2 offset);
+Rectangle getWindowArea();
 
-Rectangle mapArea(Vector2 ratio, Vector2 sizeRatio);
-Rectangle mapAreaPoints(Vector2 startRatio, Vector2 endRatio);
-Rectangle mapAreaCentered(Vector2 centerRatio, Vector2 sizeRatio);
-Rectangle mapCubicArea(Vector2 ratio, Vector2 sizeRatio);
-Rectangle mapCubicAreaPoints(Vector2 startRatio, Vector2 endRatio);
-Rectangle mapCubicAreaCentered(Vector2 centerRatio, Vector2 sizeRatio);
+// Responsiveness utilities
+Rectangle mapRatioToArea(Rectangle ratio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Rectangle mapRatioToArea(Vector2 startRatio, Vector2 endRatio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapRatioToArea(Vector2 ratio, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapRatioToArea(float ratioX, float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapSizeRatioToArea(Vector2 sizeRatio, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapSizeRatioToArea(float sizeRatioX, float sizeRatioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 
-Vector2 mapRatioToScreen(Vector2 ratio);
-Vector2 mapRatioToScreen(float ratioX, float ratioY);
-Vector2 mapScreenToRatio(Vector2 screen);
-Vector2 mapScreenToRatio(float screenX, float screenY);
-Vector2 mapRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapRatioToArea(Rectangle area, float ratioX, float ratioY);
-Vector2 mapAreaToRatio(Rectangle area, Vector2 position);
-Vector2 mapAreaToRatio(Rectangle area, float positionX, float positionY);
+Rectangle mapAreaToRatio(Rectangle rect, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Rectangle mapAreaToRatio(Vector2 start, Vector2 end, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToRatio(Vector2 position, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToRatio(float x, float y, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToSizeRatio(Vector2 size, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToSizeRatio(float width, float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 
-Vector2 mapCubicRatioToScreen(Vector2 ratio);
-Vector2 mapCubicRatioToScreen(float ratioX, float ratioY);
-Vector2 mapScreenToCubicRatio(Vector2 screen);
-Vector2 mapScreenToCubicRatio(float screenX, float screenY);
-Vector2 mapCubicRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapCubicRatioToArea(Rectangle area, float ratioX, float ratioY);
-Vector2 mapAreaToCubicRatio(Rectangle area, Vector2 position);
-Vector2 mapAreaToCubicRatio(Rectangle area, float positionX, float positionY);
+float mapRatioToX(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToY(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToWidth(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToHeight(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 
-Vector2 mapSizeRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
-Vector2 mapCubicSizeRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
-
-float mapRatioToX(float ratioX);
-float mapRatioToY(float ratioY);
-float mapRatioToCubicSize(float ratio);
-float mapRatioToAreaX(Rectangle area, float ratioX);
-float mapRatioToAreaY(Rectangle area, float ratioY);
-float mapRatioToAreaWidth(Rectangle area, float ratioX);
-float mapRatioToAreaHeight(Rectangle area, float ratioY);
-float mapRatioToAreaCubicSize(Rectangle area, float ratio);
-
-float mapXToRatio(float width);
-float mapYToRatio(float height);
-float mapCubicSizeToRatio(float cubicSize);
-float mapAreaXToRatio(Rectangle area, float x);
-float mapAreaYToRatio(Rectangle area, float y);
-float mapAreaWidthToRatio(Rectangle area, float width);
-float mapAreaHeightToRatio(Rectangle area, float height);
-float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize);
+float mapXToRatio(float x, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapYToRatio(float y, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapWidthToRatio(float width, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapHeightToRatio(float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 
 // Grid/origin utility
-constexpr inline Vector2 TOP_LEFT = {0.0f, 0.0f};
-constexpr inline Vector2 TOP_CENTER = {0.0f, 0.5f};
-constexpr inline Vector2 TOP_RIGHT = {0.0f, 1.0f};
-constexpr inline Vector2 CENTER_LEFT = {0.5f, 0.0f};
-constexpr inline Vector2 CENTER = {0.5f, 0.5f};
-constexpr inline Vector2 CENTER_RIGHT = {0.5f, 1.0f};
-constexpr inline Vector2 BOTTOM_LEFT = {1.0f, 0.0f};
-constexpr inline Vector2 BOTTOM_CENTER = {1.0f, 0.5f};
-constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
-
 Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Rectangle gridRectangle(Vector2 size, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 
 Vector2 getGridCellSize(Rectangle grid, int columns, int rows);
-Vector2 getGridCellRatio(Rectangle grid, int columns, int rows);
-Vector2 getGridCellCubicRatio(Rectangle grid, int columns, int rows);
+Vector2 getGridCellRatio(Rectangle grid, int columns, int rows, int type = RATIO);
 
-Vector2 gridInvalidCell();
 Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
 Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin = CENTER);
 
@@ -98,29 +63,23 @@ constexpr inline Rectangle getSource(Texture texture) {
 
 // Render utility
 void drawText(Font font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(Font font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 
-void drawRect(Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsive(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawRect(Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawRectResponsive(Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 
-void drawTexture(Texture texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTexture(Texture texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureResponsive(Texture texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTexture(const std::string &texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureResponsive(const std::string &texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 
 // Animation render utility
 using AnimationID = size_t;
@@ -168,7 +127,6 @@ void forceAnimationState(Animation &animation, AnimationID ID);
 void animate(Animation &animation, float DT);
 
 void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsive(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsiveCubic(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimated(Animation animation, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureAnimatedResponsive(Animation animation, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);

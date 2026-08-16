@@ -77,50 +77,30 @@ void drawParticleCluster(ParticleID ID) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
          Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureCentered(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
+         drawTexture(*particle.texture, particle.position, particle.size, CENTER, Fade(WHITE, 1.0f - particle.age / particle.lifetime), source, particle.rotation);
       }
       else if (particle.texture) {
-         drawTextureCentered(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
+         drawTexture(*particle.texture, particle.position, particle.size, CENTER, Fade(WHITE, 1.0f - particle.age / particle.lifetime), FULL_SOURCE, particle.rotation);
       }
    }
 }
 
-void drawResponsiveParticles() {
+void drawResponsiveParticles(Rectangle area, int type) {
    for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
-      drawResponsiveParticleCluster(ID);
+      drawResponsiveParticleCluster(ID, area, type);
    }
 }
 
-void drawResponsiveParticleCluster(ParticleID ID) {
+void drawResponsiveParticleCluster(ParticleID ID, Rectangle area, int type) {
    for (Particle &particle: particleClusters[ID]) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
          Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureCenteredResponsive(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
+         drawTextureResponsive(*particle.texture, particle.position, particle.size, CENTER, Fade(WHITE, 1.0f - particle.age / particle.lifetime), source, area, type, particle.rotation);
       }
       else if (particle.texture) {
-         drawTextureCenteredResponsive(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
-      }
-   }
-}
-
-void drawResponsiveCubicParticles() {
-   for (size_t ID = 0; ID < particleClusters.size(); ++ID) {
-      drawResponsiveCubicParticleCluster(ID);
-   }
-}
-
-void drawResponsiveCubicParticleCluster(ParticleID ID) {
-   for (Particle &particle: particleClusters[ID]) {
-      if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
-         float unitX = (float)particle.texture->width / particle.splitWidth;
-         float unitY = (float)particle.texture->height / particle.splitHeight;
-         Rectangle source = {particle.splitX * unitX, particle.splitY * unitY, unitX, unitY};
-         drawTextureCenteredResponsiveCubic(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation, source);
-      }
-      else if (particle.texture) {
-         drawTextureCenteredResponsiveCubic(*particle.texture, particle.position, particle.size, Fade(WHITE, 1.0f - particle.age / particle.lifetime), particle.rotation);
+         drawTextureResponsive(*particle.texture, particle.position, particle.size, CENTER, Fade(WHITE, 1.0f - particle.age / particle.lifetime), FULL_SOURCE, area, type, particle.rotation);
       }
    }
 }

@@ -6,6 +6,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - [Documentation](#documentation)
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
+- - [constants.hpp](#constantshpp)
 - - [file.hpp](#filehpp)
 - - [particles.hpp](#particleshpp)
 - - [random.hpp](#randomhpp)
@@ -16,38 +17,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [Macros](#macros)
 
 ## Usage
-SRU-Lib is meant to be used together with CMake's FetchContent module and can be imported as follows:
-```cmake
-include(FetchContent)
-FetchContent_Declare(srulib
-   GIT_REPOSITORY https://github.com/Acerx-AMJ/SRU-Library.git
-   GIT_TAG main
-   GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(srulib)
-```
-However, you have to import Raylib yourself. That can also be done with FetchContent:
-```cmake
-include(FetchContent)
-FetchContent_Declare(raylib
-   GIT_REPOSITORY https://github.com/raysan5/raylib.git
-   GIT_TAG 5.5 # or another version
-   GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(raylib)
-
-FetchContent_Declare(srulib
-   GIT_REPOSITORY https://github.com/Acerx-AMJ/SRU-Library.git
-   GIT_TAG main
-   GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(srulib)
-```
-And finally you have to link it to your project:
-```cmake
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
-```
-Here's a full example:
+SRU-Lib is meant to be used together with CMake's FetchContent module. It uses Raylib as a dependency that the user must also include themselves. Here's a full working CMake example:
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 project(srulib-test) # name of your project
@@ -70,14 +40,32 @@ FetchContent_Declare(srulib
 )
 FetchContent_MakeAvailable(srulib)
 
+# include_directories(${PROJECT_SOURCE_DIR}/include) # optional if writing a larger project
 add_executable(${PROJECT_NAME} main.cpp) # add your source files
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
+```
+Project structure for this CMake file would look something like this:
+```
+Project
+|__ build/
+|__ main.cpp
+|__ CMakeLists.txt
+```
+And to build the project:
+```bash
+cmake -B build # build CMake cache (rerun after adding new source files)
+cmake --build build # build project
+```
+And finally run:
+```bash
+./build/srulib-test # or whatever you named your project
 ```
 
 ## Documentation
 Here you will find the documentation of all headers, functions and structures found in the library. Select by header:
 - [assets.hpp](#assetshpp)
 - [audio.hpp](#audiohpp)
+- [constants.hpp](#constantshpp)
 - [file.hpp](#filehpp)
 - [particles.hpp](#particleshpp)
 - [random.hpp](#randomhpp)
@@ -89,7 +77,7 @@ Here you will find the documentation of all headers, functions and structures fo
 Or browse miscellaneous documentation:
 - [Macros](#macros)
 
-## assets.hpp
+# assets.hpp
 Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot.
 
 ---
@@ -174,7 +162,7 @@ std::unordered_map<std::string, SoundPool> &getSoundPoolMap();
 ```
 Returns a reference to the specified map.
 
-## audio.hpp
+# audio.hpp
 Responsible for playing audio.
 
 ---
@@ -213,7 +201,45 @@ void playRawSoundPure(Sound sound, float pitch = 1.0f, float volume = 1.0f);
 ```
 Plays the sound.
 
-## file.hpp
+# constants.hpp
+Responsible for providing common constants.
+
+---
+```cpp
+constexpr inline Vector2 TOP_LEFT = {0.0f, 0.0f};
+constexpr inline Vector2 TOP_CENTER = {0.0f, 0.5f};
+constexpr inline Vector2 TOP_RIGHT = {0.0f, 1.0f};
+constexpr inline Vector2 CENTER_LEFT = {0.5f, 0.0f};
+constexpr inline Vector2 CENTER = {0.5f, 0.5f};
+constexpr inline Vector2 CENTER_RIGHT = {0.5f, 1.0f};
+constexpr inline Vector2 BOTTOM_LEFT = {1.0f, 0.0f};
+constexpr inline Vector2 BOTTOM_CENTER = {1.0f, 0.5f};
+constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
+```
+Origin presets for render, grid and origin functions.
+
+---
+```cpp
+constexpr inline Rectangle FULL_SOURCE = {0, 0, 0, 0};
+constexpr inline Rectangle WINDOW_AREA = {0, 0, 0, 0};
+```
+Defaults for render functions - use full texture source and use window boundaries as area respectively.
+
+---
+```cpp
+constexpr inline int RATIO = 0;
+constexpr inline int CUBIC_RATIO = 1;
+constexpr inline int FILL_RATIO = 2;
+```
+Ratio types used in [render.hpp](#renderhpp) header. *RATIO* uses regular size. *CUBIC_RATIO* uses minimum size component - width or height - as both size components, meaning it preserves aspect ratio and prevents any overflow. *FILL_RATIO* uses maximum size component - width or height - as both size components, meaning it is guaranteed to overflow and fill.
+
+---
+```cpp
+constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
+```
+Invalid grid cell. Returns from *getGridCell* from [render.hpp](#renderhpp) header.
+
+# file.hpp
 Responsible for providing common file I/O utilities.
 
 ---
@@ -373,7 +399,7 @@ std::vector<Line> getDictionaryValue(const std::string &value, char delimiter);
 Converts string to specified value. *getIntValue*, *getFloatValue*, *getBoolValue*, *getV2Value*, *getV3Value*, *getV4Value* throws warning on invalid type and returns 0 as fallback. *getColorValue* throws warning on invalid type and returns a black color as fallback. *getIntArrayValue*, *getFloatArrayValue*, *getBoolArrayValue*, *getArrayValue* returns values separated by commas and throw warnings on their sub-types being invalid. *getDictionaryValue* returns key, value pairs separated by commas and throws warning when delimiter is not found.
 
 
-## particles.hpp
+# particles.hpp
 Responsible for providing a particle manager.
 
 ---
@@ -474,12 +500,10 @@ Update a specific particle cluster or all active clusters at once.
 ```cpp
 void drawParticles();
 void drawParticleCluster(ParticleID ID);
-void drawResponsiveParticles();
-void drawResponsiveParticleCluster(ParticleID ID);
-void drawResponsiveCubicParticles();
-void drawResponsiveCubicParticleCluster(ParticleID ID);
+void drawResponsiveParticles(Rectangle area = WINDOW_AREA, int type = RATIO);
+void drawResponsiveParticleCluster(ParticleID ID, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Draw a specific particle cluster or all active clusters at once. *drawResponsiveParticles*, *drawResponsiveParticleCluster*, *drawResponsiveCubicParticles* and *drawResponsiveCubicParticleCluster* draws using ratios instead of position, meaning all config values need to be changed to ratios if these were to be used. Cubic versions preserve the aspect ratio of particles on all screen sizes and is most likely preferable to non-cubic responsive functions.
+Draw a specific particle cluster or all active clusters at once. *drawResponsiveParticles* and *drawResponsiveParticleCluster* draws using ratios instead of screen coordinates, meaning all config values need to be changed to ratios if these were to be used. Check [ratio constants](#constantshpp) for more info on ratio types. Cubic ratio is most likely preferable due to it preserving aspect ratio.
 
 ---
 ```cpp
@@ -514,7 +538,7 @@ void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Vect
 ```
 Cut the texture into `splitWidth * splitHeight` pieces and spawn the particles with the given parameters. If a parameter is not supplied then the one from the config is assumed.
 
-## random.hpp
+# random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
 
 ---
@@ -600,7 +624,7 @@ inline auto &randomElement(T &range);
 ```
 Returns a random element from a container. The container must implement *size()* and *operator[size_t]* functions, like *std::vector* does.
 
-## render.hpp
+# render.hpp
 Responsible for providing screen, size and position math utilities as well as drawing utilities.
 
 ---
@@ -608,166 +632,61 @@ Responsible for providing screen, size and position math utilities as well as dr
 float getWindowWidth();
 float getWindowHeight();
 Vector2 getWindowSize();
+Vector2 getCubicWindowSize();
 ```   
-Returns the size of the window.
+Returns the size of the window. *getCubicWindowSize* returns the size of the window as a square with its sides being the smallest size component - width or height.
 
 ---
 ```cpp
 Vector2 getWindowCenter();
 ```
-Returns the position of the center of the window.
+Returns the center of the window.
 
 ---
 ```cpp
-Vector2 getWindowCenterOffset(Vector2 offset);
+Rectangle getWindowArea();
 ```
-Returns the position of the center of the window with the added offset.
+Returns the area (boundaries) of the window {0, 0, width, height}.
 
 ---
 ```cpp
-Rectangle mapArea(Vector2 ratio, Vector2 sizeRatio);
-Rectangle mapAreaPoints(Vector2 startRatio, Vector2 endRatio);
-Rectangle mapAreaCentered(Vector2 centerRatio, Vector2 sizeRatio);
+Rectangle mapRatioToArea(Rectangle ratio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Rectangle mapRatioToArea(Vector2 startRatio, Vector2 endRatio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapRatioToArea(Vector2 ratio, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapRatioToArea(float ratioX, float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapSizeRatioToArea(Vector2 sizeRatio, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapSizeRatioToArea(float sizeRatioX, float sizeRatioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps ratios to a responsive rectangle.
+Maps a ratio to an area. Default area is the window boundaries. *mapSizeRatioToArea* must be used for converting size ratios whereas *mapRatioToArea* must be used for position. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
-Rectangle mapCubicArea(Vector2 ratio, Vector2 sizeRatio);
-Rectangle mapCubicAreaPoints(Vector2 startRatio, Vector2 endRatio);
-Rectangle mapCubicAreaCentered(Vector2 centerRatio, Vector2 sizeRatio);
+Rectangle mapAreaToRatio(Rectangle rect, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Rectangle mapAreaToRatio(Vector2 start, Vector2 end, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToRatio(Vector2 position, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToRatio(float x, float y, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToSizeRatio(Vector2 size, Rectangle area = WINDOW_AREA, int type = RATIO);
+Vector2 mapAreaToSizeRatio(float width, float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps ratios to a responsive rectangle. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the screen - width or height.
+Maps area coordinates to a ratio. Default area is the window boundaries. *mapAreaToSizeRatio* must be used for converting size whereas *mapAreaToRatio* must be used for position. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
-Vector2 mapRatioToScreen(Vector2 ratio);
-Vector2 mapRatioToScreen(float ratioX, float ratioY);
+float mapRatioToX(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToY(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToWidth(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapRatioToHeight(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps ratio where X and Y are [0; 1] to screen position where X is [0; width] and Y is [0; height].
+Maps a X/Y/width/height ratio to an area. Default area is the window boundaries. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
-Vector2 mapScreenToRatio(Vector2 screen);
-Vector2 mapScreenToRatio(float screenX, float screenY);
+float mapXToRatio(float x, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapYToRatio(float y, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapWidthToRatio(float width, Rectangle area = WINDOW_AREA, int type = RATIO);
+float mapHeightToRatio(float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps screen position where X is [0; width] and Y is [0; height] to a ratio where X and Y are [0; 1].
-
----
-```cpp
-Vector2 mapCubicRatioToScreen(Vector2 ratio);
-Vector2 mapCubicRatioToScreen(float ratioX, float ratioY);
-Vector2 mapScreenToCubicRatio(Vector2 screen);
-Vector2 mapScreenToCubicRatio(float screenX, float screenY);
-```
-Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the screen - width or height.
-
----
-```cpp
-Vector2 mapRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapRatioToArea(Rectangle area, float ratioX, float ratioY);
-```
-Maps ratio where X and Y are [0; 1] to a position in the area where X is [rect.x; rect.x + rect.width] and Y is [rect.y; rect.y + rect.height].
-
----
-```cpp
-Vector2 mapAreaToRatio(Rectangle area, Vector2 position);
-Vector2 mapAreaToRatio(Rectangle area, float positionX, float positionY);
-```
-Maps position in the area where X is [rect.x; rect.width] and Y is [rect.y; rect.height] to a ratio where X and Y are [0; 1].
-
----
-```cpp
-Vector2 mapCubicRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapCubicRatioToArea(Rectangle area, float ratioX, float ratioY);
-Vector2 mapAreaToCubicRatio(Rectangle area, Vector2 position);
-Vector2 mapAreaToCubicRatio(Rectangle area, float positionX, float positionY);
-```
-Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the area - width or height.
-
----
-```cpp
-Vector2 mapSizeRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
-```
-Maps ratio where X and Y are [0; 1] to size in the area where X is [0; area.width] and Y is [0; area.height].
-
----
-```cpp
-Vector2 mapCubicSizeRatioToArea(Rectangle area, Vector2 ratio);
-Vector2 mapCubicSizeRatioToArea(Rectangle area, float ratioX, float ratioY);
-```
-Cubic ratio versions of the previous functions. Are meant for object sizes that should preserve aspect ratio. Sources the smallest size field of the area - width or height.
-
----
-```cpp
-float mapRatioToX(float ratioX);
-float mapRatioToY(float ratioY);
-```
-Maps ratio where X/Y are [0; 1] to screen size [0; width] or [0; height] depending on the function.
-
----
-```cpp
-float mapRatioToCubicSize(float ratio);
-```
-Maps ratio where ratio is [0; 1] to [0; min(width, height)]. Is meant for object sizes that should preserve aspect ratio.
-
----
-```cpp
-float mapRatioToAreaX(Rectangle area, float ratioX);
-float mapRatioToAreaY(Rectangle area, float ratioY);
-```
-Maps ratio where X/Y are [0; 1] to a position in the area where position is [area.x; area.x + area.width] or [area.y; area.y + area.height] depending on the function.
-
----
-```cpp
-float mapRatioToAreaWidth(Rectangle area, float ratioX);
-float mapRatioToAreaHeight(Rectangle area, float ratioY);
-float mapRatioToAreaCubicSize(Rectangle area, float ratio);
-```
-Maps ratio where X/Y/Cubic are [0; 1] to a size of the area where size is [0; area.width], [0; area.height] or [0; min(area.width, area.height)] depending on the function. *mapRatioToAreaCubicSize* is meant for object sizes that should preserve aspect ratio.
-
----
-```cpp
-float mapXToRatio(float width);
-float mapYToRatio(float height);
-```
-Maps screen size [0; width] or [0; height] depending on the function to ratio [0; 1].
-
----
-```cpp
-float mapCubicSizeToRatio(float cubicSize);
-```
-Maps cubic size of the screen [0; min(width, height)] to ratio [0; 1]. Is meant for object sizes that should preserve aspect ratio.
-
----
-```cpp
-float mapAreaXToRatio(Rectangle area, float x);
-float mapAreaYToRatio(Rectangle area, float y);
-```
-Maps a position in the area [area.x, area.x + area.width] or [area.y, area.y + area.heigt] depending on the function to a ratio [0; 1].
-
----
-```cpp
-float mapAreaWidthToRatio(Rectangle area, float width);
-float mapAreaHeightToRatio(Rectangle area, float height);
-float mapAreaCubicSizeToRatio(Rectangle area, float cubicSize);
-```
-Maps size of the area [0; area.width], [0; area.height] or [0; min(area.width, area.height)] depending on the function to a ratio [0; 1]. *mapRatioToAreaCubicSize* is meant for object sizes that should preserve aspect ratio.
-
----
-```cpp
-constexpr inline Vector2 TOP_LEFT = {0.0f, 0.0f};
-constexpr inline Vector2 TOP_CENTER = {0.0f, 0.5f};
-constexpr inline Vector2 TOP_RIGHT = {0.0f, 1.0f};
-constexpr inline Vector2 CENTER_LEFT = {0.5f, 0.0f};
-constexpr inline Vector2 CENTER = {0.5f, 0.5f};
-constexpr inline Vector2 CENTER_RIGHT = {0.5f, 1.0f};
-constexpr inline Vector2 BOTTOM_LEFT = {1.0f, 0.0f};
-constexpr inline Vector2 BOTTOM_CENTER = {1.0f, 0.5f};
-constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
-```
-Origin presets for following render, grid and origin functions.
+Maps area's X/Y/width/height to a ratio. Default area is the window boundaries. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
@@ -786,27 +705,15 @@ Get position/ratio of a grid cell and combine it into a rectangle. *row* and *co
 ---
 ```cpp
 Vector2 getGridCellSize(Rectangle grid, int columns, int rows);
+Vector2 getGridCellRatio(Rectangle grid, int columns, int rows, int type = RATIO);
 ```
-Get grid cell size in grid coordinates.
-
----
-```cpp
-Vector2 getGridCellRatio(Rectangle grid, int columns, int rows);
-Vector2 getGridCellCubicRatio(Rectangle grid, int columns, int rows);
-```
-Get grid cell size in ratio coordinates.
-
----
-```cpp
-Vector2 gridInvalidCell();
-```
-Returns an invalid grid cell constant used in *getGridCell*.
+Get grid cell size in grid/ratio coordinates. *getGridCellRatio* will always return the global ratio, not local ratio for the grid area. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
 Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
 ```
-Returns the grid cell that the position is currently in. Returns *gridInvalidCell()* if position is outside of the grid.
+Returns the grid cell that the position is currently in. Returns *GRID_CELL_INVALID* (from [constants.hpp](#constantshpp)) if position is outside of the grid.
 
 ---
 ```cpp
@@ -846,57 +753,51 @@ Draw text. *origin* must be in range [0; 1]. Fits spacing using *fitSpacing*.
 
 ---
 ```cpp
-void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(Font font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Also scales font size and spacing automatically based on screen size. If no area is supplied then window boundaries are used instead.
+Responsive variation of the previous function. Instead of passing screen position, pass ratio [0; 1]. Also scales font size and spacing automatically based on screen size. If no area is supplied then window boundaries are used instead.
 
 ---
 ```cpp
 void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextResponsive(const std::string &font, Rectangle area, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 ```
 Instead of passing a font, pass an identifier of a font found in the asset manager ([assets.hpp](#assetshpp)).
 
 ---
 ```cpp
-void drawRect(Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawRect(Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
 Draw rectangle. *origin* must be in range [0; 1].
 
 ---
 ```cpp
-void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsive(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsiveCubic(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawRectResponsiveCubic(Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawRectResponsive(Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size. If no area is supplied then window boundaries are used instead.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
-void drawTexture(Texture texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTexture(Texture texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTexture(Texture texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
 ```
 Draw texture. *origin* must be in range [0; 1]. If no source is supplied then the whole texture is rendered.
 
 ---
 ```cpp
-void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(Texture texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureResponsive(Texture texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size. If no area is supplied then window boundaries are used instead.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
 
 ---
 ```cpp
-void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsive(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
-void drawTextureResponsiveCubic(const std::string &texture, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f, Rectangle source = {0, 0, 0, 0});
+void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTexture(const std::string &texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
+void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureResponsive(const std::string &texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
 Instead of passing a texture, pass an identifier to a texture in the asset manager ([assets.hpp](#assetshpp)).
 
@@ -998,22 +899,21 @@ Update animation if it isn't paused and isn't finished playing.
 ---
 ```cpp
 void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimated(Animation animation, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
 Draw animated texture. *origin* must be in range [0; 1].
 
 ---
 ```cpp
-void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsive(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsiveCubic(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
-void drawTextureAnimatedResponsiveCubic(Animation animation, Rectangle area, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
+void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
+void drawTextureAnimatedResponsive(Animation animation, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass screen ratio [0; 1]. Cubic versions will preserve aspect ratio of the size. If no area is supplied then window boundaries are used instead.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
 
-## sru.hpp
+# sru.hpp
 Includes all headers provided by the library.
 
-## text.hpp
+# text.hpp
 Responsible for modifying text.
 
 ---
@@ -1135,7 +1035,7 @@ inline float getFontSizeScaled(float fontSize);
 ```
 Returns the font size scaled responsively based on the window size. Safe from UI overflows.
 
-## util.hpp
+# util.hpp
 Responsible for vector and color utility functions.
 
 ---
@@ -1200,12 +1100,13 @@ Constructs a rectangle from position and size.
 
 ---
 ```cpp
+constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER);
 constexpr inline Vector2 R4pos(Rectangle rect);
 constexpr inline Vector2 R4size(Rectangle rect);
 constexpr inline Vector2 R4center(Rectangle rect);
-constexpr inline Vector2 R4origin(Rectangle rect);
+constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER);
 ```
-Returns the position/size/center/origin of the rectangle respectively.
+Returns the real boundaries/position/size/center/origin of the rectangle respectively.
 
 ---
 ```cpp
@@ -1289,7 +1190,7 @@ constexpr inline Color HSVA(float h, float s, float v, float a);
 ```
 Returns a HSVA color. H must be in range [0; 360], S in range [0; 1], V in range [0; 1] and A in range [0; 1].
 
-## Macros
+# Macros
 This section will document all macros present and their usage in one place. There are two ways to use these macros - either define them before including a header or define them in CMake. Defining them in CMake is safer since it protects you from ODR violations. You can include any macro in your project with this CMake function:
 ```cmake
 target_compile_definitions(${PROJECT_NAME} PRIVATE

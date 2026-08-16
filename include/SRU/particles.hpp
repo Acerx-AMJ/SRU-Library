@@ -1,5 +1,5 @@
 #pragma once
-#include "raylib.h"
+#include "SRU/constants.hpp"
 #include <vector>
 
 using ParticleID = size_t;
@@ -43,10 +43,8 @@ void updateParticleCluster(ParticleID ID, float DT);
 
 void drawParticles();
 void drawParticleCluster(ParticleID ID);
-void drawResponsiveParticles();
-void drawResponsiveParticleCluster(ParticleID ID);
-void drawResponsiveCubicParticles();
-void drawResponsiveCubicParticleCluster(ParticleID ID);
+void drawResponsiveParticles(Rectangle area = WINDOW_AREA, int type = RATIO);
+void drawResponsiveParticleCluster(ParticleID ID, Rectangle area = WINDOW_AREA, int type = RATIO);
 
 void clearParticles();
 void clearParticleCluster(ParticleID ID);
