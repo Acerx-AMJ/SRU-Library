@@ -15,6 +15,7 @@ add_library(srulib STATIC
    source/particles.cpp
    source/render.cpp
    source/text.cpp
+   source/tween.cpp
 )
 
 target_include_directories(srulib PUBLIC

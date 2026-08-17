@@ -1078,7 +1078,7 @@ ID of a tween. 0 - nil.
 
 ---
 ```cpp
-using Formula = std::function<float(float)>;
+using Formula = float(*)(float);
 ```
 Function that takes in *t* in range [0; 1] and returns a value roughly in range [0; 1].
 
