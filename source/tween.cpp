@@ -2,6 +2,7 @@
 #include "raymath.h"
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 // state
 std::vector<Tween> tweens {{}};

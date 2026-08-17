@@ -1,7 +1,6 @@
 #pragma once
 #include <cmath>
 #include <raylib.h>
-#include <functional>
 
 // formulas
 constexpr inline float linear(float t) {
@@ -161,7 +160,7 @@ constexpr inline float bounceInOut(float t) {
 
 // tweens
 using TweenID = size_t;
-using Formula = std::function<float(float)>;
+using Formula = float(*)(float);
 
 enum class TweenType {
    none, integer, floating, v2, v3, v4, r4, color
