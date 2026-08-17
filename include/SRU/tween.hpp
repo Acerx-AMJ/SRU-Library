@@ -180,41 +180,13 @@ struct Tween {
    bool finished = false;
 
    union {
-      struct {
-         int *ivalue;
-         int istart;
-         int iend;
-      };
-      struct {
-         float *fvalue;
-         float fstart;
-         float fend;
-      };
-      struct {
-         Vector2 *v2value;
-         Vector2 v2start;
-         Vector2 v2end;
-      };
-      struct {
-         Vector3 *v3value;
-         Vector3 v3start;
-         Vector3 v3end;
-      };
-      struct {
-         Vector4 *v4value;
-         Vector4 v4start;
-         Vector4 v4end;
-      };
-      struct {
-         Rectangle *r4value;
-         Rectangle r4start;
-         Rectangle r4end;
-      };
-      struct {
-         Color *cvalue;
-         Color cstart;
-         Color cend;
-      };
+      struct { int *ivalue, istart, iend; };
+      struct { float *fvalue, fstart, fend; };
+      struct { Vector2 *v2value, v2start, v2end; };
+      struct { Vector3 *v3value, v3start, v3end; };
+      struct { Vector4 *v4value, v4start, v4end; };
+      struct { Rectangle *r4value, r4start, r4end; };
+      struct { Color *cvalue, cstart, cend; };
    };
 };
 
@@ -245,6 +217,7 @@ Tween &getTween(TweenID ID);
 float getTweenProgress(TweenID ID);
 bool isTweenFinished(TweenID ID);
 bool isTweenPaused(TweenID ID);
+bool isTweenPlaying(TweenID ID);
 bool isTweenValid(TweenID ID);
 
 void updateTweens(float DT);

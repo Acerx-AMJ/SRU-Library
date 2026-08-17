@@ -29,7 +29,7 @@ TweenID pushTween(Tween &tween) {
 }
 
 bool canCreateSequenced(TweenID parentID) {
-   return isTweenValid(parentID) && tweens[parentID].progress == 0.0f;
+   return isTweenValid(parentID) && tweens[parentID].progress == 0.0f && tweens[parentID].sequenced == 0;
 }
 
 TweenID createSequenced(TweenID parentID, TweenID sequencedID) {
@@ -39,7 +39,7 @@ TweenID createSequenced(TweenID parentID, TweenID sequencedID) {
 }
 
 TweenID sequenceError() {
-   printf("srulib::createSequencedTween: could not create sequenced tween due to either parent tween being nil or already playing.\n");
+   printf("srulib::createSequencedTween: could not create sequenced tween due to either parent tween being nil, already playing or has a sequenced tween defined already.\n");
    return 0;
 }
 
@@ -163,6 +163,10 @@ void killTween(TweenID ID) {
    Tween &tween = getTween(ID);
    availableSpots.push_back(ID);
    tween.id = 0;
+
+   if (isTweenValid(tween.sequenced)) {
+      killTween(tween.sequenced);
+   }
 }
 
 Tween &getTween(TweenID ID) {
@@ -183,6 +187,11 @@ bool isTweenFinished(TweenID ID) {
 
 bool isTweenPaused(TweenID ID) {
    return getTween(ID).paused;
+}
+
+bool isTweenPlaying(TweenID ID) {
+   Tween &tween = getTween(ID);
+   return !tween.paused && !tween.finished;
 }
 
 bool isTweenValid(TweenID ID) {

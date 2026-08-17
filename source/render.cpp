@@ -299,7 +299,7 @@ void drawTextureResponsive(const std::string &texture, Rectangle ratios, Vector2
 }
 
 // Animation render utility
-static std::vector<AnimationConfig> animationConfig;
+static std::vector<AnimationConfig> animationConfig {{}};
 
 AnimationConfig::AnimationConfig(Texture texture, size_t frameWidth, size_t frameHeight, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop)
    : texture(texture), frameWidth(frameWidth), frameHeight(frameHeight), gapX(gap), gapY(gap), frameY(frameY), frameCount(frameCount), frameTime(frameTime), loop(loop) {}
@@ -332,7 +332,7 @@ AnimationID pushAnimation(AnimationConfig config) {
 }
 
 AnimationConfig &getAnimation(AnimationID ID) {
-   if (ID >= animationConfig.size()) {
+   if (ID <= 0 || ID >= animationConfig.size()) {
       printf("srulib::getAnimation: ID out of bounds. ID is %llu and animation config count is %llu.\n", ID, animationConfig.size());
       exit(EXIT_FAILURE);
    }

@@ -13,6 +13,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [render.hpp](#renderhpp)
 - - [sru.hpp](#sruhpp)
 - - [text.hpp](#texthpp)
+- - [tween.hpp](#tweenhpp)
 - - [util.hpp](#utilhpp)
 - - [Macros](#macros)
 
@@ -72,6 +73,7 @@ Here you will find the documentation of all headers, functions and structures fo
 - [render.hpp](#renderhpp)
 - [sru.hpp](#sruhpp)
 - [text.hpp](#texthpp)
+- [tween.hpp](#tweenhpp)
 - [util.hpp](#utilhpp)
 
 Or browse miscellaneous documentation:
@@ -406,7 +408,7 @@ Responsible for providing a particle manager.
 ```cpp
 using ParticleID = size_t;
 ```
-Particle ID of a specific particle config instance/particle cluster.
+Particle ID of a specific particle config instance/particle cluster. 0 - nil.
 
 ---
 ```cpp
@@ -805,7 +807,7 @@ Instead of passing a texture, pass an identifier to a texture in the asset manag
 ```cpp
 using AnimationID = size_t;
 ```
-Animation ID of a specific animation config instance.
+Animation ID of a specific animation config instance. 0 - nil.
 
 ---
 ```cpp
@@ -1034,6 +1036,145 @@ Returns a font size that will fit as closely to the width as possible. Spacing i
 inline float getFontSizeScaled(float fontSize);
 ```
 Returns the font size scaled responsively based on the window size. Safe from UI overflows.
+
+# tween.hpp
+Responsible for tweening utility functions and providing formulas for doing so.
+
+---
+```cpp
+constexpr inline float linear(float t);
+constexpr inline float quadratic(float t);
+constexpr inline float quadraticOut(float t);
+constexpr inline float quadraticInOut(float t);
+constexpr inline float cubic(float t);
+constexpr inline float cubicOut(float t);
+constexpr inline float cubicInOut(float t);
+constexpr inline float sinusoidal(float t);
+constexpr inline float sinusoidalOut(float t);
+constexpr inline float sinusoidalInOut(float t);
+constexpr inline float exponential(float t);
+constexpr inline float exponentialOut(float t);
+constexpr inline float exponentialInOut(float t);
+constexpr inline float circular(float t);
+constexpr inline float circularOut(float t);
+constexpr inline float circularInOut(float t);
+constexpr inline float elastic(float t);
+constexpr inline float elasticOut(float t);
+constexpr inline float elasticInOut(float t);
+constexpr inline float back(float t);
+constexpr inline float backOut(float t);
+constexpr inline float backInOut(float t);
+constexpr inline float bounce(float t);
+constexpr inline float bounceOut(float t);
+constexpr inline float bounceInOut(float t);
+```
+Different tween formulas. *t* must be in range [0; 1]. Some function are not guaranteed to return a result in range [0; 1], like for example the *bounce* function and might overshoot/undershoot slightly.
+
+---
+```cpp
+using TweenID = size_t;
+```
+ID of a tween. 0 - nil.
+
+---
+```cpp
+using Formula = std::function<float(float)>;
+```
+Function that takes in *t* in range [0; 1] and returns a value roughly in range [0; 1].
+
+---
+```cpp
+enum class TweenType {
+   none, integer, floating, v2, v3, v4, r4, color
+};
+```
+Tween type. Applied automatically.
+
+---
+```cpp
+struct Tween {
+   TweenType type = TweenType::none;
+   Formula formula = linear;
+   TweenID id = 0;
+   TweenID sequenced = 0;
+
+   float timer = 0.0f;
+   float time = 0.0f;
+   float progress = 0.0f;
+   bool paused = false;
+   bool finished = false;
+
+   union {
+      struct { int *ivalue, istart, iend; };
+      struct { float *fvalue, fstart, fend; };
+      struct { Vector2 *v2value, v2start, v2end; };
+      struct { Vector3 *v3value, v3start, v3end; };
+      struct { Vector4 *v4value, v4start, v4end; };
+      struct { Rectangle *r4value, r4start, r4end; };
+      struct { Color *cvalue, cstart, cend; };
+   };
+};
+```
+Tween that holds information necessary for interpolating from a value to a target. Must not be created manually. *type*, *id* and *sequenced* must not be edited manually. *formula* can use any function that takes a float and returns a float, not necessarily the predefined formulas.
+
+---
+```cpp
+TweenID createTween(int *value, int target, float time, Formula formula = linear);
+TweenID createTween(float *value, float target, float time, Formula formula = linear);
+TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+TweenID createTween(Color *value, Color target, float time, Formula formula = linear);
+```
+Create a new tween. By default uses a linear formula. Tweens are ran and destroyed automatically and only require *updateTweens* to be called every frame.
+
+---
+```cpp
+TweenID createSequencedTween(TweenID parentID, int *value, int target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, float *value, float target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, Vector2 *value, Vector2 target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, Vector3 *value, Vector3 target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, Vector4 *value, Vector4 target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, Rectangle *value, Rectangle target, float time, Formula formula = linear);
+TweenID createSequencedTween(TweenID parentID, Color *value, Color target, float time, Formula formula = linear);
+```
+Creates a sequenced tween based on parent's ID. Sequenced tweens are paused by default and ran when the parent finishes playing. Killing a parent will subsequently kill all sequenced tweens. A single tween cannot have more than one sequenced tween. By default uses a linear formula. Tweens are ran and destroyed automatically and only require *updateTweens* to be called every frame.
+
+---
+```cpp
+void pauseTween(TweenID ID);
+void resumeTween(TweenID ID);
+```
+Pause/resume a tween.
+
+---
+```cpp
+void killTween(TweenID ID);
+```
+Kill a tween and all sequent tweens.
+
+---
+```cpp
+Tween &getTween(TweenID ID);
+```
+Get a tween from ID. Be warned and don't hold references for long as they can be invalidated due to being stored in a dynamic vector.
+
+---
+```cpp
+float getTweenProgress(TweenID ID);
+bool isTweenFinished(TweenID ID);
+bool isTweenPaused(TweenID ID);
+bool isTweenPlaying(TweenID ID);
+bool isTweenValid(TweenID ID);
+```
+Tween getters.
+
+---
+```cpp
+void updateTweens(float DT);
+```
+Update all playing tweens.
 
 # util.hpp
 Responsible for vector and color utility functions.
