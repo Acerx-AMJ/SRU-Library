@@ -119,12 +119,12 @@ constexpr inline Vector2 R4size(Rectangle rect) {
    return {rect.width, rect.height};
 }
 
-constexpr inline Vector2 R4center(Rectangle rect) {
-   return {rect.x + rect.width / 2.0f, rect.y + rect.height / 2.0f};
-}
-
 constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER) {
    return {rect.width * origin.x, rect.height * origin.y};
+}
+
+constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin = CENTER) {
+   return {rect.x + rect.width * origin.x, rect.y + rect.height * origin.y};
 }
 
 // rectangle comparison functions

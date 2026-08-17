@@ -1103,10 +1103,10 @@ Constructs a rectangle from position and size.
 constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER);
 constexpr inline Vector2 R4pos(Rectangle rect);
 constexpr inline Vector2 R4size(Rectangle rect);
-constexpr inline Vector2 R4center(Rectangle rect);
 constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER);
+constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin = CENTER);
 ```
-Returns the real boundaries/position/size/center/origin of the rectangle respectively.
+Returns the real boundaries/position/size/origin/anchor of the rectangle respectively. *R4origin* - local origin inside rectangle. *R4anchor* - global position with rectangle's origin applied.
 
 ---
 ```cpp
