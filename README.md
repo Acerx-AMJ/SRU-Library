@@ -209,13 +209,13 @@ Responsible for providing common constants.
 ---
 ```cpp
 constexpr inline Vector2 TOP_LEFT = {0.0f, 0.0f};
-constexpr inline Vector2 TOP_CENTER = {0.0f, 0.5f};
-constexpr inline Vector2 TOP_RIGHT = {0.0f, 1.0f};
-constexpr inline Vector2 CENTER_LEFT = {0.5f, 0.0f};
+constexpr inline Vector2 TOP_CENTER = {0.5f, 0.0f};
+constexpr inline Vector2 TOP_RIGHT = {1.0f, 0.0f};
+constexpr inline Vector2 CENTER_LEFT = {0.0f, 0.5f};
 constexpr inline Vector2 CENTER = {0.5f, 0.5f};
-constexpr inline Vector2 CENTER_RIGHT = {0.5f, 1.0f};
-constexpr inline Vector2 BOTTOM_LEFT = {1.0f, 0.0f};
-constexpr inline Vector2 BOTTOM_CENTER = {1.0f, 0.5f};
+constexpr inline Vector2 CENTER_RIGHT = {1.0f, 0.5f};
+constexpr inline Vector2 BOTTOM_LEFT = {0.0f, 1.0f};
+constexpr inline Vector2 BOTTOM_CENTER = {0.5f, 1.0f};
 constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
 ```
 Origin presets for render, grid and origin functions.
