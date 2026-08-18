@@ -144,12 +144,11 @@ void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize)
 
       std::string_view truncated = split.substr(0, cut);
       std::string_view remainder = split.substr(cut);
+      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
 
       if (!remainder.empty() && std::isspace(remainder.front())) {
          remainder = remainder.substr(1);
       }
-
-      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
       string += truncated;
       string += (dash ? "-\n" : "\n");
       split = remainder;
@@ -245,16 +244,16 @@ void fitInsideInPlace(std::string &string, Font font, Vector2 maxSize, float fon
          }
       }
       size_t cut = left > 0 ? left - 1 : 0;
-      bool punctuation = (cut < split.size() && std::ispunct(static_cast<unsigned char>(split[cut])));
+      bool punctuation = (cut < split.size() && std::ispunct(split[cut]));
       if (punctuation) cut += 1;
 
       std::string_view truncated = split.substr(0, cut);
       std::string_view remainder = split.substr(cut);
-      if (!remainder.empty() && std::isspace(static_cast<unsigned char>(remainder.front()))) {
+      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
+
+      if (!remainder.empty() && std::isspace(remainder.front())) {
          remainder = remainder.substr(1);
       }
-
-      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
       std::string line = std::string(truncated) + (dash ? "-" : "");
       std::string candidate = string + line + "\n";
 
