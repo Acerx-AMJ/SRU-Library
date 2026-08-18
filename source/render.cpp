@@ -170,7 +170,7 @@ Vector2 convertRatio(Vector2 ratio, int type, int target, Rectangle area) {
 
 float convertRatioX(float ratio, int type, int target, Rectangle area) {
    Rectangle realArea = getArea(area);
-   float aspectRatio = area.width / area.height;
+   float aspectRatio = realArea.width / realArea.height;
 
    // cubic ratio is x * aspectRatio, whereas others are x
    if (aspectRatio > 1.0f) {
@@ -195,7 +195,7 @@ float convertRatioX(float ratio, int type, int target, Rectangle area) {
 
 float convertRatioY(float ratio, int type, int target, Rectangle area) {
    Rectangle realArea = getArea(area);
-   float aspectRatio = area.width / area.height;
+   float aspectRatio = realArea.width / realArea.height;
 
    // fill ratio is y * 1/aspectRatio, whereas others are y
    if (aspectRatio > 1.0f) {
