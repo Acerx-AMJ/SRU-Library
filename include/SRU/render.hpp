@@ -38,6 +38,10 @@ float mapYToRatio(float y, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapWidthToRatio(float width, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapHeightToRatio(float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 
+Vector2 convertRatio(Vector2 ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+float convertRatioX(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+float convertRatioY(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+
 // Grid/origin utility
 Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);

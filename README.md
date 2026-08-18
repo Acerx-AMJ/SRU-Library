@@ -692,6 +692,14 @@ Maps area's X/Y/width/height to a ratio. Default area is the window boundaries. 
 
 ---
 ```cpp
+Vector2 convertRatio(Vector2 ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+float convertRatioX(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+float convertRatioY(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
+```
+Converts a ratio of type *type* to ratio of type *target* in the given area. Check [ratio constants](#constantshpp) for more info on ratio types. Whether or not using *convertRatioX* or *convertRatioY* for a single axis is important.
+
+---
+```cpp
 Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 ```

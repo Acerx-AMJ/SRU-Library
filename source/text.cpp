@@ -144,7 +144,7 @@ void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize)
 
       std::string_view truncated = split.substr(0, cut);
       std::string_view remainder = split.substr(cut);
-      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(split.front());
+      bool dash = !truncated.empty() && !remainder.empty() && std::isalpha(truncated.back()) && std::isalpha(remainder.front());
 
       if (!remainder.empty() && std::isspace(remainder.front())) {
          remainder = remainder.substr(1);

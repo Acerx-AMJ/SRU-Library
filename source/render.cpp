@@ -164,6 +164,60 @@ float mapHeightToRatio(float height, Rectangle area, int type) {
    return height / size;
 }
 
+Vector2 convertRatio(Vector2 ratio, int type, int target, Rectangle area) {
+   return V2(convertRatioX(ratio.x, type, target, area), convertRatioY(ratio.y, type, target, area));
+}
+
+float convertRatioX(float ratio, int type, int target, Rectangle area) {
+   Rectangle realArea = getArea(area);
+   float aspectRatio = area.width / area.height;
+
+   // cubic ratio is x * aspectRatio, whereas others are x
+   if (aspectRatio > 1.0f) {
+      if ((type == RATIO || type == FILL_RATIO) && target == CUBIC_RATIO) {
+         return ratio * aspectRatio;
+      }
+      else if (type == CUBIC_RATIO && (target == RATIO || target == FILL_RATIO)) {
+         return ratio / aspectRatio;
+      }
+   }
+   // fill ratio is x * aspectRatio whereas others are x
+   else if (aspectRatio < 1.0f) {
+      if ((type == RATIO || type == CUBIC_RATIO) && target == FILL_RATIO) {
+         return ratio * aspectRatio;
+      }
+      else if (type == FILL_RATIO && (target == RATIO || target == CUBIC_RATIO)) {
+         return ratio / aspectRatio;
+      }
+   }
+   return ratio;
+}
+
+float convertRatioY(float ratio, int type, int target, Rectangle area) {
+   Rectangle realArea = getArea(area);
+   float aspectRatio = area.width / area.height;
+
+   // fill ratio is y * 1/aspectRatio, whereas others are y
+   if (aspectRatio > 1.0f) {
+      if ((type == RATIO || type == CUBIC_RATIO) && target == FILL_RATIO) {
+         return ratio / aspectRatio;
+      }
+      else if (type == FILL_RATIO && (target == RATIO || target == CUBIC_RATIO)) {
+         return ratio * aspectRatio;
+      }
+   }
+   // cubic ratio is y * 1/aspectRatio whereas others are y
+   else if (aspectRatio < 1.0f) {
+      if ((type == RATIO || type == FILL_RATIO) && target == CUBIC_RATIO) {
+         return ratio / aspectRatio;
+      }
+      else if (type == CUBIC_RATIO && (target == RATIO || target == FILL_RATIO)) {
+         return ratio * aspectRatio;
+      }
+   }
+   return ratio;
+}
+
 // Grid utility
 Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin) {
    return V2((grid.width / columns) * (column + origin.x) + grid.x, (grid.height / rows) * (row + origin.y) + grid.y);
