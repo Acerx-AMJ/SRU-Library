@@ -111,6 +111,10 @@ constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER) {
    return {rect.x - rect.width * origin.x, rect.y - rect.height * origin.y, rect.width, rect.height};
 }
 
+constexpr inline Vector2 R4topleft(Rectangle rect, Vector2 origin = CENTER) {
+   return {rect.x - rect.width * origin.x, rect.y - rect.height * origin.y};
+}
+
 constexpr inline Vector2 R4pos(Rectangle rect) {
    return {rect.x, rect.y};
 }
@@ -123,24 +127,88 @@ constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER) {
    return {rect.width * origin.x, rect.height * origin.y};
 }
 
-constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin = CENTER) {
-   return {rect.x + rect.width * origin.x, rect.y + rect.height * origin.y};
+constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin, Vector2 targetOrigin) {
+   return {rect.x - rect.width * (targetOrigin.x - origin.x), rect.y - rect.height * (targetOrigin.y - origin.y)};
+}
+
+// position/origin functions
+constexpr inline Rectangle getBounds(Vector2 position, Vector2 size, Vector2 origin = CENTER) {
+   return R4(position.x - size.x * origin.x, position.y - size.y * origin.y, size.x, size.y);
+}
+
+constexpr inline Vector2 getTopleft(Vector2 position, Vector2 size, Vector2 origin = CENTER) {
+   return {position.x - size.x * origin.x, position.y - size.y * origin.y};
+}
+
+constexpr inline Vector2 getOrigin(Vector2 size, Vector2 origin = CENTER) {
+   return {size.x * origin.x, size.y * origin.y};
+}
+
+constexpr inline Vector2 getAnchor(Vector2 position, Vector2 size, Vector2 origin, Vector2 targetOrigin) {
+   return {position.x - size.x * (targetOrigin.x - origin.x), position.y - size.y * (targetOrigin.y - origin.y)};
+}
+
+// text functions
+constexpr float fitSpacing(float fontSize) {
+   return fontSize / 10.0f;
+}
+
+inline float fitFontSize(Font font, const char *text, float maxWidth) {
+   float low = 1.0f;
+   float high = maxWidth;
+   float best = 1.0f;
+
+   while (high - low > 0.1f) {
+      float mid = (low + high) / 2.0f;
+      float width = MeasureTextEx(font, text, mid, fitSpacing(mid)).x;
+
+      if (width <= maxWidth) {
+         best = mid;
+         low = mid;
+      } else {
+         high = mid;
+      }
+   }
+   return best;
+}
+
+inline float getFontSizeScaled(float fontSize) {
+   return fontSize * fminf(GetScreenWidth(), GetScreenHeight()) / 1000.0f;
+}
+
+inline Vector2 getTextSize(Font font, const char *text, float fontSize) {
+   return MeasureTextEx(font, text, fontSize, fitSpacing(fontSize));
+}
+
+inline Rectangle getTextBounds(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin = CENTER) {
+   Vector2 size = getTextSize(font, text, fontSize);
+   return R4(position - size * origin, size);
+}
+
+inline Vector2 getTextTopleft(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin = CENTER) {
+   return position - getTextSize(font, text, fontSize) * origin;
+}
+
+inline Vector2 getTextOrigin(Font font, const char *text, float fontSize, Vector2 origin = CENTER) {
+   return getTextSize(font, text, fontSize) * origin;
+}
+
+inline Vector2 getTextAnchor(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin, Vector2 targetOrigin) {
+   return position - getTextSize(font, text, fontSize) * (targetOrigin - origin);
+}
+
+// texture source
+constexpr inline Rectangle getSource(Texture texture) {
+   return {0.0f, 0.0f, (float)texture.width, (float)texture.height};
 }
 
 // rectangle comparison functions
-
 constexpr inline bool operator == (Rectangle lhs, Rectangle rhs) {
    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.width == rhs.width && lhs.height == rhs.height;
 }
 
 constexpr inline bool operator != (Rectangle lhs, Rectangle rhs) {
    return !(lhs == rhs);
-}
-
-// Constexpr color fade
-constexpr inline Color fadeColor(Color color, float a) {
-   color.a = a * 255.0f;
-   return color;
 }
 
 // Color construction utility
@@ -250,7 +318,9 @@ constexpr inline Color HSL(float h, float s, float l) {
 }
 
 constexpr inline Color HSLA(float h, float s, float l, float a) {
-   return fadeColor(HSL(h, s, l), a);
+   Color color = HSL(h, s, l);
+   color.a = a * 255.0f;
+   return color;
 }
 
 constexpr inline Color HSV(float h, float s, float v) {
@@ -273,5 +343,7 @@ constexpr inline Color HSV(float h, float s, float v) {
 }
 
 constexpr inline Color HSVA(float h, float s, float v, float a) {
-   return fadeColor(HSV(h, s, v), a);
+   Color color = HSV(h, s, v);
+   color.a = a * 255.0f;
+   return color;
 }

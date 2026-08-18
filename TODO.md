@@ -6,3 +6,4 @@ input manager
 collisions
 examples
 documentation usage
+add parallels back to tweens

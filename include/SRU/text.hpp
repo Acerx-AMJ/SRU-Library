@@ -47,9 +47,3 @@ void cleanInPlace(std::vector<std::string> &strings);
 bool contains(const std::string &string, const std::string &substring);
 bool startsWith(const std::string &string, const std::string &substring);
 bool endsWith(const std::string &string, const std::string &substring);
-
-// Fit font size
-float fitSpacing(float fontSize);
-float fitFontSize(const char *string, Font font, float maxWidth);
-float fitFontSize(const std::string &string, Font font, float maxWidth);
-float getFontSizeScaled(float fontSize);

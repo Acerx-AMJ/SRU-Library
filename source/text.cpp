@@ -1,4 +1,5 @@
 #include "SRU/text.hpp"
+#include "SRU/util.hpp"
 #include <algorithm>
 #include <iterator>
 #include <sstream>
@@ -460,36 +461,4 @@ bool startsWith(const std::string &string, const std::string &substring) {
 
 bool endsWith(const std::string &string, const std::string &substring) {
    return string.find(substring) == string.size() - substring.size();
-}
-
-// Fit font size
-float fitSpacing(float fontSize) {
-   return fontSize / 10.0f;
-}
-
-float fitFontSize(const char *string, Font font, float maxWidth) {
-   float low = 1.0f;
-   float high = maxWidth;
-   float best = 1.0f;
-
-   while (high - low > 0.1f) {
-      float mid = (low + high) / 2.0f;
-      float width = MeasureTextEx(font, string, mid, fitSpacing(mid)).x;
-
-      if (width <= maxWidth) {
-         best = mid;
-         low = mid;
-      } else {
-         high = mid;
-      }
-   }
-   return best;
-}
-
-float fitFontSize(const std::string &string, Font font, float maxWidth) {
-   return fitFontSize(string.c_str(), font, maxWidth);
-}
-
-float getFontSizeScaled(float fontSize) {
-   return fontSize * std::min(GetScreenWidth(), GetScreenHeight()) / 1000.0f;
 }

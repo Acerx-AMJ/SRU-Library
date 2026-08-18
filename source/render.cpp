@@ -1,7 +1,6 @@
 #include "SRU/render.hpp"
 #include "SRU/assets.hpp"
 #include "SRU/random.hpp"
-#include "SRU/text.hpp"
 #include "SRU/util.hpp"
 
 // helper functions

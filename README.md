@@ -725,30 +725,6 @@ Snaps the position to the grid. Returns position if position is outside of the g
 
 ---
 ```cpp
-Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
-```
-Returns the size of the text based on parameters.
-
----
-```cpp
-Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing, Vector2 origin = CENTER);
-```
-Returns the center position of the text based on parameters. *origin* must be in range [0; 1].
-
----
-```cpp
-constexpr inline Vector2 getOrigin(Vector2 size, Vector2 origin = CENTER);
-```
-Returns the origin of the size. *origin* must be in range [0; 1].
-
----
-```cpp
-constexpr inline Rectangle getSource(Texture texture);
-```
-Returns the full texture source - *{0, 0, width, height}*.
-
----
-```cpp
 void drawText(Font font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
 Draw text. *origin* must be in range [0; 1]. Fits spacing using *fitSpacing*.
@@ -1018,25 +994,6 @@ bool endsWith(const std::string &string, const std::string &substring);
 ```
 Returns true if the string contains the given substring in a specific location.
 
----
-```cpp
-float fitSpacing(float fontSize);
-```
-Returns spacing that fits the font size.
-
----
-```cpp
-float fitFontSize(const char *string, Font font, float maxWidth);
-float fitFontSize(const std::string &string, Font font, float maxWidth);
-```
-Returns a font size that will fit as closely to the width as possible. Spacing is handled automatically using *fitSpacing()*.
-
----
-```cpp
-inline float getFontSizeScaled(float fontSize);
-```
-Returns the font size scaled responsively based on the window size. Safe from UI overflows.
-
 # tween.hpp
 Responsible for tweening utility functions and providing formulas for doing so.
 
@@ -1242,12 +1199,50 @@ Constructs a rectangle from position and size.
 ---
 ```cpp
 constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER);
+constexpr inline Vector2 R4topleft(Rectangle rect, Vector2 origin = CENTER);
 constexpr inline Vector2 R4pos(Rectangle rect);
 constexpr inline Vector2 R4size(Rectangle rect);
 constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER);
-constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin = CENTER);
+constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin, Vector2 targetOrigin);
 ```
-Returns the real boundaries/position/size/origin/anchor of the rectangle respectively. *R4origin* - local origin inside rectangle. *R4anchor* - global position with rectangle's origin applied.
+Returns the real boundaries/top-left position/position/size/origin/anchor of the rectangle respectively. *R4anchor* - returns global position with *targetOrigin* applied based on its origin. *R4topleft* - returns the top-left corner of the rectangle based on its origin.
+
+---
+```cpp
+constexpr inline Rectangle getBounds(Vector2 position, Vector2 size, Vector2 origin = CENTER);
+constexpr inline Vector2 getTopleft(Vector2 position, Vector2 size, Vector2 origin = CENTER);
+constexpr inline Vector2 getOrigin(Vector2 size, Vector2 origin = CENTER);
+constexpr inline Vector2 getAnchor(Vector2 position, Vector2 size, Vector2 origin, Vector2 targetOrigin);
+```
+Returns the real boundaries/top-left position/origin/anchor respectively. *getAnchor* - returns global position with *targetOrigin* applied based on its origin. *getTopleft* - returns the top-left corner based on origin.
+
+---
+```cpp
+constexpr float fitSpacing(float fontSize);
+```
+Fits spacing based on font size.
+
+---
+```cpp
+inline float fitFontSize(Font font, const char *text, float maxWidth);
+```
+Fits font size based on width. Fits spacing automatically using *fitSpacing*.
+
+---
+```cpp
+inline Vector2 getTextSize(Font font, const char *text, float fontSize);
+inline Rectangle getTextBounds(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin = CENTER);
+inline Vector2 getTextTopleft(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin = CENTER);
+inline Vector2 getTextOrigin(Font font, const char *text, float fontSize, Vector2 origin = CENTER);
+inline Vector2 getTextAnchor(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin, Vector2 targetOrigin);
+```
+Returns the size/real boundaries/top-left position/origin/anchor of the text respectively. *getAnchor* - returns global position with *targetOrigin* applied based on its origin. *getTopleft* - returns the top-left corner based on origin.
+
+---
+```cpp
+constexpr inline Rectangle getSource(Texture texture);
+```
+Returns full texture source.
 
 ---
 ```cpp
@@ -1255,12 +1250,6 @@ constexpr inline bool operator == (Rectangle lhs, Rectangle rhs);
 constexpr inline bool operator != (Rectangle lhs, Rectangle rhs);
 ```
 Rectangle comparison functions.
-
----
-```cpp
-constexpr inline Color fadeColor(Color color, float a);
-```
-Constexpr version of Raylib's *FadeColor(Color, float)*. Fades the color with the coresponding alpha, which must be in range [0; 1].
 
 ---
 ```cpp

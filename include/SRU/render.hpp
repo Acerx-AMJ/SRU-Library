@@ -50,17 +50,6 @@ Vector2 getGridCellRatio(Rectangle grid, int columns, int rows, int type = RATIO
 Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
 Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin = CENTER);
 
-Vector2 getTextSize(Font font, const char *text, float fontSize, float spacing);
-Vector2 getTextOrigin(Font font, const char *text, float fontSize, float spacing, Vector2 origin = CENTER);
-
-constexpr inline Vector2 getOrigin(Vector2 size, Vector2 origin = CENTER) {
-   return {size.x * origin.x, size.y * origin.y};
-}
-
-constexpr inline Rectangle getSource(Texture texture) {
-   return {0.0f, 0.0f, (float)texture.width, (float)texture.height};
-}
-
 // Render utility
 void drawText(Font font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
