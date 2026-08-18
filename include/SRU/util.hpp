@@ -128,7 +128,7 @@ constexpr inline Vector2 R4origin(Rectangle rect, Vector2 origin = CENTER) {
 }
 
 constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin, Vector2 targetOrigin) {
-   return {rect.x - rect.width * (targetOrigin.x - origin.x), rect.y - rect.height * (targetOrigin.y - origin.y)};
+   return {rect.x + rect.width * (targetOrigin.x - origin.x), rect.y + rect.height * (targetOrigin.y - origin.y)};
 }
 
 // position/origin functions
@@ -145,7 +145,7 @@ constexpr inline Vector2 getOrigin(Vector2 size, Vector2 origin = CENTER) {
 }
 
 constexpr inline Vector2 getAnchor(Vector2 position, Vector2 size, Vector2 origin, Vector2 targetOrigin) {
-   return {position.x - size.x * (targetOrigin.x - origin.x), position.y - size.y * (targetOrigin.y - origin.y)};
+   return {position.x + size.x * (targetOrigin.x - origin.x), position.y + size.y * (targetOrigin.y - origin.y)};
 }
 
 // text functions
@@ -194,7 +194,7 @@ inline Vector2 getTextOrigin(Font font, const char *text, float fontSize, Vector
 }
 
 inline Vector2 getTextAnchor(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin, Vector2 targetOrigin) {
-   return position - getTextSize(font, text, fontSize) * (targetOrigin - origin);
+   return position + getTextSize(font, text, fontSize) * (targetOrigin - origin);
 }
 
 // texture source
