@@ -14,9 +14,12 @@ constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
 
 constexpr inline Rectangle FULL_SOURCE = {0, 0, 0, 0};
 constexpr inline Rectangle WINDOW_AREA = {0, 0, 0, 0};
+constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
 
 constexpr inline int RATIO = 0;
 constexpr inline int CUBIC_RATIO = 1;
 constexpr inline int FILL_RATIO = 2;
 
-constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
+constexpr inline int FILE_TRIMMED = 0;
+constexpr inline int FILE_TRIMMED_COMMENTS = 1;
+constexpr inline int FILE_RAW = 2;

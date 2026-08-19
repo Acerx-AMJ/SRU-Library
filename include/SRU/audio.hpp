@@ -11,7 +11,7 @@
 #endif // SRULIB_MAX_PITCH
 
 void playSound(const std::string &name, float volume = 1.0f);
-void playSoundPure(const std::string &name, float pitch = 1.0f, float volume = 1.0f);
+void playSound(const std::string &name, float pitch, float volume);
 
 void playRawSound(Sound sound, float volume = 1.0f);
-void playRawSoundPure(Sound sound, float pitch = 1.0f, float volume = 1.0f);
+void playRawSound(Sound sound, float pitch, float volume);

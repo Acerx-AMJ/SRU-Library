@@ -7,6 +7,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
 - - [constants.hpp](#constantshpp)
+- - [error.hpp](#errorhpp)
 - - [file.hpp](#filehpp)
 - - [particles.hpp](#particleshpp)
 - - [random.hpp](#randomhpp)
@@ -67,6 +68,7 @@ Here you will find the documentation of all headers, functions and structures fo
 - [assets.hpp](#assetshpp)
 - [audio.hpp](#audiohpp)
 - [constants.hpp](#constantshpp)
+- [error.hpp](#errorhpp)
 - [file.hpp](#filehpp)
 - [particles.hpp](#particleshpp)
 - [random.hpp](#randomhpp)
@@ -80,9 +82,9 @@ Or browse miscellaneous documentation:
 - [Macros](#macros)
 
 # assets.hpp
-Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot.
+Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot. Is not thread safe.
 
----
+### loadAsset
 ```cpp
 Texture &loadTexture(const std::string &name, const std::string &path);
 Font &loadFont(const std::string &name, const std::string &path);
@@ -90,9 +92,11 @@ Shader &loadShader(const std::string &name, const std::string &vertexPath, const
 Model &loadModel(const std::string &name, const std::string &path);
 SoundPool &loadSoundIntoPool(const std::string &name, const std::string &path);
 ```
-Loads an asset from the given path and saves it in an internal asset map. Returns the asset if it already exists. Terminates if the asset failed to load. *loadShader* skips loading vertex or fragment shader if an empty string is supplied. *loadSoundIntoPool* instead loads the sound in the pool with the given name and returns the pool.
+Load an asset from the given path and save it. Returns the asset if it already exists. **loadShader** skips loading vertext/fragment shader if passed path is empty. **loadSoundIntoPool** load a sound into a sound pool and returns the whole pool instead of just returning a sound. 
 
----
+**loadTexture** and **loadFont** provide fallbacks on fail, whereas **loadShader**, **loadModel** and **loadSoundIntoPool** provide invalid objects on fail. It's possible to check if an asset failed to load using [assetExists](#assetexists) family of functions.
+
+### loadAssets
 ```cpp
 void loadTextures(const std::string &path);
 void loadFonts(const std::string &path);
@@ -100,15 +104,15 @@ void loadShaders(const std::string &path);
 void loadModels(const std::string &path);
 void loadSounds(const std::string &path);
 ```
-Loads all files as assets recursively from the given path. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load. *loadShader* automatically groups vertex (.vs) and fragment (.fs) shaders together. *loadSounds* automatically groups sounds with the same name but different numbering (e.g. sound, sound1, sound2, ...).
+Load all files as assets recursively from the given path. Creates the folder if it doesn't already exist and won't load any assets if the path provided is not a directory. **loadSounds** automatically groups sounds with the same name but with different numbering together in a pool (e.g. sound, sound1, sound2, ...) and **loadShader** automatically groups vertex (.vs) and fragment (.fs) shaders with the same name together. See [loadAsset](#loadasset) family of functions for more info on loading.
 
 ---
 ```cpp
 void loadAssets(const std::string &path);
 ```
-Loads all files recursively as assets based on the file extension. Only loads file types supported by Raylib (see [here](https://github.com/raysan5/raylib/blob/master/FAQ.md#what-file-formats-are-supported-by-raylib)) and .vs and .fs files. Creates the folder if it does not exist. Terminates if the path provided is a file or if any of the assets failed to load. Automatically groups sounds with the same name but different numbering (e.g. sound, sound1, sound2, ...).
+Load all files recursively as assets based on the file extension. Only loads file types supported by [Raylib](https://github.com/raysan5/raylib/blob/master/FAQ.md#what-file-formats-are-supported-by-raylib) and .vs and .fs files. Creates the folder if it does not exist and won't load any assets if the path provided is not a directory. Automatically groups sounds with the same name but with different numbering together in a pool (e.g. sound, sound1, sound2, ...) and vertex (.vs) and fragment (.fs) shaders with the same name together. See [loadAsset](#loadasset) family of functions for more info on loading.
 
----
+### unloadAsset
 ```cpp
 void unloadTexture(const std::string &name);
 void unloadFont(const std::string &name);
@@ -116,9 +120,9 @@ void unloadShader(const std::string &name);
 void unloadModel(const std::string &name);
 void unloadSound(const std::string &name);
 ```
-Unloads an asset if it exists.
+Unloads an asset if it exists. Does nothing otherwise.
 
----
+### unloadAssets
 ```cpp
 void unloadTextures();
 void unloadFonts();
@@ -134,7 +138,7 @@ void unloadAssets();
 ```
 Unloads all assets - textures, fonts, shaders, models and sounds.
 
----
+### assetExists
 ```cpp
 bool textureExists(const std::string &name);
 bool fontExists(const std::string &name);
@@ -142,9 +146,9 @@ bool shaderExists(const std::string &name);
 bool modelExists(const std::string &name);
 bool soundExists(const std::string &name);
 ```
-Returns whether or not asset by the given name exists.
+Returns whether or not asset by the given name exists. Assets that fail to load, including fallback assets, do not exist in the map and therefore this can be used for error checking.
 
----
+### getAsset
 ```cpp
 Texture &getTexture(const std::string &name);
 Font &getFont(const std::string &name);
@@ -152,9 +156,9 @@ Shader &getShader(const std::string &name);
 Model &getModel(const std::string &name);
 SoundPool &getSoundPool(const std::string &name);
 ```
-Returns asset by name if it exists. Terminates if it does not.
+Returns asset by name if it exists. **getTexture** and **getFont** provide fallbacks on fail, whereas **getShader**, **getModel** and **getSoundPool** provide invalid objects. It's possible to check if an asset is valid using [assetExists](#assetexists) family of functions.
 
----
+### getAssetMap
 ```cpp
 std::unordered_map<std::string, Texture> &getTextureMap();
 std::unordered_map<std::string, Font> &getFontMap();
@@ -162,12 +166,12 @@ std::unordered_map<std::string, Shader> &getShaderMap();
 std::unordered_map<std::string, Model> &getModelMap();
 std::unordered_map<std::string, SoundPool> &getSoundPoolMap();
 ```
-Returns a reference to the specified map.
+Returns a reference to the given asset map.
 
 # audio.hpp
 Responsible for playing audio.
 
----
+### Audio Macros
 ```cpp
 #define SRULIB_MIN_PITCH 0.925f
 ```
@@ -179,34 +183,24 @@ Defines the default minimum pitch used in *playSound*. Default is 0.925.
 ```
 Defines the default maximum pitch used in *playSound*. Default is 1.075.
 
----
+### playSound
 ```cpp
 void playSound(const std::string &name, float volume = 1.0f);
+void playSound(const std::string &name, float pitch, float volume);
 ```
-Retrives the sound pool from the asset manager, selects a random sound from the pool and plays it. Assigns the sound a random pitch based on macros.
-
----
-```cpp
-void playSoundPure(const std::string &name, float pitch = 1.0f, float volume = 1.0f);
-```
-Retrieves the sound pool from the asset manager, selects a random sound from the pool and plays it.
+Retrieves the sound pool from the asset manager if exists and plays a random sound. If no pitch is supplied then random pitch is used instead based on [Audio Macros](#audio-macros). Throws a warning on non-existent/invalid sound pool.
 
 ---
 ```cpp
 void playRawSound(Sound sound, float volume = 1.0f);
+void playRawSound(Sound sound, float pitch, float volume);
 ```
-Plays the sound. Assigns the sound a random pitch based on macros.
-
----
-```cpp
-void playRawSoundPure(Sound sound, float pitch = 1.0f, float volume = 1.0f);
-```
-Plays the sound.
+Plays a sound. If no pitch is supplied then random pitch is used instead based on [Audio Macros](#audio-macros).
 
 # constants.hpp
 Responsible for providing common constants.
 
----
+### Origin Constants
 ```cpp
 constexpr inline Vector2 TOP_LEFT = {0.0f, 0.0f};
 constexpr inline Vector2 TOP_CENTER = {0.5f, 0.0f};
@@ -220,7 +214,7 @@ constexpr inline Vector2 BOTTOM_RIGHT = {1.0f, 1.0f};
 ```
 Origin presets for render, grid and origin functions.
 
----
+### Render Constants
 ```cpp
 constexpr inline Rectangle FULL_SOURCE = {0, 0, 0, 0};
 constexpr inline Rectangle WINDOW_AREA = {0, 0, 0, 0};
@@ -229,92 +223,142 @@ Defaults for render functions - use full texture source and use window boundarie
 
 ---
 ```cpp
+constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
+```
+Invalid grid cell. Returns from [getGridCell](#getgridcell).
+
+### Ratio Constants
+```cpp
 constexpr inline int RATIO = 0;
 constexpr inline int CUBIC_RATIO = 1;
 constexpr inline int FILL_RATIO = 2;
 ```
-Ratio types used in [render.hpp](#renderhpp) header. *RATIO* uses regular size. *CUBIC_RATIO* uses minimum size component - width or height - as both size components, meaning it preserves aspect ratio and prevents any overflow. *FILL_RATIO* uses maximum size component - width or height - as both size components, meaning it is guaranteed to overflow and fill.
+Ratio types used in [render.hpp](#renderhpp) header. **RATIO** uses regular size. **CUBIC_RATIO** uses minimum size component - width or height - as both size components, meaning it preserves aspect ratio and prevents any overflow. **FILL_RATIO** uses maximum size component - width or height - as both size components, meaning it is guaranteed to overflow and fill.
+
+### File Constants
+```cpp
+constexpr inline int FILE_TRIMMED = 0;
+constexpr inline int FILE_TRIMMED_COMMENTS = 1;
+constexpr inline int FILE_RAW = 2;
+```
+File read types used in [file.hpp](#filehpp) header. **FILE_TRIMMED** reads lines, trims them and ignores empty ones. **FILE_TRIMMED_COMMENTS** reads lines, trims them and ignores empty ones and comments, **FILE_RAW** returns raw lines.
+
+# error.hpp
+Responsible for customizing error handling used in the library.
+
+### Log Level
+```cpp
+enum class SRULibLogLevel { all, error, none };
+```
+Log level of the library: all - log warnings and errors, error - log only fatal errors, none - do not log anything.
 
 ---
 ```cpp
-constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
+void setSRULibLogLevel(SRULibLogLevel level);
 ```
-Invalid grid cell. Returns from *getGridCell* from [render.hpp](#renderhpp) header.
+Set the log level of the library.
+
+### Callback
+```cpp
+using SRULibCallback = void(*)(const char *msg);
+```
+Callback used for displaying errors and warnings.
+
+---
+```cpp
+void setSRULibErrorCallback(SRULibCallback callback);
+void setSRULibWarningCallback(SRULibCallback callback);
+```
+Set error/warning callback for the library. By default warning callback simply prints the warning, whereas error callback prints the error and calls **exit(EXIT_FAILURE)**.
+
+### Error/Warning
+```cpp
+void SRULibError(const char *msg);
+void SRULibWarning(const char *msg);
+```
+Call the error/warning callback with the given message.
 
 # file.hpp
 Responsible for providing common file I/O utilities.
 
----
+### getLinesFromFile
 ```cpp
-std::vector<std::string> getLinesFromFile(const std::string &path);
-std::vector<std::string> getRawLinesFromFile(const std::string &path);
-std::vector<std::string> getLinesFromFileIgnoringComments(const std::string &path, const std::string &comment);
+std::vector<std::string> getLinesFromFile(const std::string &path, int type = FILE_TRIMMED, const std::string &comment = "");
 ```
-Get all lines from a file. *getRawLinesFromFile* returns raw lines, *getLinesFromFile* trims lines and ignores empty lines and *getLinesFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+Get all lines from a file. See [File Constants](#file-constants) for read types.
 
----
+### getRandomLineFromFile
 ```cpp
-std::string getRandomLineFromFile(const std::string &path);
-std::string getRandomRawLineFromFile(const std::string &path);
-std::string getRandomLineFromFileIgnoringComments(const std::string &path, const std::string &comment);
+std::string getRandomLineFromFile(const std::string &path, int type = FILE_TRIMMED, const std::string &comment = "");
 ```
-Get a random line from a file. *getRandomRawLineFromFile* returns raw lines, *getRandomLineFromFile* trims lines and ignores empty lines and *getRandomLineFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+Get a random line from a file. See [File Constants](#file-constants) for read types.
 
----
+### getKeyValuePairFromFile
 ```cpp
-std::unordered_map<std::string, std::string> getKeyValuePairFromFile(const std::string &path, const std::string &delimiter);
-std::unordered_map<std::string, std::string> getRawKeyValuePairFromFile(const std::string &path, const std::string &delimiter);
-std::unordered_map<std::string, std::string> getKeyValuePairFromFileIgnoringComments(const std::string &path, const std::string &delimiter, const std::string &comment);
+std::unordered_map<std::string, std::string> getKeyValuePairFromFile(const std::string &path, const std::string &delimiter = "=", int type = FILE_TRIMMED, const std::string &comment = "");
 ```
-Get a key value pair from a file. *getRawKeyValuePairFromFile* returns raw lines, *getKeyValuePairFromFile* trims lines and ignores empty lines and *getKeyValuePairFromFileIgnoringComments* trims lines and ignores empty lines and comments. Comments are ignored from the start of the comment to the end of the line. Lines are expected to be in the format: key delimiter value (e.g. `color=red`). If a line does not contain the delimiter the line will be used as a key with an empty value. For both functions except *getRawKeyValuePairFromFile* empty keys are ignored. All functions allow empty values (e.g. `color=` or `color`). Throws a warning if the file couldn't be opened. In that case the output will be empty.
+Get a key value pair from a file. See [File Constants](#file-constants) for read types. Lines are expected to be in format **KEY=VALUE**. Unless read type is set to **FILE_RAW**, empty keys will be ignored. Values, however, can be empty and if no delimiter is found in a line then the line will be used as a key with an empty value.
 
----
+### getFileContents
 ```cpp
 std::string getFileContents(const std::string &path);
 ```
-Reads entire contents of the file into a string. Throws a warning if the file couldn't be opened. In that case the output will be empty.
+Reads entire file into a string.
 
----
+### getFileInPlace
 ```cpp
-void getLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path);
-void getRawLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path);
-void getLinesFromFileIgnoringCommentsInPlace(std::vector<std::string> &output, const std::string &path, const std::string &comment);
-void getRandomLineFromFileInPlace(std::string &output, const std::string &path);
-void getRandomRawLineFromFileInPlace(std::string &output, const std::string &path);
-void getRandomLineFromFileIgnoringCommentsInPlace(std::string &output, const std::string &path, const std::string &comment);
-void getKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter);
-void getRawKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter);
-void getKeyValuePairFromFileIgnoringCommentsInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter, const std::string &comment);
+void getLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path, int type = FILE_TRIMMED, const std::string &comment = "");
+void getRandomLineFromFileInPlace(std::string &output, const std::string &path, int type = FILE_TRIMMED, const std::string &comment = "");
+void getKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter = "=", int type = FILE_TRIMMED, const std::string &comment = "");
 void getFileContentsInPlace(std::string &output, const std::string &path);
 ```
 Same as the previous functions but store output directly in a variable.
 
----
+### writeFile
 ```cpp
-bool writeKeyValuePairToFile(const std::string &path, const std::unordered_map<std::string, std::string> &map, const std::string &delimiter);
-```
-Writes the map to a file in the format: key delimiter value (e.g. `color=red`). Throws a warning if the file couldn't be opened. Returns the success of the operation.
-
----
-```cpp
+bool writeKeyValuePairToFile(const std::string &path, const std::unordered_map<std::string, std::string> &map, const std::string &delimiter = "=");
 bool writeFile(const std::string &path, const std::string &contents);
-bool writeFileLines(const std::string &path, const std::vector<std::string> &lines);
+bool writeFile(const std::string &path, const std::vector<std::string> &lines);
 ```
-Writes the contents to the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
+Writes contents to a file. **writeKeyValuePairToFile** writes the map in the format **KEY=VALUE**. Returns the success of the operation.
 
----
+### appendFile
 ```cpp
 bool appendFile(const std::string &path, const std::string &contents);
-bool appendFileLines(const std::string &path, const std::vector<std::string> &lines);
+bool appendFile(const std::string &path, const std::vector<std::string> &lines);
 ```
-Appends the contents to the existing contents of the file. Throws a warning if the file couldn't be opened. Returns the success of the operation.
+Appends contents to a file. Returns the success of the operation.
 
----
+### createDirectory
+```cpp
+bool createDirectory(const std::string &path);
+```
+Creates directories recursively. Returns the success of the operation.
+
+### deleteFile
+```cpp
+bool deleteFile(const std::string &path);
+```
+Deletes file/directory recursively. Returns the success of the operation. Will return false when attempting to delete a file that does not exist.
+
+### copyFile/moveFile
+```cpp
+bool copyFile(const std::string &path, const std::string &destination);
+bool moveFile(const std::string &path, const std::string &destination);
+```
+Copy/move a file/directory recursively. Returns the success of the operation
+
+### pathExists
+```cpp
+bool pathExists(const std::string &path);
+bool fileExists(const std::string &path);
+bool directoryExists(const std::string &path);
+```
+Returns whether path/file/directory exists.
+
+### Line/Header Structs
 ```cpp
 struct Line {
-   Line() = default;
-   Line(const std::string &field, const std::string &value);
-
    std::string field;
    std::string value;
 };
@@ -324,21 +368,17 @@ A line containing a field and value.
 ---
 ```cpp
 struct Header {
-   Header() = default;
-   Header(const std::string &name, const std::vector<Line> &lines)
-      : name(name), lines(lines) {}
-
    std::string name;
    std::vector<Line> lines;
 };
 ```
 A header containing its name and lines associated with it.
 
----
+### getHeadersFromConfig
 ```cpp
-std::vector<Header> getHeadersFromConfig(const std::string &path, const std::string &comment, const std::string &headerStart, const std::string &headerEnd, char delimiter);
+std::vector<Header> getHeadersFromConfig(const std::string &path, const std::string &comment = "#", const std::string &headerStart = "[", const std::string &headerEnd = "]", char delimiter = '=');
 ```
-Returns headers with their following config based on following syntax, here's an example assuming *comment='#'*, *headerStart='['*, *headerEnd=']'*, *delimiter='='*:
+Returns headers with their following config based on following syntax, here's a syntax example assuming **comment='#'**, **headerStart='['**, **headerEnd=']'**, **delimiter='='**:
 ```python
 # Comments and empty lines are ignored
 [audio]
@@ -349,57 +389,25 @@ music_volume=1
 fullscreen=true
 resolution=1920,1080
 ```
-This file would return the following:
-```
-std::vector<Header>{
-   Header{
-      name = "audio",
-      lines = {
-         Line{
-            field = "sfx_volume",
-            value = "1",
-         },
-         Line{
-            field = "music_volume",
-            value = "1",
-         },
-      },
-   },
-   Header{
-      name = "resolution",
-      lines = {
-         Line{
-            field = "fullscreen",
-            value = "true",
-         },
-         Line{
-            field = "resolution",
-            value = "1920,1080",
-         },
-      },
-   },
-}
-```
-And then the following values can be extracted using these functions:
+This file would return two headers - audio and display - with their corresponding config key, value pairs. The values from the key, value pairs can be extracted using [getValue](#getvalue) functions.
 
----
+### getValue
 ```cpp
-int getIntValue(const std::string &value);
-float getFloatValue(const std::string &value);
-bool getBoolValue(const std::string &value);
-std::string getStringValue(const std::string &value);
-Vector2 getV2Value(const std::string &value);
-Vector3 getV3Value(const std::string &value);
-Vector4 getV4Value(const std::string &value);
-Color getColorValue(const std::string &value);
-std::vector<int> getIntArrayValue(const std::string &value);
-std::vector<float> getFloatArrayValue(const std::string &value);
-std::vector<bool> getBoolArrayValue(const std::string &value);
-std::vector<std::string> getArrayValue(const std::string &value);
-std::vector<Line> getDictionaryValue(const std::string &value, char delimiter);
+int getIntValue(const std::string &value, bool *ok = nullptr);
+float getFloatValue(const std::string &value, bool *ok = nullptr);
+bool getBoolValue(const std::string &value, bool *ok = nullptr);
+std::string getStringValue(const std::string &value, bool *ok = nullptr);
+Vector2 getV2Value(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+Vector3 getV3Value(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+Vector4 getV4Value(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+Color getColorValue(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+std::vector<int> getIntArrayValue(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+std::vector<float> getFloatArrayValue(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+std::vector<char> getBoolArrayValue(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+std::vector<std::string> getArrayValue(const std::string &value, char delimiter = ',', bool *ok = nullptr);
+std::vector<Line> getDictionaryValue(const std::string &value, char delimiter = ',', char keyValueDelimiter = '=', bool *ok = nullptr);
 ```
-Converts string to specified value. *getIntValue*, *getFloatValue*, *getBoolValue*, *getV2Value*, *getV3Value*, *getV4Value* throws warning on invalid type and returns 0 as fallback. *getColorValue* throws warning on invalid type and returns a black color as fallback. *getIntArrayValue*, *getFloatArrayValue*, *getBoolArrayValue*, *getArrayValue* returns values separated by commas and throw warnings on their sub-types being invalid. *getDictionaryValue* returns key, value pairs separated by commas and throws warning when delimiter is not found.
-
+Converts string to specified value. Returns 0/BLACK/empty on fail. Optionally sets **ok** based on success of the conversion. **getIntArrayValue**, **getFloatArrayValue**, **getBoolArrayValue** and **getArrayValue** return values separated by commas. **getDictionaryValue** returns key, value pairs separated by commas.
 
 # particles.hpp
 Responsible for providing a particle manager.
@@ -719,7 +727,7 @@ Vector2 getGridCellRatio(Rectangle grid, int columns, int rows, int type = RATIO
 ```
 Get grid cell size in grid/ratio coordinates. *getGridCellRatio* will always return the global ratio, not local ratio for the grid area. Check [ratio constants](#constantshpp) for more info on ratio types.
 
----
+### getGridCell
 ```cpp
 Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
 ```

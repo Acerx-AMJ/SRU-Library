@@ -5,5 +5,5 @@ navigation manager (fuck that)
 input manager
 collisions
 examples
-documentation usage
+documentation usage, document errors?
 add parallels back to tweens

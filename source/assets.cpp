@@ -1,4 +1,5 @@
 #include "SRU/assets.hpp"
+#include "SRU/error.hpp"
 #include <filesystem>
 
 static std::unordered_map<std::string, Texture> textures;
@@ -7,6 +8,12 @@ static std::unordered_map<std::string, Shader> shaders;
 static std::unordered_map<std::string, Model> models;
 static std::unordered_map<std::string, std::vector<Sound>> sounds;
 
+static Texture fallbackTexture {0};
+static Font fallbackFont {0};
+static Shader fallbackShader {0};
+static Model fallbackModel {{}, 0};
+static std::vector<Sound> fallbackSound;
+
 // Load asset functions
 Texture &loadTexture(const std::string &name, const std::string &path) {
    if (auto it = textures.find(name); it != textures.end()) {
@@ -14,10 +21,16 @@ Texture &loadTexture(const std::string &name, const std::string &path) {
    }
 
    Texture texture = LoadTexture(path.c_str());
-   if (texture.id == 0) {
-      printf("srulib::loadTexture: Failed to load texture from file '%s'.\n", path.c_str());
-      exit(EXIT_FAILURE);
+   if (!IsTextureValid(texture)) {
+      if (!IsTextureValid(fallbackTexture)) {
+         Image image = GenImageChecked(8, 8, 2, 2, BLACK, PURPLE);
+         fallbackTexture = LoadTextureFromImage(image);
+         UnloadImage(image);
+      }
+      SRULibWarning(TextFormat("srulib::loadTexture: Failed to load texture from file '%s'. Using fallback.\n", path.c_str()));
+      return fallbackTexture;
    }
+
    textures.insert({name, texture});
    return textures[name];
 }
@@ -28,9 +41,9 @@ Font &loadFont(const std::string &name, const std::string &path) {
    }
 
    Font font = LoadFontEx(path.c_str(), 120, nullptr, 0);
-   if (font.texture.id == 0) {
-      printf("srulib::loadFont: Failed to load font from file '%s'.\n", path.c_str());
-      exit(EXIT_FAILURE);      
+   if (!IsFontValid(font)) {
+      SRULibWarning(TextFormat("srulib::loadFont: Failed to load font from file '%s'. Using fallback.\n", path.c_str()));
+      return fallbackFont;
    }
 
    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
@@ -43,11 +56,12 @@ Shader &loadShader(const std::string &name, const std::string &vertexPath, const
       return it->second;
    }
 
-   Shader shader = LoadShader(vertexPath.c_str(), fragmentPath.c_str());
-   if (shader.id == 0) {
-      printf("srulib::loadShader: Failed to load shader from files: vertex: '%s', fragment: '%s'.\n", vertexPath.c_str(), fragmentPath.c_str());
-      exit(EXIT_FAILURE);
+   Shader shader = LoadShader((vertexPath.empty() ? nullptr : vertexPath.c_str()), (fragmentPath.empty() ? nullptr : fragmentPath.c_str()));
+   if (!IsShaderValid(shader)) {
+      SRULibWarning(TextFormat("srulib::loadShader: Failed to load shader from files: vertex: '%s', fragment: '%s'.\n", vertexPath.c_str(), fragmentPath.c_str()));
+      return fallbackShader;
    }
+
    shaders.insert({name, shader});
    return shaders[name];
 }
@@ -58,19 +72,20 @@ Model &loadModel(const std::string &name, const std::string &path) {
    }
 
    Model model = LoadModel(path.c_str());
-   if (model.meshCount == 0) {
-      printf("srulib::loadModel: Failed to load model from file '%s'.\n", path.c_str());
-      exit(EXIT_FAILURE);
+   if (!IsModelValid(model)) {
+      SRULibWarning(TextFormat("srulib::loadModel: Failed to load model from file '%s'.\n", path.c_str()));
+      return fallbackModel;
    }
+
    models.insert({name, model});
    return models[name];
 }
 
 std::vector<Sound> &loadSoundIntoPool(const std::string &name, const std::string &path) {
    Sound newSound = LoadSound(path.c_str());
-   if (newSound.frameCount == 0) {
-      printf("srulib::loadSoundIntoPool: Failed to load sound from file '%s'.\n", path.c_str());
-      exit(EXIT_FAILURE);
+   if (!IsSoundValid(newSound)) {
+      SRULibWarning(TextFormat("srulib::loadSoundIntoPool: Failed to load sound from file '%s'.\n", path.c_str()));
+      return fallbackSound;
    }
 
    std::vector<Sound> &pool = sounds[name];
@@ -80,8 +95,8 @@ std::vector<Sound> &loadSoundIntoPool(const std::string &name, const std::string
 
 void loadTextures(const std::string &path) {
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadTextures: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadTextures: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
    
    std::filesystem::create_directories(path);
@@ -94,8 +109,8 @@ void loadTextures(const std::string &path) {
 
 void loadFonts(const std::string &path) {
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadFonts: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadFonts: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
    
    std::filesystem::create_directories(path);
@@ -108,8 +123,8 @@ void loadFonts(const std::string &path) {
 
 void loadShaders(const std::string &path) {
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadShaders: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadShaders: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
 
    std::filesystem::create_directories(path);
@@ -136,8 +151,8 @@ void loadShaders(const std::string &path) {
 
 void loadModels(const std::string &path) {
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadModels: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadModels: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
    
    std::filesystem::create_directories(path);
@@ -150,8 +165,8 @@ void loadModels(const std::string &path) {
 
 void loadSounds(const std::string &path) {
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadSounds: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadSounds: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
 
    std::filesystem::create_directories(path);
@@ -161,7 +176,7 @@ void loadSounds(const std::string &path) {
       }
 
       std::string stem = file.path().stem().string();
-      if (isdigit(stem.back())) {
+      if (!stem.empty() && isdigit(stem.back())) {
          stem = stem.substr(0, stem.find_last_not_of("1234567890") + 1);
       }
       loadSoundIntoPool(stem, file.path().string());
@@ -192,8 +207,8 @@ void loadAssets(const std::string &path) {
    }};
 
    if (std::filesystem::exists(path) && !std::filesystem::is_directory(path)) {
-      printf("srulib::loadAssets: Path '%s' is not a directory.\n", path.c_str());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::loadAssets: Path '%s' is not a directory.\n", path.c_str()));
+      return;
    }
 
    std::filesystem::create_directories(path);
@@ -233,7 +248,7 @@ void loadAssets(const std::string &path) {
             break;
          case FileType::sound: {
             std::string stem = file.path().stem().string();
-            if (isdigit(stem.back())) {
+            if (!stem.empty() && isdigit(stem.back())) {
                stem = stem.substr(0, stem.find_last_not_of("1234567890") + 1);
             }
             loadSoundIntoPool(stem, file.path().string());
@@ -284,6 +299,9 @@ void unloadSound(const std::string &name) {
 void unloadTextures() {
    for (auto &[_, texture]: textures) {
       UnloadTexture(texture);
+   }
+   if (IsTextureValid(fallbackTexture)) {
+      UnloadTexture(fallbackTexture);
    }
    textures.clear();
 }
@@ -351,40 +369,46 @@ Texture &getTexture(const std::string &name) {
    if (auto it = textures.find(name); it != textures.end()) {
       return it->second;
    }
-   printf("srulib::getTexture: Texture '%s' does not exist.\n", name.c_str());
-   exit(EXIT_FAILURE);
+
+   if (!IsTextureValid(fallbackTexture)) {
+      Image image = GenImageChecked(8, 8, 2, 2, BLACK, PURPLE);
+      fallbackTexture = LoadTextureFromImage(image);
+      UnloadImage(image);
+   }
+   SRULibWarning(TextFormat("srulib::getTexture: Texture '%s' does not exist. Using fallback.\n", name.c_str()));
+   return fallbackTexture;
 }
 
 Font &getFont(const std::string &name) {
    if (auto it = fonts.find(name); it != fonts.end()) {
       return it->second;
    }
-   printf("srulib::getFont: Font '%s' does not exist.\n", name.c_str());
-   exit(EXIT_FAILURE);
+   SRULibWarning(TextFormat("srulib::getFont: Font '%s' does not exist. Using fallback.\n", name.c_str()));
+   return fallbackFont;
 }
 
 Shader &getShader(const std::string &name) {
    if (auto it = shaders.find(name); it != shaders.end()) {
       return it->second;
    }
-   printf("srulib::getShader: Shader '%s' does not exist.\n", name.c_str());
-   exit(EXIT_FAILURE);
+   SRULibWarning(TextFormat("srulib::getShader: Shader '%s' does not exist.\n", name.c_str()));
+   return fallbackShader;
 }
 
 Model &getModel(const std::string &name) {
    if (auto it = models.find(name); it != models.end()) {
       return it->second;
    }
-   printf("srulib::getModel: Model '%s' does not exist.\n", name.c_str());
-   exit(EXIT_FAILURE);
+   SRULibWarning(TextFormat("srulib::getModel: Model '%s' does not exist.\n", name.c_str()));
+   return fallbackModel;
 }
 
 std::vector<Sound> &getSoundPool(const std::string &name) {
    if (auto it = sounds.find(name); it != sounds.end()) {
       return it->second;
    }
-   printf("srulib::getSoundPool: Sound '%s' does not exist.\n", name.c_str());
-   exit(EXIT_FAILURE);
+   SRULibWarning(TextFormat("srulib::getSoundPool: Sound '%s' does not exist.\n", name.c_str()));
+   return fallbackSound;
 }
 
 std::unordered_map<std::string, Texture> &getTextureMap() {
