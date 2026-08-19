@@ -543,13 +543,13 @@ Spawn particles. If different count, texture or position is supplied then that i
 # random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
 
----
+### Random Macro
 ```cpp
 #define SRULIB_USE_RAND
 ```
-If defined, C *rand()* function will be used instead of *std::mt19937*. When defined, the random must be seeded manually.
+If defined, C **rand()** function will be used instead of **std::mt19937**. When defined, the random must be seeded manually.
 
----
+### getRNG
 ```cpp
 #ifndef SRULIB_USE_RAND
 inline std::mt19937 &getRNG();
@@ -557,49 +557,39 @@ inline std::mt19937 &getRNG();
 ```
 Returns the random device used for generating random numbers.
 
----
+### seedRandom
 ```cpp
 inline void seedRandom(int seed);
-```
-Seeds the random device with the given seed.
-
----
-```cpp
 inline void seedRandomFromTime();
 ```
-Seeds the random device using the current time.
+Seeds the random device with the given seed or time.
 
----
+### randomIndex
 ```cpp
 inline size_t randomIndex(size_t size);
 ```
-Returns a random index in range [0; size).
+Returns a random index in range [0; size). If size is 0 then 0 is returned.
 
----
+### randomInt
 ```cpp
 inline int randomInt(int min, int max);
 ```
 Returns a random integer in range [min; max].
 
----
+### randomFloat
 ```cpp
 inline float randomFloat(float min, float max);
 ```
 Returns a random real number in range [min; max].
 
----
+### chance
 ```cpp
 inline bool chance(int percent);
-```
-Returns true roughly with the probability of the given percent. Percent are expected to be in range [0; 100].
-
----
-```cpp
 inline bool chancePrecise(float percent);
 ```
-Returns true roughly with the probability of the given percent. Percent are expected to be in range [0; 1].
+Returns true roughly with the probability of the given percent. **chance** expects percent in range [0; 100], whereas **chancePrecise** expects percent in range [0; 1].
 
----
+### randomVx
 ```cpp
 inline Vector2 randomV2(Vector2 min, Vector2 max);
 inline Vector3 randomV3(Vector3 min, Vector3 max);
@@ -609,9 +599,9 @@ inline Vector2 randomV2(float min, float max);
 inline Vector3 randomV3(float min, float max);
 inline Vector4 randomV4(float min, float max);
 ```
-Returns a vector with all values being a random real number in range [min; max]. All values are not guaranteed to be equal.
+Returns a vector with all values being a random real number in range [min; max]. Values are not guaranteed to be equal.
 
----
+### randomVxValue
 ```cpp
 inline Vector2 randomV2Value(float min, float max);
 inline Vector3 randomV3Value(float min, float max);
@@ -619,12 +609,12 @@ inline Vector4 randomV4Value(float min, float max);
 ```
 Returns a vector with all values being a random real number in range [min; max]. All values will be identical.
 
----
+### randomElement
 ```cpp
 template<class T>
 inline auto &randomElement(T &range);
 ```
-Returns a random element from a container. The container must implement *size()* and *operator[size_t]* functions, like *std::vector* does.
+Returns a random element from a container. The container must implement **size()** and **operator[size_t]** functions, like **std::vector** does. Calling this on an empty container will index 0 and cause undefined behavior.
 
 # render.hpp
 Responsible for providing screen, size and position math utilities as well as drawing utilities.

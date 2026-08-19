@@ -14,6 +14,7 @@ inline void seedRandomFromTime() {
 }
 
 inline size_t randomIndex(size_t size) {
+   if (size == 0) return 0;
    return rand() % size;
 }
 
@@ -26,11 +27,11 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return (rand() % 101) <= percent;
+   return (rand() % 100) < percent;
 }
 
 inline bool chancePrecise(float percent) {
-   return (float)rand() / (float)RAND_MAX <= percent;
+   return (float)rand() / (float)RAND_MAX < percent;
 }
 
 #else
@@ -62,11 +63,11 @@ inline float randomFloat(float min, float max) {
 }
 
 inline bool chance(int percent) {
-   return randomInt(0, 100) <= percent;
+   return randomInt(0, 99) < percent;
 }
 
 inline bool chancePrecise(float percent) {
-   return randomFloat(0.0f, 1.0f) <= percent;
+   return randomFloat(0.0f, 1.0f) < percent;
 }
 
 #endif // SRULIB_USE_RAND
