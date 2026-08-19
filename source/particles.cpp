@@ -1,3 +1,4 @@
+#include "SRU/error.hpp"
 #include "SRU/particles.hpp"
 #include "SRU/random.hpp"
 #include "SRU/render.hpp"
@@ -5,53 +6,79 @@
 #include <algorithm>
 #include <cstdio>
 
-static std::vector<ParticleConfig> particleConfig {{}};
-static std::vector<std::vector<Particle>> particleClusters {{}};
+static std::unordered_map<std::string, ParticleCluster> particleClusters;
+static ParticleCluster fallbackCluster;
 
-Particle::Particle(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime)
-   : position(position), velocity(velocity), acceleration(acceleration), size(size), scale(scale), rotation(rotation), rotationVelocity(rotationVelocity), friction(friction), lifetime(lifetime) {}
-
-Particle::Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime)
-   : texture(texture), position(position), velocity(velocity), acceleration(acceleration), size(size), scale(scale), rotation(rotation), rotationVelocity(rotationVelocity), friction(friction), lifetime(lifetime) {}
-
-Particle::Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime, int splitX, int splitY, int splitWidth, int splitHeight)
-   : texture(texture), position(position), velocity(velocity), acceleration(acceleration), size(size), scale(scale), rotation(rotation), rotationVelocity(rotationVelocity), friction(friction), lifetime(lifetime), splitX(splitX), splitY(splitY), splitWidth(splitWidth), splitHeight(splitHeight) {}
-
-ParticleID pushParticleConfig(ParticleConfig config) {
-   particleConfig.push_back(config);
-   particleClusters.push_back({});
-   return particleConfig.size() - 1;
+void pushParticleCluster(const std::string &name, ParticleConfig config) {
+   std::vector<Particle> vector;
+   vector.reserve(config.count);
+   particleClusters[name] = {config, vector};
 }
 
-ParticleConfig &getParticleConfig(ParticleID ID) {
-   if (ID <= 0 || ID >= particleConfig.size()) {
-      printf("srulib::getParticleConfig: ID out of bounds. ID is %llu and particle config count is %llu.\n", ID, particleConfig.size());
-      exit(EXIT_FAILURE);
+void removeParticleCluster(const std::string &name) {
+   particleClusters.erase(name);
+}
+
+bool particleClusterExists(const std::string &name) {
+   return particleClusters.find(name) != particleClusters.end();
+}
+
+ParticleCluster &getParticleCluster(const std::string &name) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      return it->second;
    }
-   return particleConfig[ID];
+   SRULibWarning(TextFormat("srulib::getParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   return fallbackCluster;
 }
 
-std::vector<ParticleConfig> &getParticleConfigContainer() {
-   return particleConfig;
+size_t getParticleClusterCount() {
+   return particleClusters.size();
 }
 
-std::vector<std::vector<Particle>> &getParticleClusters() {
+std::unordered_map<std::string, ParticleCluster> &getParticleClusterContainer() {
    return particleClusters;
 }
 
-std::vector<Particle> &getParticleCluster(ParticleID ID) {
-   return particleClusters[ID];
+bool isParticleClusterEmpty(const std::string &name) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      return it->second.cluster.empty();
+   }
+   SRULibWarning(TextFormat("srulib::isParticleClusterEmpty: Particle cluster '%s' does not exist.\n", name.c_str()));
+   return true;
+}
+
+size_t getParticleCount(const std::string &name) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      return it->second.cluster.size();
+   }
+   SRULibWarning(TextFormat("srulib::getParticleCount: Particle cluster '%s' does not exist.\n", name.c_str()));
+   return 0;
+}
+
+size_t getTotalParticleCount() {
+   size_t total = 0;
+   for (auto &[_, cluster]: particleClusters) {
+      total += cluster.cluster.size();
+   }
+   return total;
 }
 
 void updateParticles(float DT) {
-   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
-      updateParticleCluster(ID, DT);
+   for (auto &[_, cluster]: particleClusters) {
+      updateParticleCluster(cluster, DT);
    }
 }
 
-void updateParticleCluster(ParticleID ID, float DT) {
-   std::vector<Particle> &cluster = particleClusters[ID];
-   for (Particle &particle: cluster) {
+void updateParticleCluster(const std::string &name, float DT) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      updateParticleCluster(it->second, DT);
+      return;
+   }
+   SRULibWarning(TextFormat("srulib::updateParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+}
+
+void updateParticleCluster(ParticleCluster &cluster, float DT) {
+   for (Particle &particle: cluster.cluster) {
       particle.age += DT;
       particle.position += particle.velocity * DT;
       particle.velocity += particle.acceleration * DT;
@@ -60,19 +87,27 @@ void updateParticleCluster(ParticleID ID, float DT) {
       particle.rotation += particle.rotationVelocity * DT;
    }
 
-   cluster.erase(std::remove_if(cluster.begin(), cluster.end(), [](const Particle &p) -> bool {
+   cluster.cluster.erase(std::remove_if(cluster.cluster.begin(), cluster.cluster.end(), [](const Particle &p) -> bool {
       return p.age >= p.lifetime;
-   }), cluster.end());
+   }), cluster.cluster.end());
 }
 
 void drawParticles() {
-   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
-      drawParticleCluster(ID);
+   for (const auto &[_, cluster]: particleClusters) {
+      drawParticleCluster(cluster);
    }
 }
 
-void drawParticleCluster(ParticleID ID) {
-   for (Particle &particle: particleClusters[ID]) {
+void drawParticleCluster(const std::string &name) {
+   if (const auto it = particleClusters.find(name); it != particleClusters.end()) {
+      drawParticleCluster(it->second);
+      return;
+   }
+   SRULibWarning(TextFormat("srulib::drawParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+}
+
+void drawParticleCluster(const ParticleCluster &cluster) {
+   for (const Particle &particle: cluster.cluster) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
@@ -86,13 +121,21 @@ void drawParticleCluster(ParticleID ID) {
 }
 
 void drawResponsiveParticles(Rectangle area, int type) {
-   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
-      drawResponsiveParticleCluster(ID, area, type);
+   for (const auto &[_, cluster]: particleClusters) {
+      drawResponsiveParticleCluster(cluster, area, type);
    }
 }
 
-void drawResponsiveParticleCluster(ParticleID ID, Rectangle area, int type) {
-   for (Particle &particle: particleClusters[ID]) {
+void drawResponsiveParticleCluster(const std::string &name, Rectangle area, int type) {
+   if (const auto it = particleClusters.find(name); it != particleClusters.end()) {
+      drawResponsiveParticleCluster(it->second, area, type);
+      return;
+   }
+   SRULibWarning(TextFormat("srulib::drawResponsiveParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+}
+
+void drawResponsiveParticleCluster(const ParticleCluster &cluster, Rectangle area, int type) {
+   for (const Particle &particle: cluster.cluster) {
       if (particle.texture && (particle.splitWidth != 0 || particle.splitHeight != 0)) {
          float unitX = (float)particle.texture->width / particle.splitWidth;
          float unitY = (float)particle.texture->height / particle.splitHeight;
@@ -106,123 +149,62 @@ void drawResponsiveParticleCluster(ParticleID ID, Rectangle area, int type) {
 }
 
 void clearParticles() {
-   for (size_t ID = 1; ID < particleClusters.size(); ++ID) {
-      clearParticleCluster(ID);
+   for (auto &[_, cluster]: particleClusters) {
+      clearParticleCluster(cluster);
    }
 }
 
-void clearParticleCluster(ParticleID ID) {
-   particleClusters[ID].clear();
-}
-
-void spawnParticles(ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(config.texture, config.count, randomV2(config.minimum.position, config.maximum.position), ID);
-}
-
-void spawnParticles(Vector2 position, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(config.texture, config.count, position, ID);
-}
-
-void spawnParticles(size_t count, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(config.texture, count, randomV2(config.minimum.position, config.maximum.position), ID);
-}
-
-void spawnParticles(size_t count, Vector2 position, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(config.texture, count, position, ID);
-}
-
-void spawnParticles(Texture *texture, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(texture, config.count, randomV2(config.minimum.position, config.maximum.position), ID);
-}
-
-void spawnParticles(Texture *texture, Vector2 position, ParticleID ID) {
-   spawnParticles(texture, particleConfig[ID].count, position, ID);
-}
-
-void spawnParticles(Texture *texture, size_t count, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnParticles(texture, count, randomV2(config.minimum.position, config.maximum.position), ID);
-}
-
-void spawnParticles(Texture *texture, size_t count, Vector2 position, ParticleID ID) {
-   std::vector<Particle> &cluster = particleClusters[ID];
-   ParticleConfig &config = particleConfig[ID];
-
-   for (size_t i = 0; i < count; ++i) {
-      cluster.emplace_back(
-         texture,
-         position,
-         randomV2(config.minimum.velocity, config.maximum.velocity),
-         randomV2(config.minimum.acceleration, config.maximum.acceleration),
-         config.cubic ? randomV2Value(config.minimum.size.x, config.maximum.size.y) : randomV2(config.minimum.size, config.maximum.size),
-         randomFloat(config.minimum.scale, config.maximum.scale),
-         randomFloat(config.minimum.rotation, config.maximum.rotation),
-         randomFloat(config.minimum.rotationVelocity, config.maximum.rotationVelocity),
-         randomFloat(config.minimum.friction, config.maximum.friction),
-         randomFloat(config.minimum.lifetime, config.maximum.lifetime)
-      );
+void clearParticleCluster(const std::string &name) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      clearParticleCluster(it->second);
+      return;
    }
+   SRULibWarning(TextFormat("srulib::clearParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
 }
 
-void spawnSplitParticles(ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(config.texture, randomInt(config.minimum.splitWidth, config.maximum.splitWidth), randomInt(config.minimum.splitHeight, config.maximum.splitHeight), randomV2(config.minimum.position, config.maximum.position), ID);
+void clearParticleCluster(ParticleCluster &cluster) {
+   cluster.cluster.clear();
 }
 
-void spawnSplitParticles(Vector2 position, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(config.texture, randomInt(config.minimum.splitWidth, config.maximum.splitWidth), randomInt(config.minimum.splitHeight, config.maximum.splitHeight), position, ID);
+void spawnParticles(const std::string &name, size_t count, Texture *texture, Vector2 position, bool useConfigPosition) {
+   if (auto it = particleClusters.find(name); it != particleClusters.end()) {
+      spawnParticles(it->second, count, texture, position, useConfigPosition);
+      return;
+   }
+   SRULibWarning(TextFormat("srulib::spawnParticles: Particle cluster '%s' does not exist.\n", name.c_str()));
 }
 
-void spawnSplitParticles(int splitWidth, int splitHeight, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(config.texture, splitWidth, splitHeight, randomV2(config.minimum.position, config.maximum.position), ID);
-}
+void spawnParticles(ParticleCluster &cluster, size_t count, Texture *texture, Vector2 position, bool useConfigPosition) {
+   Texture *particleTexture = (texture && !IsTextureValid(*texture) ? cluster.config.texture : texture);
+   size_t particleCount = (count == 0 ? cluster.config.count : count);
 
-void spawnSplitParticles(int splitWidth, int splitHeight, Vector2 position, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(config.texture, splitWidth, splitHeight, position, ID);
-}
+   const Particle &min = cluster.config.minimum;
+   const Particle &max = cluster.config.maximum;
 
-void spawnSplitParticles(Texture *texture, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(texture, randomInt(config.minimum.splitWidth, config.maximum.splitWidth), randomInt(config.minimum.splitHeight, config.maximum.splitHeight), randomV2(config.minimum.position, config.maximum.position), ID);
-}
+   bool shouldSplit = (min.splitWidth != 0 && min.splitHeight != 0 && max.splitWidth != 0 && max.splitHeight != 0);
+   int splitWidth = 0;
+   int splitHeight = 0;
+   
+   if (shouldSplit) {
+      splitWidth = randomInt(min.splitWidth, max.splitWidth);
+      splitHeight = randomInt(min.splitHeight, max.splitHeight);
+      particleCount = splitWidth * splitHeight;
+   }
 
-void spawnSplitParticles(Texture *texture, Vector2 position, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(texture, randomInt(config.minimum.splitWidth, config.maximum.splitWidth), randomInt(config.minimum.splitHeight, config.maximum.splitHeight), position, ID);
-}
-
-void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, ParticleID ID) {
-   ParticleConfig &config = particleConfig[ID];
-   spawnSplitParticles(texture, splitWidth, splitHeight, randomV2(config.minimum.position, config.maximum.position), ID);
-}
-
-void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Vector2 position, ParticleID ID) {
-   std::vector<Particle> &cluster = particleClusters[ID];
-   ParticleConfig &config = particleConfig[ID];
-   size_t N = splitWidth * splitHeight;
-
-   for (size_t i = 0; i < N; ++i) {
-      cluster.emplace_back(
-         texture,
-         position,
-         randomV2(config.minimum.velocity, config.maximum.velocity),
-         randomV2(config.minimum.acceleration, config.maximum.acceleration),
-         config.cubic ? randomV2Value(config.minimum.size.x, config.maximum.size.y) : randomV2(config.minimum.size, config.maximum.size),
-         randomFloat(config.minimum.scale, config.maximum.scale),
-         randomFloat(config.minimum.rotation, config.maximum.rotation),
-         randomFloat(config.minimum.rotationVelocity, config.maximum.rotationVelocity),
-         randomFloat(config.minimum.friction, config.maximum.friction),
-         randomFloat(config.minimum.lifetime, config.maximum.lifetime),
-         i % splitWidth,
-         i / splitWidth,
+   for (size_t i = 0; i < particleCount; ++i) {
+      cluster.cluster.emplace_back(
+         particleTexture,
+         (useConfigPosition ? randomV2(min.position, max.position) : position),
+         randomV2(min.velocity, max.velocity),
+         randomV2(min.acceleration, max.acceleration),
+         cluster.config.cubic ? randomV2Value(min.size.x, max.size.y) : randomV2(min.size, max.size),
+         randomFloat(min.scale, max.scale),
+         randomFloat(min.rotation, max.rotation),
+         randomFloat(min.rotationVelocity, max.rotationVelocity),
+         randomFloat(min.friction, max.friction),
+         randomFloat(min.lifetime, max.lifetime),
+         (shouldSplit ? i % splitWidth : 0),
+         (shouldSplit ? i / splitWidth : 0),
          splitWidth,
          splitHeight
       );

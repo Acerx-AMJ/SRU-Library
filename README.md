@@ -106,7 +106,6 @@ void loadSounds(const std::string &path);
 ```
 Load all files as assets recursively from the given path. Creates the folder if it doesn't already exist and won't load any assets if the path provided is not a directory. **loadSounds** automatically groups sounds with the same name but with different numbering together in a pool (e.g. sound, sound1, sound2, ...) and **loadShader** automatically groups vertex (.vs) and fragment (.fs) shaders with the same name together. See [loadAsset](#loadasset) family of functions for more info on loading.
 
----
 ```cpp
 void loadAssets(const std::string &path);
 ```
@@ -132,7 +131,6 @@ void unloadSounds();
 ```
 Unloads all assets from the specified container.
 
----
 ```cpp
 void unloadAssets();
 ```
@@ -177,7 +175,6 @@ Responsible for playing audio.
 ```
 Defines the default minimum pitch used in *playSound*. Default is 0.925.
 
----
 ```cpp
 #define SRULIB_MAX_PITCH 1.075f
 ```
@@ -190,7 +187,6 @@ void playSound(const std::string &name, float pitch, float volume);
 ```
 Retrieves the sound pool from the asset manager if exists and plays a random sound. If no pitch is supplied then random pitch is used instead based on [Audio Macros](#audio-macros). Throws a warning on non-existent/invalid sound pool.
 
----
 ```cpp
 void playRawSound(Sound sound, float volume = 1.0f);
 void playRawSound(Sound sound, float pitch, float volume);
@@ -221,7 +217,6 @@ constexpr inline Rectangle WINDOW_AREA = {0, 0, 0, 0};
 ```
 Defaults for render functions - use full texture source and use window boundaries as area respectively.
 
----
 ```cpp
 constexpr inline Vector2 GRID_CELL_INVALID = {-1.0f, -1.0f};
 ```
@@ -252,7 +247,6 @@ enum class SRULibLogLevel { all, error, none };
 ```
 Log level of the library: all - log warnings and errors, error - log only fatal errors, none - do not log anything.
 
----
 ```cpp
 void setSRULibLogLevel(SRULibLogLevel level);
 ```
@@ -264,7 +258,6 @@ using SRULibCallback = void(*)(const char *msg);
 ```
 Callback used for displaying errors and warnings.
 
----
 ```cpp
 void setSRULibErrorCallback(SRULibCallback callback);
 void setSRULibWarningCallback(SRULibCallback callback);
@@ -365,7 +358,6 @@ struct Line {
 ```
 A line containing a field and value.
 
----
 ```cpp
 struct Header {
    std::string name;
@@ -412,20 +404,9 @@ Converts string to specified value. Returns 0/BLACK/empty on fail. Optionally se
 # particles.hpp
 Responsible for providing a particle manager.
 
----
-```cpp
-using ParticleID = size_t;
-```
-Particle ID of a specific particle config instance/particle cluster. 0 - nil.
-
----
+### Particle/Cluster Structs
 ```cpp
 struct Particle {
-   Particle() = default;
-   Particle(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime);
-   Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime);
-   Particle(Texture *texture, Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 size, float scale, float rotation, float rotationVelocity, float friction, float lifetime, int splitX, int splitY, int splitWidth, int splitHeight);
-
    Texture2D *texture = nullptr;
    Vector2 position, velocity, acceleration;
    Vector2 size;
@@ -442,23 +423,22 @@ struct Particle {
 };
 ```
 A single particle.
-- *texture* - texture of the particle.
-- *position* - position of the particle. Does not need to be set in the config if particles are to be spawned in specific locations.
-- *velocity* - the velocity of the particle - how much it moves per second.
-- *acceleration* - the acceleration of the particle - how much faster velocity gets per second.
-- *size* - the size of the particle.
-- *scale* - how much should the particle scale per second.
-- *rotation* - rotation of the particle.
-- *rotationVelocity* - the velocity of the rotation - how much it rotates per second.
-- *friction* - how quickly the velocity slows down.
-- *lifetime* - lifetime of the particle in seconds.
-- *age* - the age of the particle in seconds. Should not be edited manually.
-- *splitX* - the split position X of the particle when calling *spawnSplitParticles()*. Should not be edited manually.
-- *splitY* - the split position Y of the particle when calling *spawnSplitParticles()*. Should not be edited manually.
-- *splitWidth* - in how many pieces should the texture be split on X axis when calling *spawnSplitParticles()*.
-- *splitHeight* - in how many pieces should the texture be split on Y axis when calling *spawnSplitParticles()*.
+- **texture** - texture of the particle.
+- **position** - position of the particle. Does not need to be set in the config if particles are to be spawned in specific locations.
+- **velocity** - the velocity of the particle - how much it moves per second.
+- **acceleration** - the acceleration of the particle - how much faster velocity gets per second.
+- **size** - the size of the particle.
+- **scale** - how much should the particle scale per second.
+- **rotation** - rotation of the particle.
+- **rotationVelocity** - the velocity of the rotation - how much it rotates per second.
+- **friction** - how quickly the velocity slows down.
+- **lifetime** - lifetime of the particle in seconds.
+- **age** - the age of the particle in seconds. Should not be edited manually.
+- **splitX** - the split position X of the particle. Should not be edited manually.
+- **splitY** - the split position Y of the particle. Should not be edited manually.
+- **splitWidth** - in how many pieces should the texture be split on X axis. If both are non-zero then particle count is ignored and instead is calculated by **splitWidth** * **splitHeight**.
+- **splitHeight** - in how many pieces should the texture be split on Y axis. If both are non-zero then particle count is ignored and instead is calculated by **splitWidth** * **splitHeight**.
 
----
 ```cpp
 struct ParticleConfig {
    Texture2D *texture = nullptr;
@@ -467,86 +447,98 @@ struct ParticleConfig {
    bool cubic = false;
 };
 ```
-Particle config instance responsible for saving common particle data.
+Particle config instance responsible for saving common particle data. **cubic** controls whether particles should have equal width and height.
 
----
 ```cpp
-ParticleID pushParticleConfig(ParticleConfig config);
+struct ParticleCluster {
+   ParticleConfig config;
+   std::vector<Particle> cluster;
+};
 ```
-Create a new config instance and return its ID. Automatically creates a particle cluster with the same ID.
+Particle cluster containing particle config and all alive particles.
 
----
+### pushParticleCluster
 ```cpp
-ParticleConfig &getParticleConfig(ParticleID ID);
+void pushParticleCluster(const std::string &name, ParticleConfig config);
 ```
-Get particle config instance by its ID. Terminates if ID is invalid.
+Create a new particle cluster instance and assign it to the given name.
 
----
+### removeParticleCluster
 ```cpp
-std::vector<ParticleConfig> &getParticleConfigContainer();
+void removeParticleCluster(const std::string &name);
 ```
-Get particle config container.
+Removes particle cluster by name. Does nothing if it does not exist.
 
----
+### particleClusterExists
 ```cpp
-std::vector<std::vector<Particle>> &getParticleClusters();
+bool particleClusterExists(const std::string &name);
 ```
-Get particle cluster container.
+Returns whether or not particle cluster exists.
 
----
+### getParticleCluster
 ```cpp
-std::vector<Particle> &getParticleCluster(ParticleID ID);
+ParticleCluster &getParticleCluster(const std::string &name);
 ```
-Get a specific particle cluster by ID.
+Returns particle cluster by name. Returns invalid object if it does not exist.
 
----
+### getParticleClusterCount
+```cpp
+size_t getParticleClusterCount();
+```
+Returns particle cluster count.
+
+### getParticleClusterContainer
+```cpp
+std::unordered_map<std::string, ParticleCluster> &getParticleClusterContainer();
+```
+Returns the particle cluster container.
+
+### isParticleClusterEmpty
+```cpp
+bool isParticleClusterEmpty(const std::string &name);
+```
+Returns whether or not there are no alive particles in the particle cluster.
+
+### getParticleCount
+```cpp
+size_t getParticleCount(const std::string &name);
+size_t getTotalParticleCount();
+```
+Get particle count of a single cluster or the total particle count of all clusters.
+
+### updateParticles
 ```cpp
 void updateParticles(float DT);
-void updateParticleCluster(ParticleID ID, float DT);
+void updateParticleCluster(const std::string &name, float DT);
+void updateParticleCluster(ParticleCluster &cluster, float DT);
 ```
-Update a specific particle cluster or all active clusters at once.
+Update particles - either all active clusters or a single specific one - based on delta time.
 
----
+### drawParticles
 ```cpp
 void drawParticles();
-void drawParticleCluster(ParticleID ID);
+void drawParticleCluster(const std::string &name);
+void drawParticleCluster(const ParticleCluster &cluster);
 void drawResponsiveParticles(Rectangle area = WINDOW_AREA, int type = RATIO);
-void drawResponsiveParticleCluster(ParticleID ID, Rectangle area = WINDOW_AREA, int type = RATIO);
+void drawResponsiveParticleCluster(const std::string &name, Rectangle area = WINDOW_AREA, int type = RATIO);
+void drawResponsiveParticleCluster(const ParticleCluster &cluster, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Draw a specific particle cluster or all active clusters at once. *drawResponsiveParticles* and *drawResponsiveParticleCluster* draws using ratios instead of screen coordinates, meaning all config values need to be changed to ratios if these were to be used. Check [ratio constants](#constantshpp) for more info on ratio types. Cubic ratio is most likely preferable due to it preserving aspect ratio.
+Render particles - either all active clusters or a single specific one. Responsive versions require positional config values (**position**, **velocity**, **acceleration**, **size**) to be in ratio coordinates instead of screen coordinates. Check [Ratio Constants](#ratio-constants) for more info on ratio types. Cubic ratio is most likely preferable due to it preserving aspect ratio.
 
----
+### clearParticles
 ```cpp
 void clearParticles();
-void clearParticleCluster(ParticleID ID);
+void clearParticleCluster(const std::string &name);
+void clearParticleCluster(ParticleCluster &cluster);
 ```
-Clear all particles of a specific particle cluster or all particles at once.
+Clear particles - either all active clusters or a single specific one.
 
----
+### spawnParticles
 ```cpp
-void spawnParticles(ParticleID ID);
-void spawnParticles(Vector2 position, ParticleID ID);
-void spawnParticles(size_t count, ParticleID ID);
-void spawnParticles(size_t count, Vector2 position, ParticleID ID);
-void spawnParticles(Texture *texture, ParticleID ID);
-void spawnParticles(Texture *texture, Vector2 position, ParticleID ID);
-void spawnParticles(Texture *texture, size_t count, ParticleID ID);
-void spawnParticles(Texture *texture, size_t count, Vector2 position, ParticleID ID);
+void spawnParticles(const std::string &name, size_t count = 0, Texture *texture = nullptr, Vector2 position = {}, bool useConfigPosition = true);
+void spawnParticles(ParticleCluster &cluster, size_t count = 0, Texture *texture = nullptr, Vector2 position = {}, bool useConfigPosition = true);
 ```
-Spawn particles with the given parameters. If a parameter is not supplied then the one from the config is assumed.
-
----
-```cpp
-void spawnSplitParticles(ParticleID ID);
-void spawnSplitParticles(Vector2 position, ParticleID ID);
-void spawnSplitParticles(int splitWidth, int splitHeight, ParticleID ID);
-void spawnSplitParticles(int splitWidth, int splitHeight, Vector2 position, ParticleID ID);
-void spawnSplitParticles(Texture *texture, ParticleID ID);
-void spawnSplitParticles(Texture *texture, Vector2 position, ParticleID ID);
-void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, ParticleID ID);
-void spawnSplitParticles(Texture *texture, int splitWidth, int splitHeight, Vector2 position, ParticleID ID);
-```
-Cut the texture into `splitWidth * splitHeight` pieces and spawn the particles with the given parameters. If a parameter is not supplied then the one from the config is assumed.
+Spawn particles. If different count, texture or position is supplied then that is used instead of the value from particle config.
 
 # random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
