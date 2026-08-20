@@ -159,24 +159,98 @@ constexpr inline float bounceInOut(float t) {
 }
 
 // tweens
-using TweenID = size_t;
-using Formula = float(*)(float);
-
-enum class TweenType {
+typedef float(*Formula)(float);
+enum class TweenValue: char {
    none, integer, floating, v2, v3, v4, r4, color
 };
 
+enum class TweenType: char {
+   automatic, manual, loop,
+};
+
+struct TweenID {
+   size_t ID = 0;
+
+   // chain
+   TweenID chain(int *value, int target, float time, Formula formula = linear);
+   TweenID chain(float *value, float target, float time, Formula formula = linear);
+   TweenID chain(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+   TweenID chain(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+   TweenID chain(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+   TweenID chain(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+   TweenID chain(Color *value, Color target, float time, Formula formula = linear);
+
+   // parallel
+   TweenID parallel(int *value, int target, float time, Formula formula = linear);
+   TweenID parallel(float *value, float target, float time, Formula formula = linear);
+   TweenID parallel(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+   TweenID parallel(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+   TweenID parallel(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+   TweenID parallel(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+   TweenID parallel(Color *value, Color target, float time, Formula formula = linear);
+
+   // methods
+   void stop();
+   void resume();
+   void toggleStopped();
+   void restart();
+   void kill();
+
+   bool stopped();
+   bool killed();
+   bool playing();
+   bool finished();
+   bool valid();
+   bool isRoot();
+
+   struct Tween &tween();
+   struct Tween &root();
+
+   // mask it as a size_t
+   constexpr TweenID() = default;
+   constexpr TweenID(size_t ID)
+      : ID(ID) {}
+
+   constexpr size_t &operator = (TweenID other) {
+      ID = other;
+      return ID;
+   }
+
+   constexpr size_t &operator = (size_t other) {
+      ID = other;
+      return ID;
+   }
+
+   constexpr size_t &operator ++ () {
+      return ++ID;
+   }
+
+   constexpr size_t &operator -- () {
+      return --ID;
+   }
+
+   constexpr operator size_t () {
+      return ID;
+   }
+};
+
 struct Tween {
-   TweenType type = TweenType::none;
    Formula formula = linear;
    TweenID id = 0;
-   TweenID sequenced = 0;
+   TweenID root = 0;
+   TweenID chained = 0;
+   TweenID paralleled = 0;
+   TweenValue value = TweenValue::none;
+   TweenType type = TweenType::automatic;
+
+   bool stopped = false;
+   bool killed = false;
+   bool started = false;
+   bool finished = false;
 
    float timer = 0.0f;
    float time = 0.0f;
    float progress = 0.0f;
-   bool paused = false;
-   bool finished = false;
 
    union {
       struct { int *ivalue, istart, iend; };
@@ -190,33 +264,16 @@ struct Tween {
 };
 
 // create tweens
-TweenID createTween(int *value, int target, float time, Formula formula = linear);
-TweenID createTween(float *value, float target, float time, Formula formula = linear);
-TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula = linear);
-TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula = linear);
-TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula = linear);
-TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula = linear);
-TweenID createTween(Color *value, Color target, float time, Formula formula = linear);
+TweenID createTween(int *value, int target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(float *value, float target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Color *value, Color target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
 
-// create sequenced tweens
-TweenID createSequencedTween(TweenID parentID, int *value, int target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, float *value, float target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector2 *value, Vector2 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector3 *value, Vector3 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector4 *value, Vector4 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Rectangle *value, Rectangle target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Color *value, Color target, float time, Formula formula = linear);
-
-// tween functions
-void pauseTween(TweenID ID);
-void resumeTween(TweenID ID);
-void killTween(TweenID ID);
-
-Tween &getTween(TweenID ID);
-float getTweenProgress(TweenID ID);
-bool isTweenFinished(TweenID ID);
-bool isTweenPaused(TweenID ID);
-bool isTweenPlaying(TweenID ID);
-bool isTweenValid(TweenID ID);
-
+// update tweens
 void updateTweens(float DT);
+void killAllTweens();
+size_t getTweenCount();
+size_t getTweenFreeSpotCount();

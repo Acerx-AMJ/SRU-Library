@@ -1,10 +1,10 @@
 #pragma once
 
+typedef void(*SRULibCallback)(const char *msg);
 enum class SRULibLogLevel {
    all, error, none
 };
 
-using SRULibCallback = void(*)(const char *msg);
 void setSRULibErrorCallback(SRULibCallback callback);
 void setSRULibWarningCallback(SRULibCallback callback);
 void setSRULibLogLevel(SRULibLogLevel level);

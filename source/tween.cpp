@@ -1,7 +1,6 @@
+#include "SRU/error.hpp"
 #include "SRU/tween.hpp"
 #include "raymath.h"
-#include <cstdio>
-#include <cstdlib>
 #include <vector>
 
 // state
@@ -29,214 +28,366 @@ TweenID pushTween(Tween &tween) {
    }
 }
 
-bool canCreateSequenced(TweenID parentID) {
-   return isTweenValid(parentID) && tweens[parentID].progress == 0.0f && tweens[parentID].sequenced == 0;
+// chain tweens
+TweenID TweenID::chain(int *value, int target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
 }
 
-TweenID createSequenced(TweenID parentID, TweenID sequencedID) {
-   tweens[sequencedID].paused = true;
-   tweens[parentID].sequenced = sequencedID;
-   return sequencedID;
+TweenID TweenID::chain(float *value, float target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
 }
 
-TweenID sequenceError() {
-   printf("srulib::createSequencedTween: could not create sequenced tween due to either parent tween being nil, already playing or has a sequenced tween defined already.\n");
-   return 0;
+TweenID TweenID::chain(Vector2 *value, Vector2 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
+}
+
+TweenID TweenID::chain(Vector3 *value, Vector3 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
+}
+
+TweenID TweenID::chain(Vector4 *value, Vector4 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
+}
+
+TweenID TweenID::chain(Rectangle *value, Rectangle target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
+}
+
+TweenID TweenID::chain(Color *value, Color target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].chained = tween;
+   return tween;
+}
+
+// create parallel
+TweenID TweenID::parallel(int *value, int target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(float *value, float target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(Vector2 *value, Vector2 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(Vector3 *value, Vector3 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(Vector4 *value, Vector4 target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(Rectangle *value, Rectangle target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
+}
+
+TweenID TweenID::parallel(Color *value, Color target, float time, Formula formula) {
+   TweenID tween = createTween(value, target, time, formula);
+   tweens[tween].started = false;
+   tweens[tween].root = (tweens[ID].root.valid() ? tweens[ID].root : *this);
+   tweens[ID].paralleled = tween;
+   return tween;
 }
 
 // create tweens
-TweenID createTween(int *value, int target, float time, Formula formula) {
-   Tween tween {TweenType::integer, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(int *value, int target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::integer, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.ivalue = value;
    tween.istart = *value;
    tween.iend = target;
    return pushTween(tween);
 }
 
-TweenID createTween(float *value, float target, float time, Formula formula) {
-   Tween tween {TweenType::floating, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(float *value, float target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::floating, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.fvalue = value;
    tween.fstart = *value;
    tween.fend = target;
    return pushTween(tween);
 }
 
-TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula) {
-   Tween tween {TweenType::v2, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::v2, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.v2value = value;
    tween.v2start = *value;
    tween.v2end = target;
    return pushTween(tween);
 }
 
-TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula) {
-   Tween tween {TweenType::v3, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::v3, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.v3value = value;
    tween.v3start = *value;
    tween.v3end = target;
    return pushTween(tween);
 }
 
-TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula) {
-   Tween tween {TweenType::v4, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::v4, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.v4value = value;
    tween.v4start = *value;
    tween.v4end = target;
    return pushTween(tween);
 }
 
-TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula) {
-   Tween tween {TweenType::r4, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::r4, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.r4value = value;
    tween.r4start = *value;
    tween.r4end = target;
    return pushTween(tween);
 }
 
-TweenID createTween(Color *value, Color target, float time, Formula formula) {
-   Tween tween {TweenType::color, formula, 0, 0, 0.0f, time, 0.0f, false, false};
+TweenID createTween(Color *value, Color target, float time, Formula formula, TweenType type) {
+   Tween tween {formula, 0, 0, 0, 0, TweenValue::color, type, false, false, true, false, 0.0f, time, 0.0f};
    tween.cvalue = value;
    tween.cstart = *value;
    tween.cend = target;
    return pushTween(tween);
 }
 
-// create sequenced tweens
-TweenID createSequencedTween(TweenID parentID, int *value, int target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
+// private tween helpers
+void updateTweenStartValues(TweenID ID) {
+   if (!ID.valid()) return;
+   Tween &tween = ID.tween();
+
+   switch (tween.value) {
+   case TweenValue::integer:  tween.istart  = *tween.ivalue; break;
+   case TweenValue::floating: tween.fstart  = *tween.fvalue; break;
+   case TweenValue::v2:       tween.v2start = *tween.v2value; break;
+   case TweenValue::v3:       tween.v3start = *tween.v3value; break;
+   case TweenValue::v4:       tween.v4start = *tween.v4value; break;
+   case TweenValue::r4:       tween.r4start = *tween.r4value; break;
+   case TweenValue::color:    tween.cstart  = *tween.cvalue; break;
+   default: break;
    }
-   return sequenceError();
 }
 
-TweenID createSequencedTween(TweenID parentID, float *value, float target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
+void startTween(TweenID ID) {
+   if (!ID.valid()) return;
+   Tween &tween = ID.tween();
+
+   if (!tween.started && !tween.killed && !tween.finished) {
+      tween.started = true;
+      updateTweenStartValues(ID);
    }
-   return sequenceError();
 }
 
-TweenID createSequencedTween(TweenID parentID, Vector2 *value, Vector2 target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
+void updateTween(TweenID ID, float DT) {
+   if (!ID.valid()) return;
+   Tween &tween = ID.tween();
+   startTween(tween.paralleled);
+   updateTween(tween.paralleled, DT);
+
+   if (tween.finished) {
+      startTween(tween.chained);
+      updateTween(tween.chained, DT);
    }
-   return sequenceError();
-}
 
-TweenID createSequencedTween(TweenID parentID, Vector3 *value, Vector3 target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
+   if (!tween.started || tween.killed || tween.finished) return;
+   tween.timer += DT;
+   tween.progress = (tween.time == 0.0f ? 0.0f : Clamp(tween.timer / tween.time, 0.0f, 1.0f));
+
+   float t = tween.formula(tween.progress);
+   switch (tween.value) {
+   case TweenValue::integer:  *tween.ivalue = Lerp(tween.istart, tween.iend, t); break;
+   case TweenValue::floating: *tween.fvalue = Lerp(tween.fstart, tween.fend, t); break;
+   case TweenValue::v2:       *tween.v2value = Vector2Lerp(tween.v2start, tween.v2end, t); break;
+   case TweenValue::v3:       *tween.v3value = Vector3Lerp(tween.v3start, tween.v3end, t); break;
+   case TweenValue::v4:       *tween.v4value = Vector4Lerp(tween.v4start, tween.v4end, t); break;
+   case TweenValue::r4:       *tween.r4value = R4Lerp(tween.r4start, tween.r4end, t); break;
+   case TweenValue::color:    *tween.cvalue = ColorLerp(tween.cstart, tween.cend, t); break;
+   default: break;
    }
-   return sequenceError();
-}
 
-TweenID createSequencedTween(TweenID parentID, Vector4 *value, Vector4 target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
+   if (tween.progress >= 1.0f) {
+      tween.finished = true;
+      startTween(tween.chained);
+      updateTween(tween.chained, DT);
    }
-   return sequenceError();
 }
 
-TweenID createSequencedTween(TweenID parentID, Rectangle *value, Rectangle target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
-   }
-   return sequenceError();
+bool isTweenFinished(TweenID ID) {
+   if (!ID.valid()) return true;
+   Tween &tween = ID.tween();
+   return tween.finished && isTweenFinished(tween.paralleled) && isTweenFinished(tween.chained);
 }
 
-TweenID createSequencedTween(TweenID parentID, Color *value, Color target, float time, Formula formula) {
-   if (canCreateSequenced(parentID)) {
-      return createSequenced(parentID, createTween(value, target, time, formula));
-   }
-   return sequenceError();
-}
+void resetTween(TweenID ID) {
+   if (!ID.valid()) return;
+   Tween &tween = ID.tween();
 
-// tween functions
-void pauseTween(TweenID ID) {
-   getTween(ID).paused = true;
-}
-
-void resumeTween(TweenID ID) {
-   getTween(ID).paused = false;
+   resetTween(tween.chained);
+   resetTween(tween.paralleled);
+   tween.started = false;
+   tween.finished = false;
+   tween.timer = (tween.timer >= tween.time ? tween.timer - tween.time : 0.0f);
+   tween.progress = 0.0f;
 }
 
 void killTween(TweenID ID) {
-   Tween &tween = getTween(ID);
+   if (!ID.valid()) return;
+   Tween &tween = ID.tween();
+
+   killTween(tween.chained);
+   killTween(tween.paralleled);
    availableSpots.push_back(ID);
    tween.id = 0;
-
-   if (isTweenValid(tween.sequenced)) {
-      killTween(tween.sequenced);
-   }
+   tween.killed = true;
 }
 
-Tween &getTween(TweenID ID) {
-   if (!isTweenValid(ID)) {
-      printf("srulib::getTween: invalid tween ID - %llu. Tween count is %llu.\n", ID, tweens.size());
-      exit(EXIT_FAILURE);
+// tweenid methods
+void TweenID::stop() {
+   root().stopped = true;
+}
+
+void TweenID::resume() {
+   root().stopped = false;
+}
+
+void TweenID::toggleStopped() {
+   Tween &r = root();
+   r.stopped = !r.stopped;
+}
+
+void TweenID::restart() {
+   Tween &r = root();
+   if (r.killed) return;
+   r.stopped = false;
+   resetTween(r.id);
+   startTween(r.id);
+}
+
+void TweenID::kill() {
+   killTween(root().id);
+}
+
+bool TweenID::stopped() {
+   return root().stopped;
+}
+
+bool TweenID::killed() {
+   return root().killed;
+}
+
+bool TweenID::playing() {
+   return !finished() && !stopped() && !killed();
+}
+
+bool TweenID::finished() {
+   return isTweenFinished(root().id);
+}
+
+bool TweenID::valid() {
+   return ID > 0 && ID < tweens.size();
+}
+
+bool TweenID::isRoot() {
+   return valid() && !tweens[ID].root.valid();
+}
+
+Tween &TweenID::tween() {
+   if (!valid()) {
+      SRULibWarning(TextFormat("srulib::TweenID::tween: tried to get tween from invalid ID %llu.\n", ID));
+      return tweens[0];
    }
    return tweens[ID];
 }
 
-float getTweenProgress(TweenID ID) {
-   return getTween(ID).progress;
+Tween &TweenID::root() {
+   if (!valid()) {
+      SRULibWarning(TextFormat("srulib::TweenID::root: tried to get root from invalid ID %llu.\n", ID));
+      return tweens[0];
+   }
+   Tween &tween = tweens[ID];
+   return (!tween.root.valid() ? tween : tweens[tween.root]);
 }
 
-bool isTweenFinished(TweenID ID) {
-   return getTween(ID).finished;
-}
-
-bool isTweenPaused(TweenID ID) {
-   return getTween(ID).paused;
-}
-
-bool isTweenPlaying(TweenID ID) {
-   Tween &tween = getTween(ID);
-   return !tween.paused && !tween.finished;
-}
-
-bool isTweenValid(TweenID ID) {
-   return ID >= 1 && ID < tweens.size();
-}
-
+// update tweens
 void updateTweens(float DT) {
-   for (TweenID ID = 0; ID < tweens.size(); ++ID) {
-      if (!isTweenValid(ID)) continue;
-      Tween &tween = tweens[ID];
-      
-      if (tween.paused || tween.finished || tween.id == 0) continue;
-      tween.timer += DT;
-      tween.progress = (tween.time == 0.0f ? 0.0f : Clamp(tween.timer / tween.time, 0.0f, 1.0f));
+   for (TweenID ID = 1; ID < tweens.size(); ++ID) {
+      Tween &tween = ID.tween();
 
-      float t = tween.formula(tween.progress);
-      switch (tween.type) {
-      case TweenType::integer:  *tween.ivalue = Lerp(tween.istart, tween.iend, t); break;
-      case TweenType::floating: *tween.fvalue = Lerp(tween.fstart, tween.fend, t); break;
-      case TweenType::v2:       *tween.v2value = Vector2Lerp(tween.v2start, tween.v2end, t); break;
-      case TweenType::v3:       *tween.v3value = Vector3Lerp(tween.v3start, tween.v3end, t); break;
-      case TweenType::v4:       *tween.v4value = Vector4Lerp(tween.v4start, tween.v4end, t); break;
-      case TweenType::r4:       *tween.r4value = R4Lerp(tween.r4start, tween.r4end, t); break;
-      case TweenType::color:    *tween.cvalue = ColorLerp(tween.cstart, tween.cend, t); break;
-      default: break;
+      // start updating from root tweens
+      if (!tween.id.valid() || tween.stopped || tween.killed || tween.root.valid()) continue;
+      updateTween(ID, DT);
+
+      // automatic cleanup
+      if (tween.type == TweenType::automatic && ID.finished()) {
+         ID.kill();         
       }
 
-      if (tween.progress < 1.0f) continue;
-      tween.finished = true;
-      availableSpots.push_back(tween.id);
-      tween.id = 0;
-
-      if (!isTweenValid(tween.sequenced)) continue;
-      Tween &next = tweens[tween.sequenced];
-      next.paused = false;
-      switch (next.type) {
-      case TweenType::integer:  next.istart  = *next.ivalue; break;
-      case TweenType::floating: next.fstart  = *next.fvalue; break;
-      case TweenType::v2:       next.v2start = *next.v2value; break;
-      case TweenType::v3:       next.v3start = *next.v3value; break;
-      case TweenType::v4:       next.v4start = *next.v4value; break;
-      case TweenType::r4:       next.r4start = *next.r4value; break;
-      case TweenType::color:    next.cstart  = *next.cvalue; break;
-      default: break;
+      // looping tween
+      if (tween.type == TweenType::loop && ID.finished()) {
+         ID.restart();
       }
    }
+}
+
+void killAllTweens() {
+   for (TweenID ID = 1; ID < tweens.size(); ++ID) {
+      Tween &tween = ID.tween();
+      if (tween.id.valid() && !tween.killed && !tween.root.valid()) ID.kill();
+   }
+}
+
+size_t getTweenCount() {
+   return tweens.size();
+}
+
+size_t getTweenFreeSpotCount() {
+   return availableSpots.size();
 }

@@ -75,7 +75,7 @@ void drawTextureResponsive(const std::string &texture, Vector2 ratio, Vector2 si
 void drawTextureResponsive(const std::string &texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 
 // Animation render utility
-using AnimationID = size_t;
+typedef size_t AnimationID;
 
 struct AnimationConfig {
    AnimationConfig() = default;

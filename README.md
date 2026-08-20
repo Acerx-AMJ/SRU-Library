@@ -254,7 +254,7 @@ Set the log level of the library.
 
 ### Callback
 ```cpp
-using SRULibCallback = void(*)(const char *msg);
+typedef void(*SRULibCallback)(const char *msg);
 ```
 Callback used for displaying errors and warnings.
 
@@ -779,7 +779,7 @@ Instead of passing a texture, pass an identifier to a texture in the asset manag
 
 ---
 ```cpp
-using AnimationID = size_t;
+typedef size_t AnimationID;
 ```
 Animation ID of a specific animation config instance. 0 - nil.
 
@@ -994,7 +994,7 @@ Returns true if the string contains the given substring in a specific location.
 # tween.hpp
 Responsible for tweening utility functions and providing formulas for doing so.
 
----
+### Tween Formulas
 ```cpp
 constexpr inline float linear(float t);
 constexpr inline float quadratic(float t);
@@ -1022,41 +1022,160 @@ constexpr inline float bounce(float t);
 constexpr inline float bounceOut(float t);
 constexpr inline float bounceInOut(float t);
 ```
-Different tween formulas. *t* must be in range [0; 1]. Some function are not guaranteed to return a result in range [0; 1], like for example the *bounce* function and might overshoot/undershoot slightly.
+Different tween formulas. *t* must be in range [0; 1]. Some functions are not guaranteed to return a result in range [0; 1], like for example the *bounce* function, and might overshoot/undershoot slightly.
 
----
+### Formula
 ```cpp
-using TweenID = size_t;
-```
-ID of a tween. 0 - nil.
-
----
-```cpp
-using Formula = float(*)(float);
+typedef float(*Formula)(float);
 ```
 Function that takes in *t* in range [0; 1] and returns a value roughly in range [0; 1].
 
----
+### TweenValue
 ```cpp
-enum class TweenType {
+enum class TweenValue: char {
    none, integer, floating, v2, v3, v4, r4, color
 };
 ```
-Tween type. Applied automatically.
+Tween value. Applied automatically by [createTween](#createtween) functions.
 
----
+### TweenType
+```cpp
+enum class TweenType: char {
+   automatic, manual, loop,
+};
+```
+Tween type. Default is **automatic** - create the tween, update it and remove it when it finishes. **manual** - create the tween, update it and let the user remove it manually using [TweenID::kill](#tweenidkill) function. **loop** - create the tween, update it and keep looping it until the user stops it.
+
+### TweenID
+```cpp
+struct TweenID {
+   size_t ID = 0;
+
+   TweenID chain(int *value, int target, float time, Formula formula = linear);
+   TweenID chain(float *value, float target, float time, Formula formula = linear);
+   TweenID chain(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+   TweenID chain(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+   TweenID chain(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+   TweenID chain(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+   TweenID chain(Color *value, Color target, float time, Formula formula = linear);
+
+   TweenID parallel(int *value, int target, float time, Formula formula = linear);
+   TweenID parallel(float *value, float target, float time, Formula formula = linear);
+   TweenID parallel(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+   TweenID parallel(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+   TweenID parallel(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+   TweenID parallel(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+   TweenID parallel(Color *value, Color target, float time, Formula formula = linear);
+
+   void stop();
+   void resume();
+   void toggleStopped();
+   void restart();
+   void kill();
+
+   bool stopped();
+   bool killed();
+   bool playing();
+   bool finished();
+   bool valid();
+   bool isRoot();
+
+   struct Tween &tween();
+   struct Tween &root();
+
+   constexpr TweenID() = default;
+   constexpr TweenID(size_t ID);
+
+   constexpr size_t &operator = (TweenID other);
+   constexpr size_t &operator = (size_t other);
+   constexpr size_t &operator ++ ();
+   constexpr size_t &operator -- ();
+   constexpr operator size_t ();
+};
+```
+**TweenID** holds an internal ID to a tween and is used for chaining and adding parallel tweens to the initial [createTween](#createtween) function. It also has utility functions for managing the root tween.
+
+### TweenID::chain
+```cpp
+TweenID TweenID::chain(int *value, int target, float time, Formula formula = linear);
+TweenID TweenID::chain(float *value, float target, float time, Formula formula = linear);
+TweenID TweenID::chain(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+TweenID TweenID::chain(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+TweenID TweenID::chain(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+TweenID TweenID::chain(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+TweenID TweenID::chain(Color *value, Color target, float time, Formula formula = linear);
+```
+Create a new tween and run it after this tween has finished playing.
+
+### TweenID::parallel
+```cpp
+TweenID TweenID::parallel(int *value, int target, float time, Formula formula = linear);
+TweenID TweenID::parallel(float *value, float target, float time, Formula formula = linear);
+TweenID TweenID::parallel(Vector2 *value, Vector2 target, float time, Formula formula = linear);
+TweenID TweenID::parallel(Vector3 *value, Vector3 target, float time, Formula formula = linear);
+TweenID TweenID::parallel(Vector4 *value, Vector4 target, float time, Formula formula = linear);
+TweenID TweenID::parallel(Rectangle *value, Rectangle target, float time, Formula formula = linear);
+TweenID TweenID::parallel(Color *value, Color target, float time, Formula formula = linear);
+```
+Create a new tween and run it in parallel with the current one.
+
+### TweenID::stop/Tween::resume
+```cpp
+void TweenID::stop();
+void TweenID::resume();
+void TweenID::toggleStopped();
+```
+Stop/resume the root tween. Tween will not account for any value changes when resumed.
+
+### TweenID::restart
+```cpp
+void TweenID::restart();
+```
+Restart the root tween. Tween will not reset the values to the initial and that is user's responsibility if they wish to.
+
+### TweenID::kill
+```cpp
+void TweenID::kill();
+```
+Kill the root tween and stop all chained and parallel tweens. Calling any **TweenID** functions on a killed tween is undefined behavior as a new tween might or might not take its place in memory.
+
+### TweenID Getters
+```cpp
+bool TweenID::stopped();
+bool TweenID::killed();
+bool TweenID::playing();
+bool TweenID::finished();
+bool TweenID::valid();
+bool TweenID::isRoot();
+```
+Check if tween is stopped/killed/playing/finished/valid/root tween respectively.
+
+### TweenID Tween Getters
+```cpp
+Tween &TweenID::tween();
+Tween &TweenID::root();
+```
+Get tween/root tween based on ID. Throws a warning and returns invalid tween if **TweenID** is invalid. While references won't be invalidated, the tween itself can be invalidated after killing/finishing and might point to a different tween afterwards.
+
+### Tween
 ```cpp
 struct Tween {
-   TweenType type = TweenType::none;
    Formula formula = linear;
    TweenID id = 0;
-   TweenID sequenced = 0;
+   TweenID root = 0;
+   TweenID chained = 0;
+   TweenID paralleled = 0;
+   TweenValue value = TweenValue::none;
+   TweenType type = TweenType::automatic;
+
+   bool stopped = false;
+   bool killed = false;
+   bool started = false;
+   bool finished = false;
 
    float timer = 0.0f;
    float time = 0.0f;
    float progress = 0.0f;
-   bool paused = false;
-   bool finished = false;
 
    union {
       struct { int *ivalue, istart, iend; };
@@ -1069,66 +1188,38 @@ struct Tween {
    };
 };
 ```
-Tween that holds information necessary for interpolating from a value to a target. Must not be created manually. *type*, *id* and *sequenced* must not be edited manually. *formula* can use any function that takes a float and returns a float, not necessarily the predefined formulas.
+Tween that holds information necessary for interpolating from a value to a target. Must not be created manually and it is recommended to not be edited manually. Create it with [createTween](#createtween) and chain and parallel using [TweenID::chain](#tweenidchain) and [TweenID::parallel](#tweenidparallel).
 
----
+### createTween
 ```cpp
-TweenID createTween(int *value, int target, float time, Formula formula = linear);
-TweenID createTween(float *value, float target, float time, Formula formula = linear);
-TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula = linear);
-TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula = linear);
-TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula = linear);
-TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula = linear);
-TweenID createTween(Color *value, Color target, float time, Formula formula = linear);
+TweenID createTween(int *value, int target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(float *value, float target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector2 *value, Vector2 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector3 *value, Vector3 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Vector4 *value, Vector4 target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Rectangle *value, Rectangle target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
+TweenID createTween(Color *value, Color target, float time, Formula formula = linear, TweenType type = TweenType::automatic);
 ```
-Create a new tween. By default uses a linear formula. Tweens are ran and destroyed automatically and only require *updateTweens* to be called every frame.
+Create a new root tween. Must be updated using [updateTweens](#updatetweens). See [Tween Formulas](#tween-formulas) for a list of all built-in formulas. See [TweenType](#tweentype) for further type information.
 
----
-```cpp
-TweenID createSequencedTween(TweenID parentID, int *value, int target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, float *value, float target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector2 *value, Vector2 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector3 *value, Vector3 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Vector4 *value, Vector4 target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Rectangle *value, Rectangle target, float time, Formula formula = linear);
-TweenID createSequencedTween(TweenID parentID, Color *value, Color target, float time, Formula formula = linear);
-```
-Creates a sequenced tween based on parent's ID. Sequenced tweens are paused by default and ran when the parent finishes playing. Killing a parent will subsequently kill all sequenced tweens. A single tween cannot have more than one sequenced tween. By default uses a linear formula. Tweens are ran and destroyed automatically and only require *updateTweens* to be called every frame.
-
----
-```cpp
-void pauseTween(TweenID ID);
-void resumeTween(TweenID ID);
-```
-Pause/resume a tween.
-
----
-```cpp
-void killTween(TweenID ID);
-```
-Kill a tween and all sequent tweens.
-
----
-```cpp
-Tween &getTween(TweenID ID);
-```
-Get a tween from ID. Be warned and don't hold references for long as they can be invalidated due to being stored in a dynamic vector.
-
----
-```cpp
-float getTweenProgress(TweenID ID);
-bool isTweenFinished(TweenID ID);
-bool isTweenPaused(TweenID ID);
-bool isTweenPlaying(TweenID ID);
-bool isTweenValid(TweenID ID);
-```
-Tween getters.
-
----
+### updateTweens
 ```cpp
 void updateTweens(float DT);
 ```
-Update all playing tweens.
+Update all playing tweens. Note that finished tweens might be invalidated after creating new tweens.
+
+### killAllTweens
+```cpp
+void killAllTweens();
+```
+Kill all active tweens.
+
+### getTweenCount
+```cpp
+size_t getTweenCount();
+size_t getTweenFreeSpotCount();
+```
+Get tween count/killed tween count that could be used to hold a new tween.
 
 # util.hpp
 Responsible for vector and color utility functions.
