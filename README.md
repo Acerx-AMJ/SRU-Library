@@ -892,49 +892,46 @@ Includes all headers provided by the library.
 # text.hpp
 Responsible for modifying text.
 
----
+### wrap
 ```cpp
 std::string wrap(const std::string &string, Font font, float maxWidth, float fontSize);
 ```
-Wrap the text to fit in the width.
+Wrap the text to fit in the width. Fits spacing using [fitSpacing](#fitspacing).
 
----
+### truncate
 ```cpp
 std::string truncate(const std::string &string, Font font, float maxWidth, float fontSize);
 ```
-Truncate the text to fit in the width.
+Truncate the text to fit in the width. Fits spacing using [fitSpacing](#fitspacing).
 
----
+### fitInside
 ```cpp
 std::string fitInside(const std::string &string, Font font, Vector2 maxSize, float fontSize);
 ```
-Wrap and then truncate the text to fit in the bounds.
+Wrap and then truncate the text to fit in the bounds. Fits spacing using [fitSpacing](#fitspacing).
 
----
+### divideText
 ```cpp
 std::vector<std::string> divideText(const std::string &string, Font font, float maxWidth, float fontSize);
 ```
-Divides the text into lines to fit in the width. Works similarly to *wrap*.
+Divides the text into lines to fit in the width. Works similarly to **wrap**. Fits spacing using [fitSpacing](#fitspacing).
 
----
+### toRomanNumeral
 ```cpp
 std::string toRomanNumeral(size_t number);
 ```
 Convert the number to a roman numeral. Highest numeral is M - 1000.
 
----
+### toCase
 ```cpp
 std::string toUpper(const std::string &string);
-```
-Convert the string to uppercase.
-
----
-```cpp
 std::string toLower(const std::string &string);
+std::string toTitle(const std::string &string);
+std::string capitalize(const std::string &string);
 ```
-Convert the string to lowercase.
+Convert the string to uppercase/lowercase/title/capitalized. **toTitle** capitalizes all words and removes underscores. **capitalize** only capitalizes the first character if it's a letter.
 
----
+### trim
 ```cpp
 std::string trim(const std::string &string);
 std::string trimLeft(const std::string &string);
@@ -942,28 +939,28 @@ std::string trimRight(const std::string &string);
 ```
 Trim leading/trailing spaces from the string.
 
----
+### split
 ```cpp
 std::vector<std::string> split(const std::string &string, char delimiter);
 std::vector<std::string> split(const std::string &string, const std::string &delimiter);
 std::vector<std::string> splitOnWhiteSpace(const std::string &string);
 ```
-Split string into pieces based on the delimeter. *splitOnWhiteSpace* handles all white space including tabs, new lines and some others. Will start or end with an empty string if the string respectively starts or ends with the delimeter except for in *splitOnWhiteSpace*.
+Split string into pieces based on the delimeter. **splitOnWhiteSpace** handles all white space including tabs, new lines and some others. Will start or end with an empty string if the string respectively starts or ends with the delimeter except for in **splitOnWhiteSpace**.
 
----
+### join
 ```cpp
 std::string join(const std::vector<std::string> &parts, const std::string &delimiter);
 std::string join(const std::vector<std::string> &parts);
 ```
 Joins all of the strings into one. Separates with delimiter if it is specified.
 
----
+### clean
 ```cpp
 std::vector<std::string> clean(const std::vector<std::string> &strings);
 ```
 Removes all empty strings from the vector and trims all strings.
 
----
+### textInPlace
 ```cpp
 void wrapInPlace(std::string &string, Font font, float maxWidth, float fontSize);
 void truncateInPlace(std::string &string, Font font, float maxWidth, float fontSize);
@@ -972,6 +969,8 @@ void divideTextInPlace(std::vector<std::string> &output, const std::string &stri
 void toRomanNumeralInPlace(std::string &string, size_t number);
 void toUpperInPlace(std::string &string);
 void toLowerInPlace(std::string &string);
+void toTitleInPlace(std::string &string);
+void capitalizeInPlace(std::string &string);
 void trimInPlace(std::string &string);
 void trimLeftInPlace(std::string &string);
 void trimRightInPlace(std::string &string);
@@ -984,7 +983,7 @@ void cleanInPlace(std::vector<std::string> &strings);
 ```
 Same as the previous functions but operate directly on the output.
 
----
+### contains
 ```cpp
 bool contains(const std::string &string, const std::string &substring);
 bool startsWith(const std::string &string, const std::string &substring);
@@ -1134,7 +1133,7 @@ Update all playing tweens.
 # util.hpp
 Responsible for vector and color utility functions.
 
----
+### Vx Constructors
 ```cpp
 template<typename T, typename Y>
 constexpr inline Vector2 V2(T x, Y y);
@@ -1147,7 +1146,6 @@ constexpr inline Vector4 V4(T x, Y y, U z, I w);
 ```
 Returns a vector with all values set.
 
----
 ```cpp
 template<typename T>
 constexpr inline Vector2 V2(T value);
@@ -1160,7 +1158,6 @@ constexpr inline Vector4 V4(T value);
 ```
 Returns a vector where all values are set to the given value.
 
----
 ```cpp
 constexpr inline Vector2 V2();
 constexpr inline Vector3 V3();
@@ -1168,33 +1165,30 @@ constexpr inline Vector4 V4();
 ```
 Returns a zero-initialized vector.
 
----
 ```cpp
 constexpr inline Vector3 V3(Color color);
 constexpr inline Vector4 V4(Color color);
 ```
 Converts the color to a vector. Changes all values from [0; 255] to [0; 1].
 
----
+### R4 Constructors
 ```cpp
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Rectangle R4(T x, Y y, U w, I h);
 ```
 Returns a rectangle with all values set.
 
----
 ```cpp
 constexpr inline Rectangle R4();
 ```
 Returns a zero-initialized rectangle.
 
----
 ```cpp
 constexpr inline Rectangle R4(Vector2 position, Vector2 size);
 ```
 Constructs a rectangle from position and size.
 
----
+### R4 Position
 ```cpp
 constexpr inline Rectangle R4bounds(Rectangle rect, Vector2 origin = CENTER);
 constexpr inline Vector2 R4topleft(Rectangle rect, Vector2 origin = CENTER);
@@ -1205,7 +1199,7 @@ constexpr inline Vector2 R4anchor(Rectangle rect, Vector2 origin, Vector2 target
 ```
 Returns the real boundaries/top-left position/position/size/origin/anchor of the rectangle respectively. *R4anchor* - returns global position with *targetOrigin* applied based on its origin. *R4topleft* - returns the top-left corner of the rectangle based on its origin.
 
----
+### V2 Position
 ```cpp
 constexpr inline Rectangle getBounds(Vector2 position, Vector2 size, Vector2 origin = CENTER);
 constexpr inline Vector2 getTopleft(Vector2 position, Vector2 size, Vector2 origin = CENTER);
@@ -1214,19 +1208,19 @@ constexpr inline Vector2 getAnchor(Vector2 position, Vector2 size, Vector2 origi
 ```
 Returns the real boundaries/top-left position/origin/anchor respectively. *getAnchor* - returns global position with *targetOrigin* applied based on its origin. *getTopleft* - returns the top-left corner based on origin.
 
----
+### fitSpacing
 ```cpp
 constexpr float fitSpacing(float fontSize);
 ```
 Fits spacing based on font size.
 
----
+### fitFontSize
 ```cpp
 inline float fitFontSize(Font font, const char *text, float maxWidth);
 ```
 Fits font size based on width. Fits spacing automatically using *fitSpacing*.
 
----
+### Text Size/Position
 ```cpp
 inline Vector2 getTextSize(Font font, const char *text, float fontSize);
 inline Rectangle getTextBounds(Font font, const char *text, float fontSize, Vector2 position, Vector2 origin = CENTER);
@@ -1236,39 +1230,36 @@ inline Vector2 getTextAnchor(Font font, const char *text, float fontSize, Vector
 ```
 Returns the size/real boundaries/top-left position/origin/anchor of the text respectively. *getAnchor* - returns global position with *targetOrigin* applied based on its origin. *getTopleft* - returns the top-left corner based on origin.
 
----
+### getSource
 ```cpp
 constexpr inline Rectangle getSource(Texture texture);
 ```
 Returns full texture source.
 
----
+### Rectangle Comparison
 ```cpp
 constexpr inline bool operator == (Rectangle lhs, Rectangle rhs);
 constexpr inline bool operator != (Rectangle lhs, Rectangle rhs);
 ```
 Rectangle comparison functions.
 
----
+### RGB
 ```cpp
 template<typename T, typename Y, typename U>
 constexpr inline Color RGB(T r, Y g, U b);
 ```
 Returns an RGB color.
 
----
 ```cpp
 constexpr inline Color RGB(Vector3 color);
 ```
 Converts vector to RGB color. Changes all values from [0; 1] to [0; 255].
 
----
 ```cpp
 constexpr inline Color RGBF(float r, float g, float b);
 ```
 Converts float values [0; 1] to RGB [0; 255].
 
----
 ```cpp
 template<typename T, typename Y, typename U, typename I>
 constexpr inline Color RGBA(T r, Y g, U b, I a);
@@ -1276,47 +1267,35 @@ constexpr inline Color RGBA(Color rgb, unsigned char a);
 ```
 Returns an RGBA color.
 
----
 ```cpp
 constexpr inline Color RGBA(Vector4 color);
 ```
 Converts vector to RGBA color. Changes all values from [0; 1] to [0; 255].
 
----
 ```cpp
 constexpr inline Color RGBAF(float r, float g, float b, float a);
 ```
 Converts float values [0; 1] to RGB [0; 255].
 
----
+### HEX
 ```cpp
 constexpr inline Color HEX(const char *hex);
 ```
 Returns a HEX color. The string must be in one of the formats: *#rgb*, *#rgba*, *#rrggbb* or *#rrggbbaa*, where symbols are 0-9, a-f or A-F.
 
----
+### HSL
 ```cpp
 constexpr inline Color HSL(float h, float s, float l);
-```
-Returns a HSL color. H must be in range [0; 360], S in range [0; 1] and L in range [0; 1].
-
----
-```cpp
 constexpr inline Color HSLA(float h, float s, float l, float a);
 ```
-Returns a HSLA color. H must be in range [0; 360], S in range [0; 1], L in range [0; 1] and A in range [0; 1].
+Returns a HSL color. **H** must be in range [0; 360], **S** in range [0; 1], **L** in range [0; 1] and **A** in range [0; 1].
 
----
+### HSV
 ```cpp
 constexpr inline Color HSV(float h, float s, float v);
-```
-Returns a HSV color. H must be in range [0; 360], S in range [0; 1] and V in range [0; 1].
-
----
-```cpp
 constexpr inline Color HSVA(float h, float s, float v, float a);
 ```
-Returns a HSVA color. H must be in range [0; 360], S in range [0; 1], V in range [0; 1] and A in range [0; 1].
+Returns a HSV color. **H** must be in range [0; 360], **S** in range [0; 1], **V** in range [0; 1] and **A** in range [0; 1].
 
 # Macros
 This section will document all macros present and their usage in one place. There are two ways to use these macros - either define them before including a header or define them in CMake. Defining them in CMake is safer since it protects you from ODR violations. You can include any macro in your project with this CMake function:

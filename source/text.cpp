@@ -48,6 +48,18 @@ std::string toLower(const std::string &string) {
    return lowerString;
 }
 
+std::string toTitle(const std::string &string) {
+   std::string title = string;
+   toTitleInPlace(title);
+   return title;
+}
+
+std::string capitalize(const std::string &string) {
+   std::string capitalized = string;
+   capitalizeInPlace(capitalized);
+   return capitalized;
+}
+
 std::string trim(const std::string &string) {
    std::string trimmedString = string;
    trimInPlace(trimmedString);
@@ -305,8 +317,8 @@ void divideTextInPlace(std::vector<std::string> &output, const std::string &stri
       truncated = view.substr(0, left - punctuation);
       view = view.substr(left - punctuation);
       
-      bool dash = std::isalpha(truncated.back()) && std::isalpha(view.front());
-      if (std::isspace(view.front())) {
+      bool dash = !truncated.empty() && !view.empty() && std::isalpha(truncated.back()) && std::isalpha(view.front());
+      if (!view.empty() && std::isspace(view.front())) {
          view = view.substr(1);
       }
       output.push_back(truncated + (dash ? "-\n" : "\n"));
@@ -348,6 +360,25 @@ void toLowerInPlace(std::string &string) {
    std::transform(string.begin(), string.end(), string.begin(), ::tolower);
 }
 
+void toTitleInPlace(std::string &string) {
+   trimInPlace(string);
+   toLowerInPlace(string);
+
+   if (!string.empty()) {
+      string.front() = toupper(string.front());
+   }
+
+   for (size_t i = string.find_first_of(" \n\r\t\v\f_"); i != std::string::npos; i = string.find_first_of(" \n\r\t\v\f_", i + 1)) {
+      if (string[i] == '_') string[i] = ' ';
+      if (i + 1 < string.size() && isalpha(string[i + 1])) string[i + 1] = toupper(string[i + 1]);
+   }
+}
+
+void capitalizeInPlace(std::string &string) {
+   toLowerInPlace(string);
+   if (!string.empty()) string.front() = toupper(string.front());
+}
+
 void trimInPlace(std::string &string) {
    trimLeftInPlace(string);
    trimRightInPlace(string);
@@ -372,7 +403,7 @@ void splitInPlace(std::vector<std::string> &output, const std::string &string, c
       output.push_back(piece);
    }
 
-   if (string.back() == delimiter) {
+   if (!string.empty() && string.back() == delimiter) {
       output.push_back("");
    }
 }
@@ -459,5 +490,5 @@ bool startsWith(const std::string &string, const std::string &substring) {
 }
 
 bool endsWith(const std::string &string, const std::string &substring) {
-   return string.find(substring) == string.size() - substring.size();
+   return substring.size() <= string.size() && string.rfind(substring) == string.size() - substring.size();
 }

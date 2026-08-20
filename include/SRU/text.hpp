@@ -12,6 +12,8 @@ std::string toRomanNumeral(size_t number);
 
 std::string toUpper(const std::string &string);
 std::string toLower(const std::string &string);
+std::string toTitle(const std::string &string);
+std::string capitalize(const std::string &string);
 std::string trim(const std::string &string);
 std::string trimLeft(const std::string &string);
 std::string trimRight(const std::string &string);
@@ -32,6 +34,8 @@ void toRomanNumeralInPlace(std::string &string, size_t number);
 
 void toUpperInPlace(std::string &string);
 void toLowerInPlace(std::string &string);
+void toTitleInPlace(std::string &string);
+void capitalizeInPlace(std::string &string);
 void trimInPlace(std::string &string);
 void trimLeftInPlace(std::string &string);
 void trimRightInPlace(std::string &string);
