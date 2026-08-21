@@ -1041,15 +1041,20 @@ Tween value. Applied automatically by [createTween](#createtween) functions.
 ### TweenType
 ```cpp
 enum class TweenType: char {
-   automatic, manual, loop,
+   automatic, manual, loop, pingpong
 };
 ```
-Tween type. Default is **automatic** - create the tween, update it and remove it when it finishes. **manual** - create the tween, update it and let the user remove it manually using [TweenID::kill](#tweenidkill) function. **loop** - create the tween, update it and keep looping it until the user stops it.
+Tween type. Default is **automatic** - remove the tween when it finishes. **manual** - do not remove the tween automatically and make the user remove it manually using [TweenID::kill](#tweenidkill) function. **loop** - loop the tween until the user stops it. **pingpong** - loop the tween and reverse it on finish (making it bounce back and forth) until the user stops it.
 
 ### TweenID
 ```cpp
 struct TweenID {
    size_t ID = 0;
+   int generation = 0;
+
+   constexpr TweenID();
+   constexpr TweenID(size_t ID);
+   constexpr TweenID(size_t ID, int generation);
 
    TweenID chain(int *value, int target, float time, Formula formula = linear);
    TweenID chain(float *value, float target, float time, Formula formula = linear);
@@ -1071,29 +1076,22 @@ struct TweenID {
    void resume();
    void toggleStopped();
    void restart();
+   void reverse();
    void kill();
 
-   bool stopped();
-   bool killed();
-   bool playing();
-   bool finished();
-   bool valid();
+   bool isStopped();
+   bool isKilled();
+   bool isPlaying();
+   bool isFinished();
+   bool isReversed();
+   bool isValid();
    bool isRoot();
 
    struct Tween &tween();
    struct Tween &root();
-
-   constexpr TweenID() = default;
-   constexpr TweenID(size_t ID);
-
-   constexpr size_t &operator = (TweenID other);
-   constexpr size_t &operator = (size_t other);
-   constexpr size_t &operator ++ ();
-   constexpr size_t &operator -- ();
-   constexpr operator size_t ();
 };
 ```
-**TweenID** holds an internal ID to a tween and is used for chaining and adding parallel tweens to the initial [createTween](#createtween) function. It also has utility functions for managing the root tween.
+**TweenID** holds an internal ID to a tween and is used for chaining and adding parallel tweens to the root tween, see [createTween](#createtween). It also has utility functions for managing the root tween and retrieving its state.
 
 ### TweenID::chain
 ```cpp
@@ -1133,29 +1131,36 @@ void TweenID::restart();
 ```
 Restart the root tween. Tween will not reset the values to the initial and that is user's responsibility if they wish to.
 
+### TweenID::reverse
+```cpp
+void TweenID::reverse();
+```
+Reverse the root tween. This means swapping end and start for all sub-tweens and inversing the progress.
+
 ### TweenID::kill
 ```cpp
 void TweenID::kill();
 ```
-Kill the root tween and stop all chained and parallel tweens. Calling any **TweenID** functions on a killed tween is undefined behavior as a new tween might or might not take its place in memory.
+Kill the root tween and all of its sub-tweens. Will invalidate the **TweenID** for the root and all sub-tweens and throw a warning if any function is called from them.
 
 ### TweenID Getters
 ```cpp
-bool TweenID::stopped();
-bool TweenID::killed();
-bool TweenID::playing();
-bool TweenID::finished();
-bool TweenID::valid();
+bool TweenID::isStopped();
+bool TweenID::isKilled();
+bool TweenID::isPlaying();
+bool TweenID::isFinished();
+bool TweenID::isReversed();
+bool TweenID::isValid();
 bool TweenID::isRoot();
 ```
-Check if tween is stopped/killed/playing/finished/valid/root tween respectively.
+Check if tween is stopped/killed/playing/finished/reversed/valid/root tween respectively.
 
 ### TweenID Tween Getters
 ```cpp
 Tween &TweenID::tween();
 Tween &TweenID::root();
 ```
-Get tween/root tween based on ID. Throws a warning and returns invalid tween if **TweenID** is invalid. While references won't be invalidated, the tween itself can be invalidated after killing/finishing and might point to a different tween afterwards.
+Get tween/root tween based on ID. Throws a warning and returns invalid tween if **TweenID** is invalid or the underlying tween has been killed. While references won't be invalidated, the tween itself can be invalidated and might point to a different tween. That's why it's recommended to not hold onto these references and instead use functions provided by **TweenID**.
 
 ### Tween
 ```cpp
@@ -1168,6 +1173,7 @@ struct Tween {
    TweenValue value = TweenValue::none;
    TweenType type = TweenType::automatic;
 
+   bool reversed = false;
    bool stopped = false;
    bool killed = false;
    bool started = false;
@@ -1176,6 +1182,7 @@ struct Tween {
    float timer = 0.0f;
    float time = 0.0f;
    float progress = 0.0f;
+   int generation = 0;
 
    union {
       struct { int *ivalue, istart, iend; };
@@ -1206,13 +1213,14 @@ Create a new root tween. Must be updated using [updateTweens](#updatetweens). Se
 ```cpp
 void updateTweens(float DT);
 ```
-Update all playing tweens. Note that finished tweens might be invalidated after creating new tweens.
+Update all playing tweens.
 
 ### killAllTweens
 ```cpp
 void killAllTweens();
+void killFinishedTweens();
 ```
-Kill all active tweens.
+Kill all/all finished tweens.
 
 ### getTweenCount
 ```cpp

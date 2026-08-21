@@ -165,11 +165,16 @@ enum class TweenValue: char {
 };
 
 enum class TweenType: char {
-   automatic, manual, loop,
+   automatic, manual, loop, pingpong
 };
 
 struct TweenID {
    size_t ID = 0;
+   int generation = 0;
+
+   constexpr TweenID() = default;
+   constexpr TweenID(size_t ID): ID(ID) {}
+   constexpr TweenID(size_t ID, int generation): ID(ID), generation(generation) {}
 
    // chain
    TweenID chain(int *value, int target, float time, Formula formula = linear);
@@ -194,44 +199,19 @@ struct TweenID {
    void resume();
    void toggleStopped();
    void restart();
+   void reverse();
    void kill();
 
-   bool stopped();
-   bool killed();
-   bool playing();
-   bool finished();
-   bool valid();
+   bool isStopped();
+   bool isKilled();
+   bool isPlaying();
+   bool isFinished();
+   bool isReversed();
+   bool isValid();
    bool isRoot();
 
    struct Tween &tween();
    struct Tween &root();
-
-   // mask it as a size_t
-   constexpr TweenID() = default;
-   constexpr TweenID(size_t ID)
-      : ID(ID) {}
-
-   constexpr size_t &operator = (TweenID other) {
-      ID = other;
-      return ID;
-   }
-
-   constexpr size_t &operator = (size_t other) {
-      ID = other;
-      return ID;
-   }
-
-   constexpr size_t &operator ++ () {
-      return ++ID;
-   }
-
-   constexpr size_t &operator -- () {
-      return --ID;
-   }
-
-   constexpr operator size_t () {
-      return ID;
-   }
 };
 
 struct Tween {
@@ -243,6 +223,7 @@ struct Tween {
    TweenValue value = TweenValue::none;
    TweenType type = TweenType::automatic;
 
+   bool reversed = false;
    bool stopped = false;
    bool killed = false;
    bool started = false;
@@ -251,6 +232,7 @@ struct Tween {
    float timer = 0.0f;
    float time = 0.0f;
    float progress = 0.0f;
+   int generation = 0;
 
    union {
       struct { int *ivalue, istart, iend; };
@@ -275,5 +257,7 @@ TweenID createTween(Color *value, Color target, float time, Formula formula = li
 // update tweens
 void updateTweens(float DT);
 void killAllTweens();
+void killFinishedTweens();
+
 size_t getTweenCount();
 size_t getTweenFreeSpotCount();
