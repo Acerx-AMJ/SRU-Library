@@ -619,28 +619,28 @@ Returns a random element from a container. The container must implement **size()
 # render.hpp
 Responsible for providing screen, size and position math utilities as well as drawing utilities.
 
----
+### getWindowSize
 ```cpp
 float getWindowWidth();
 float getWindowHeight();
 Vector2 getWindowSize();
 Vector2 getCubicWindowSize();
 ```   
-Returns the size of the window. *getCubicWindowSize* returns the size of the window as a square with its sides being the smallest size component - width or height.
+Returns the size of the window. **getCubicWindowSize** returns the size of the window as a square with its sides being the smallest size component - width or height.
 
----
+### getWindowCenter
 ```cpp
 Vector2 getWindowCenter();
 ```
 Returns the center of the window.
 
----
+### getWindowArea
 ```cpp
 Rectangle getWindowArea();
 ```
 Returns the area (boundaries) of the window {0, 0, width, height}.
 
----
+### mapRatioToArea
 ```cpp
 Rectangle mapRatioToArea(Rectangle ratio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
 Rectangle mapRatioToArea(Vector2 startRatio, Vector2 endRatio, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
@@ -649,9 +649,9 @@ Vector2 mapRatioToArea(float ratioX, float ratioY, Rectangle area = WINDOW_AREA,
 Vector2 mapSizeRatioToArea(Vector2 sizeRatio, Rectangle area = WINDOW_AREA, int type = RATIO);
 Vector2 mapSizeRatioToArea(float sizeRatioX, float sizeRatioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps a ratio to an area. Default area is the window boundaries. *mapSizeRatioToArea* must be used for converting size ratios whereas *mapRatioToArea* must be used for position. Check [ratio constants](#constantshpp) for more info on ratio types.
+Maps a ratio to an area. Default area is the window boundaries. **mapSizeRatioToArea** must be used for converting size ratios whereas **mapRatioToArea** must be used for position. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### mapAreaToRatio
 ```cpp
 Rectangle mapAreaToRatio(Rectangle rect, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
 Rectangle mapAreaToRatio(Vector2 start, Vector2 end, Vector2 origin = CENTER, Rectangle area = WINDOW_AREA, int type = RATIO);
@@ -660,115 +660,115 @@ Vector2 mapAreaToRatio(float x, float y, Rectangle area = WINDOW_AREA, int type 
 Vector2 mapAreaToSizeRatio(Vector2 size, Rectangle area = WINDOW_AREA, int type = RATIO);
 Vector2 mapAreaToSizeRatio(float width, float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps area coordinates to a ratio. Default area is the window boundaries. *mapAreaToSizeRatio* must be used for converting size whereas *mapAreaToRatio* must be used for position. Check [ratio constants](#constantshpp) for more info on ratio types.
+Maps area coordinates to a ratio. Default area is the window boundaries. **mapAreaToSizeRatio** must be used for converting size whereas **mapAreaToRatio** must be used for position. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### mapRatioToX
 ```cpp
 float mapRatioToX(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapRatioToY(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapRatioToWidth(float ratioX, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapRatioToHeight(float ratioY, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps a X/Y/width/height ratio to an area. Default area is the window boundaries. Check [ratio constants](#constantshpp) for more info on ratio types.
+Maps a X/Y/width/height ratio to an area. Default area is the window boundaries. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### mapXToRatio
 ```cpp
 float mapXToRatio(float x, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapYToRatio(float y, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapWidthToRatio(float width, Rectangle area = WINDOW_AREA, int type = RATIO);
 float mapHeightToRatio(float height, Rectangle area = WINDOW_AREA, int type = RATIO);
 ```
-Maps area's X/Y/width/height to a ratio. Default area is the window boundaries. Check [ratio constants](#constantshpp) for more info on ratio types.
+Maps area's X/Y/width/height to a ratio. Default area is the window boundaries. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### convertRatio
 ```cpp
 Vector2 convertRatio(Vector2 ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
 float convertRatioX(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
 float convertRatioY(float ratio, int type = RATIO, int target = RATIO, Rectangle area = WINDOW_AREA);
 ```
-Converts a ratio of type *type* to ratio of type *target* in the given area. Check [ratio constants](#constantshpp) for more info on ratio types. Whether or not using *convertRatioX* or *convertRatioY* for a single axis is important.
+Converts a ratio of type **type** to ratio of type **target** in the given area. Check [Ratio Constants](#constantshpp) for more info on ratio types. Whether or not using **convertRatioX** or **convertRatioY** for a single axis is important.
 
----
+### gridPosition
 ```cpp
 Vector2 gridPosition(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Vector2 gridRatio(Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 ```
-Get position/ratio of a grid cell. *row* and *column* are 0-indexed. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+Get position/ratio of a grid cell. **row** and **column** are 0-indexed. **origin** is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
 
----
+### gridRectangle
 ```cpp
 Rectangle gridRectangle(Vector2 size, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 Rectangle gridRatioRectangle(Vector2 sizeRatio, Rectangle grid, int columns, int rows, int column, int row, Vector2 origin = CENTER);
 ```
-Get position/ratio of a grid cell and combine it into a rectangle. *row* and *column* are 0-indexed. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+Get position/ratio of a grid cell and combine it into a rectangle. **row** and **column** are 0-indexed. **origin** is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
 
----
+### getGridCellSize
 ```cpp
 Vector2 getGridCellSize(Rectangle grid, int columns, int rows);
 Vector2 getGridCellRatio(Rectangle grid, int columns, int rows, int type = RATIO);
 ```
-Get grid cell size in grid/ratio coordinates. *getGridCellRatio* will always return the global ratio, not local ratio for the grid area. Check [ratio constants](#constantshpp) for more info on ratio types.
+Get grid cell size in grid/ratio coordinates. **getGridCellRatio** will always return the global ratio, not local ratio for the grid area. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
 ### getGridCell
 ```cpp
 Vector2 getGridCell(Rectangle grid, int columns, int rows, Vector2 position);
 ```
-Returns the grid cell that the position is currently in. Returns *GRID_CELL_INVALID* (from [constants.hpp](#constantshpp)) if position is outside of the grid.
+Returns the grid cell that the position is currently in. Returns **GRID_CELL_INVALID** (from [constants.hpp](#constantshpp)) if position is outside of the grid.
 
----
+### snapToGrid
 ```cpp
 Vector2 snapToGrid(Rectangle grid, int columns, int rows, Vector2 position, Vector2 origin = CENTER);
 ```
-Snaps the position to the grid. Returns position if position is outside of the grid. *origin* is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
+Snaps the position to the grid. Returns position if position is outside of the grid. **origin** is the origin of the cell, where (0; 0) is top-left and (1; 1) is bottom-right and by default it is the center of the cell.
 
----
+### drawText
 ```cpp
 void drawText(Font font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
-Draw text. *origin* must be in range [0; 1]. Fits spacing using *fitSpacing*.
+Draw text. **origin** must be in range [0; 1]. Fits spacing using **fitSpacing**.
 
----
+### drawTextResponsive
 ```cpp
 void drawTextResponsive(Font font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 ```
 Responsive variation of the previous function. Instead of passing screen position, pass ratio [0; 1]. Also scales font size and spacing automatically based on screen size. If no area is supplied then window boundaries are used instead.
 
----
+### drawText std::string Overloads
 ```cpp
 void drawText(const std::string &font, Vector2 position, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawTextResponsive(const std::string &font, Vector2 ratio, const char *text, float fontSize, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, float rotation = 0.0f);
 ```
 Instead of passing a font, pass an identifier of a font found in the asset manager ([assets.hpp](#assetshpp)).
 
----
+### drawRect
 ```cpp
 void drawRect(Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawRect(Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
-Draw rectangle. *origin* must be in range [0; 1].
+Draw rectangle. **origin** must be in range [0; 1].
 
----
+### drawRectResponsive
 ```cpp
 void drawRectResponsive(Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 void drawRectResponsive(Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### drawTexture
 ```cpp
 void drawTexture(Texture texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
 void drawTexture(Texture texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
 ```
-Draw texture. *origin* must be in range [0; 1]. If no source is supplied then the whole texture is rendered.
+Draw texture. **origin** must be in range [0; 1]. If no source is supplied then the whole texture is rendered.
 
----
+### drawTextureResponsive
 ```cpp
 void drawTextureResponsive(Texture texture, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 void drawTextureResponsive(Texture texture, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
----
+### drawTexture std::string Overloads
 ```cpp
 void drawTexture(const std::string &texture, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
 void drawTexture(const std::string &texture, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, Rectangle source = FULL_SOURCE, float rotation = 0.0f);
@@ -777,16 +777,15 @@ void drawTextureResponsive(const std::string &texture, Rectangle ratios, Vector2
 ```
 Instead of passing a texture, pass an identifier to a texture in the asset manager ([assets.hpp](#assetshpp)).
 
----
+### AnimationID
 ```cpp
 typedef size_t AnimationID;
 ```
 Animation ID of a specific animation config instance. 0 - nil.
 
----
+### AnimationConfig
 ```cpp
 struct AnimationConfig {
-public:
    AnimationConfig() = default;
    AnimationConfig(Texture texture, size_t frameWidth, size_t frameHeight, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
    AnimationConfig(Texture texture, size_t frameSize, size_t gap, size_t frameY, size_t frameCount, float frameTime, bool loop = true);
@@ -805,7 +804,7 @@ public:
 ```
 Animation config instance responsible for saving common animation data between different animated objects.
 
----
+### Animation
 ```cpp
 struct Animation {
    Animation() = default;
@@ -823,68 +822,68 @@ struct Animation {
 ```
 Animated object instance.
 
----
+### pushAnimation
 ```cpp
 AnimationID pushAnimation(AnimationConfig config);
 ```
 Create a new config instance and return its ID.
 
----
+### getAnimation
 ```cpp
 AnimationConfig &getAnimation(AnimationID ID);
 ```
-Get animation config instance by its ID. Terminates if ID is invalid.
+Get animation config instance by its ID. Throws warning if ID is invalid.
 
----
+### getAnimationContainer
 ```cpp
 std::vector<AnimationConfig> &getAnimationContainer();
 ```
 Get animation config container.
 
----
+### getAnimationSource
 ```cpp
 Rectangle getAnimationSource(Animation animation);
 Rectangle getAnimationSource(Animation animation, AnimationConfig config);
 ```
-Get calculated animation frame source based on animation's state. Terminates if animation's config ID is invalid.
+Get calculated animation frame source based on animation's state. Throws warning if animation's config ID is invalid.
 
----
+### isAnimationPlaying
 ```cpp
 bool isAnimationPlaying(Animation &animation, AnimationID ID);
 ```
 Returns true if animation is playing and isn't finished. Looping animations will never finish.
 
----
+### setAnimationState
 ```cpp
 void setAnimationState(Animation &animation, AnimationID ID);
 ```
 Sets animation's state to the given config if the same config isn't already being used and resets animation to default.
 
----
+### forceAnimationState
 ```cpp
 void forceAnimationState(Animation &animation, AnimationID ID);
 ```
 Sets animation's state to the given config and resets animation to default.
 
----
+### animate
 ```cpp
 void animate(Animation &animation, float DT);
 ```
 Update animation if it isn't paused and isn't finished playing.
 
----
+### drawTextureAnimated
 ```cpp
 void drawTextureAnimated(Animation animation, Vector2 position, Vector2 size, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 void drawTextureAnimated(Animation animation, Rectangle rect, Vector2 origin = CENTER, Color color = WHITE, float rotation = 0.0f);
 ```
-Draw animated texture. *origin* must be in range [0; 1].
+Draw animated texture. **origin** must be in range [0; 1].
 
----
+### drawTextureAnimatedResponsive
 ```cpp
 void drawTextureAnimatedResponsive(Animation animation, Vector2 ratio, Vector2 sizeRatio, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 void drawTextureAnimatedResponsive(Animation animation, Rectangle ratios, Vector2 origin = CENTER, Color color = WHITE, Rectangle area = WINDOW_AREA, int type = RATIO, float rotation = 0.0f);
 ```
-Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [ratio constants](#constantshpp) for more info on ratio types.
+Responsive variations of the previous functions. Instead of passing screen position, pass ratio [0; 1]. If no area is supplied then window boundaries are used instead. Check [Ratio Constants](#constantshpp) for more info on ratio types.
 
 # sru.hpp
 Includes all headers provided by the library.

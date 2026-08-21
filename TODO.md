@@ -1,9 +1,8 @@
 music manager
 camera system
-some form of UI elements
-navigation manager (fuck that)
+some form of UI elements   <<< probably not
+navigation manager         <<<
 input manager
 collisions
 examples
 documentation usage, document errors?
-add parallels back to tweens

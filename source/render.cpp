@@ -1,6 +1,7 @@
-#include "SRU/render.hpp"
 #include "SRU/assets.hpp"
+#include "SRU/error.hpp"
 #include "SRU/random.hpp"
+#include "SRU/render.hpp"
 #include "SRU/util.hpp"
 
 // helper functions
@@ -386,8 +387,8 @@ AnimationID pushAnimation(AnimationConfig config) {
 
 AnimationConfig &getAnimation(AnimationID ID) {
    if (ID <= 0 || ID >= animationConfig.size()) {
-      printf("srulib::getAnimation: ID out of bounds. ID is %llu and animation config count is %llu.\n", ID, animationConfig.size());
-      exit(EXIT_FAILURE);
+      SRULibWarning(TextFormat("srulib::getAnimation: ID %llu is out of bounds.\n", ID));
+      return animationConfig[0];
    }
    return animationConfig[ID];
 }
@@ -439,7 +440,7 @@ void animate(Animation &animation, float DT) {
    }
 
    animation.timer += DT;
-   if (animation.timer >= config.frameTime) {
+   while (animation.timer >= config.frameTime) {
       animation.timer -= config.frameTime;
       animation.frame = (animation.frame + 1) % config.frameCount;
       if (animation.frame == 0) {
