@@ -1,5 +1,5 @@
-# SRU-Library
-## About
+<img height="150" src="assets/sru.png"/>
+
 SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce rewriting different utility functions and managers for different Raylib projects. Inspired by my own utilities.
 
 ## ToC
