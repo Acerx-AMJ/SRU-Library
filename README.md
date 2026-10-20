@@ -1,8 +1,10 @@
 # SRU-Library
 ## About
 SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce rewriting different utility functions and managers for different Raylib projects. Inspired by my own utilities.
+
 ## ToC
 - [Usage](#usage)
+- [Real Project Usage](#real-project-usage)
 - [Documentation](#documentation)
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
@@ -17,6 +19,7 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [tween.hpp](#tweenhpp)
 - - [util.hpp](#utilhpp)
 - - [Macros](#macros)
+- [Credits](#credits)
 
 ## Usage
 SRU-Lib is meant to be used together with CMake's FetchContent module. It uses Raylib as a dependency that the user must also include themselves. Here's a full working CMake example:
@@ -62,6 +65,48 @@ And finally run:
 ```bash
 ./build/srulib-test # or whatever you named your project
 ```
+
+## Real project usage
+For real projects you definitely want to install Raylib on your computer instead of fetching it every time. You also will need to handle more than a single file. There are also extra optional flags that you might or might not need and that's up to you to decide.
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(srulib-test) # name of your project
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # if using clangd
+add_compile_options(-Wall) # recommended. will show all warnings
+
+include(FetchContent)
+FetchContent_Declare(srulib GIT_REPOSITORY https://github.com/Acerx-AMJ/SRU-Library.git GIT_TAG main GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(srulib)
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+find_package(raylib REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
+```
+
+Project structure for this CMake configuration looks like this:
+```
+Project
+|__ build/
+|__ include/
+|   |__ header1.hpp
+|   |__ header2.hpp
+|   |__ ...
+|__ source/
+|   |__ source1.cpp
+|   |__ source2.cpp
+|   |__ ...
+|__ CMakeLists.txt
+|__ ...
+```
+
+Building cache and compiling is the same as for the previous usage example.
 
 ## Documentation
 Here you will find the documentation of all headers, functions and structures found in the library. Select by header:
@@ -1423,3 +1468,6 @@ Defines the default maximum pitch used in *playSound*. Default is 1.075. Used in
 #define SRULIB_USE_RAND
 ```
 If defined, C *rand()* function will be used instead of *std::mt19937*. When defined, the random must be seeded manually. Used in [random.hpp](#randomhpp).
+
+## Credits
+This project was made by Daniel Vishnevsky and is licensed under MIT License.
