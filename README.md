@@ -1,10 +1,10 @@
 <img height="150" src="assets/sru.png"/>
 
-SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce rewriting different utility functions and managers for different Raylib projects. Inspired by my own utilities.
+SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce rewriting different utility functions and managers for different Raylib projects. Inspired by utilities used for Sandbox-2D and AA3.
 
 ## ToC
 - [Usage](#usage)
-- [Real Project Usage](#real-project-usage)
+- [Building](#building)
 - [Documentation](#documentation)
 - - [assets.hpp](#assetshpp)
 - - [audio.hpp](#audiohpp)
@@ -22,9 +22,9 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - [Credits](#credits)
 
 ## Usage
-SRU-Lib is meant to be used together with CMake's FetchContent module. It uses Raylib as a dependency that the user must also include themselves. Here's a full working CMake example:
+SRU-Lib can be used together with CMake's FetchContent module. It uses Raylib as a dependency that the user must also include themselves. Here's a full CMake example:
 ```cmake
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(srulib-test) # name of your project
 
 set(CMAKE_CXX_STANDARD 17) # at least C++17 for SRU-Lib
@@ -49,64 +49,54 @@ FetchContent_MakeAvailable(srulib)
 add_executable(${PROJECT_NAME} main.cpp) # add your source files
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
 ```
-Project structure for this CMake file would look something like this:
-```
-Project
-|__ build/
-|__ main.cpp
-|__ CMakeLists.txt
-```
-And to build the project:
-```bash
-cmake -B build # build CMake cache (rerun after adding new source files)
-cmake --build build # build project
-```
-And finally run:
-```bash
-./build/srulib-test # or whatever you named your project
+
+Here's a test program to compile:
+```cpp
+#include "SRU/sru.hpp"
+
+int main() {
+   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+   InitWindow(960, 540, "SRU-Lib Test");
+   SetTargetFPS(60);
+
+   while (!WindowShouldClose()) {
+      BeginDrawing();
+      drawTextResponsive(GetFontDefault(), {0.5f, 0.5f}, "Hello, SRU-Lib!", 125.0f);
+      EndDrawing();
+   }
+   CloseWindow();
+}
 ```
 
-## Real project usage
-For real projects you definitely want to install Raylib on your computer instead of fetching it every time. You also will need to handle more than a single file. There are also extra optional flags that you might or might not need and that's up to you to decide.
+You can build the project with the following commands:
+```bash
+cmake -B build
+cmake --build build
+```
+The executable will be found in `build/srulib-test` (or whatever you named your project).
 
+## Building
+Here's a cross-platform way to build and install the library. You need to be in the same directory as the CMakeLists.txt file:
+```bash
+cmake -S . -B build
+cmake --build build
+cmake --install build # needs sudo on Linux/MacOS
+```
+
+Here's an example on how to include the library with CMake (assuming Raylib is also installed):
 ```cmake
 cmake_minimum_required(VERSION 3.10)
-project(srulib-test) # name of your project
+project(srulib-test)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # if using clangd
-add_compile_options(-Wall) # recommended. will show all warnings
 
-include(FetchContent)
-FetchContent_Declare(srulib GIT_REPOSITORY https://github.com/Acerx-AMJ/SRU-Library.git GIT_TAG main GIT_SHALLOW TRUE)
-FetchContent_MakeAvailable(srulib)
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
 
 find_package(raylib REQUIRED)
+find_package(srulib REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib srulib)
 ```
-
-Project structure for this CMake configuration looks like this:
-```
-Project
-|__ build/
-|__ include/
-|   |__ header1.hpp
-|   |__ header2.hpp
-|   |__ ...
-|__ source/
-|   |__ source1.cpp
-|   |__ source2.cpp
-|   |__ ...
-|__ CMakeLists.txt
-|__ ...
-```
-
-Building cache and compiling is the same as for the previous usage example.
 
 ## Documentation
 Here you will find the documentation of all headers, functions and structures found in the library. Select by header:
