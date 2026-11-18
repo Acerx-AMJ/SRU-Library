@@ -2,16 +2,20 @@
 #include <raylib.h>
 #include <string>
 
-#ifndef SRULIB_MIN_PITCH
-   #define SRULIB_MIN_PITCH 0.925f
-#endif // SRULIB_MIN_PITCH
+// sound pitch/volume getters/setters
+void setSoundPitch(float pitch);
+void setSoundPitch(float min, float max);
+void setSoundPitchMin(float pitch);
+void setSoundPitchMax(float pitch);
+void setSoundVolume(float volume);
 
-#ifndef SRULIB_MAX_PITCH
-   #define SRULIB_MAX_PITCH 1.075f
-#endif // SRULIB_MAX_PITCH
+float getSoundPitchMin();
+float getSoundPitchMax();
+float getSoundVolume();
 
-void playSound(const std::string &name, float volume = 1.0f);
+// play sound functions
+void playSound(const std::string &name);
 void playSound(const std::string &name, float pitch, float volume);
 
-void playRawSound(Sound sound, float volume = 1.0f);
+void playRawSound(Sound sound);
 void playRawSound(Sound sound, float pitch, float volume);

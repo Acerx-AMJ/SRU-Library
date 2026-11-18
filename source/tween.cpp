@@ -382,7 +382,7 @@ bool TweenID::isRoot() {
 
 Tween &TweenID::tween() {
    if (!isValid()) {
-      SRULibWarning(TextFormat("srulib::TweenID::tween: tried to get tween from invalid ID %llu.\n", ID));
+      SRULibWarning("srulib::TweenID::tween: tried to get tween from invalid ID %llu.\n", ID);
       return tweens[0];
    }
    return tweens[ID];
@@ -390,7 +390,7 @@ Tween &TweenID::tween() {
 
 Tween &TweenID::root() {
    if (!isValid()) {
-      SRULibWarning(TextFormat("srulib::TweenID::root: tried to get root from invalid ID %llu.\n", ID));
+      SRULibWarning("srulib::TweenID::root: tried to get root from invalid ID %llu.\n", ID);
       return tweens[0];
    }
    Tween &tween = tweens[ID];

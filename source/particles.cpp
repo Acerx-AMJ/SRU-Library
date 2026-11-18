@@ -27,7 +27,7 @@ ParticleCluster &getParticleCluster(const std::string &name) {
    if (auto it = particleClusters.find(name); it != particleClusters.end()) {
       return it->second;
    }
-   SRULibWarning(TextFormat("srulib::getParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::getParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str());
    return fallbackCluster;
 }
 
@@ -43,7 +43,7 @@ bool isParticleClusterEmpty(const std::string &name) {
    if (auto it = particleClusters.find(name); it != particleClusters.end()) {
       return it->second.cluster.empty();
    }
-   SRULibWarning(TextFormat("srulib::isParticleClusterEmpty: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::isParticleClusterEmpty: Particle cluster '%s' does not exist.\n", name.c_str());
    return true;
 }
 
@@ -51,7 +51,7 @@ size_t getParticleCount(const std::string &name) {
    if (auto it = particleClusters.find(name); it != particleClusters.end()) {
       return it->second.cluster.size();
    }
-   SRULibWarning(TextFormat("srulib::getParticleCount: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::getParticleCount: Particle cluster '%s' does not exist.\n", name.c_str());
    return 0;
 }
 
@@ -74,7 +74,7 @@ void updateParticleCluster(const std::string &name, float DT) {
       updateParticleCluster(it->second, DT);
       return;
    }
-   SRULibWarning(TextFormat("srulib::updateParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::updateParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str());
 }
 
 void updateParticleCluster(ParticleCluster &cluster, float DT) {
@@ -103,7 +103,7 @@ void drawParticleCluster(const std::string &name) {
       drawParticleCluster(it->second);
       return;
    }
-   SRULibWarning(TextFormat("srulib::drawParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::drawParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str());
 }
 
 void drawParticleCluster(const ParticleCluster &cluster) {
@@ -131,7 +131,7 @@ void drawResponsiveParticleCluster(const std::string &name, Rectangle area, int 
       drawResponsiveParticleCluster(it->second, area, type);
       return;
    }
-   SRULibWarning(TextFormat("srulib::drawResponsiveParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::drawResponsiveParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str());
 }
 
 void drawResponsiveParticleCluster(const ParticleCluster &cluster, Rectangle area, int type) {
@@ -159,7 +159,7 @@ void clearParticleCluster(const std::string &name) {
       clearParticleCluster(it->second);
       return;
    }
-   SRULibWarning(TextFormat("srulib::clearParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::clearParticleCluster: Particle cluster '%s' does not exist.\n", name.c_str());
 }
 
 void clearParticleCluster(ParticleCluster &cluster) {
@@ -171,7 +171,7 @@ void spawnParticles(const std::string &name, size_t count, Texture *texture, Vec
       spawnParticles(it->second, count, texture, position, useConfigPosition);
       return;
    }
-   SRULibWarning(TextFormat("srulib::spawnParticles: Particle cluster '%s' does not exist.\n", name.c_str()));
+   SRULibWarning("srulib::spawnParticles: Particle cluster '%s' does not exist.\n", name.c_str());
 }
 
 void spawnParticles(ParticleCluster &cluster, size_t count, Texture *texture, Vector2 position, bool useConfigPosition) {

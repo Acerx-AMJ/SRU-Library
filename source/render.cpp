@@ -387,7 +387,7 @@ AnimationID pushAnimation(AnimationConfig config) {
 
 AnimationConfig &getAnimation(AnimationID ID) {
    if (ID <= 0 || ID >= animationConfig.size()) {
-      SRULibWarning(TextFormat("srulib::getAnimation: ID %llu is out of bounds.\n", ID));
+      SRULibWarning("srulib::getAnimation: ID %llu is out of bounds.\n", ID);
       return animationConfig[0];
    }
    return animationConfig[ID];

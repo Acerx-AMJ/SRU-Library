@@ -18,7 +18,6 @@ SRU-Lib is a simple C++ utility library designed for use with Raylib to reduce r
 - - [text.hpp](#texthpp)
 - - [tween.hpp](#tweenhpp)
 - - [util.hpp](#utilhpp)
-- - [Macros](#macros)
 - [Credits](#credits)
 
 ## Usage
@@ -113,9 +112,6 @@ Here you will find the documentation of all headers, functions and structures fo
 - [tween.hpp](#tweenhpp)
 - [util.hpp](#utilhpp)
 
-Or browse miscellaneous documentation:
-- [Macros](#macros)
-
 # assets.hpp
 Responsible for asset loading, unloading and retrieval. Handles textures, fonts, shaders and models. Note that different asset types use different containers so a texture can exist with a font that's using an identical name whereas two textures with the same name cannot. Is not thread safe.
 
@@ -204,29 +200,36 @@ Returns a reference to the given asset map.
 # audio.hpp
 Responsible for playing audio.
 
-### Audio Macros
+### setSoundPitch/Volume
 ```cpp
-#define SRULIB_MIN_PITCH 0.925f
+void setSoundPitch(float pitch);
+void setSoundPitch(float min, float max);
+void setSoundPitchMin(float pitch);
+void setSoundPitchMax(float pitch);
+void setSoundVolume(float volume);
 ```
-Defines the default minimum pitch used in *playSound*. Default is 0.925.
+Sets the minimum pitch, maximum pitch or default volume based on function used. Default min pitch is 0.925, default max pitch is 1.075 and default volume is 1.0. Volume ranges in [0; 1].
 
+### getSoundPitch/Volume
 ```cpp
-#define SRULIB_MAX_PITCH 1.075f
+float getSoundPitchMin();
+float getSoundPitchMax();
+float getSoundVolume();
 ```
-Defines the default maximum pitch used in *playSound*. Default is 1.075.
+Retrieves the minimum pitch, maximum pitch and volume accordingly.
 
 ### playSound
 ```cpp
-void playSound(const std::string &name, float volume = 1.0f);
+void playSound(const std::string &name);
 void playSound(const std::string &name, float pitch, float volume);
 ```
-Retrieves the sound pool from the asset manager if exists and plays a random sound. If no pitch is supplied then random pitch is used instead based on [Audio Macros](#audio-macros). Throws a warning on non-existent/invalid sound pool.
+Retrieves the sound pool from the asset manager if exists and plays a random sound. If no pitch and volume is supplied then random pitch and default volume is used instead. Throws a warning on non-existent/invalid sound pool.
 
 ```cpp
-void playRawSound(Sound sound, float volume = 1.0f);
+void playRawSound(Sound sound);
 void playRawSound(Sound sound, float pitch, float volume);
 ```
-Plays a sound. If no pitch is supplied then random pitch is used instead based on [Audio Macros](#audio-macros).
+Plays a sound. If no pitch and volume is supplied then random pitch and default volume is used instead.
 
 # constants.hpp
 Responsible for providing common constants.
@@ -278,7 +281,9 @@ Responsible for customizing error handling used in the library.
 
 ### Log Level
 ```cpp
-enum class SRULibLogLevel { all, error, none };
+enum SRULibLogLevel {
+   SRULIB_LOG_LEVEL_ALL, SRULIB_LOG_LEVEL_ERROR, SRULIB_LOG_LEVEL_NONE
+};
 ```
 Log level of the library: all - log warnings and errors, error - log only fatal errors, none - do not log anything.
 
@@ -301,10 +306,10 @@ Set error/warning callback for the library. By default warning callback simply p
 
 ### Error/Warning
 ```cpp
-void SRULibError(const char *msg);
-void SRULibWarning(const char *msg);
+void SRULibError(const char *msg, ...);
+void SRULibWarning(const char *msg, ...);
 ```
-Call the error/warning callback with the given message.
+Call the error/warning callback with the given message. Uses printf syntax.
 
 # file.hpp
 Responsible for providing common file I/O utilities.
@@ -578,17 +583,9 @@ Spawn particles. If different count, texture or position is supplied then that i
 # random.hpp
 Responsible for providing easy to use random functions for integers, real numbers and vectors.
 
-### Random Macro
-```cpp
-#define SRULIB_USE_RAND
-```
-If defined, C **rand()** function will be used instead of **std::mt19937**. When defined, the random must be seeded manually.
-
 ### getRNG
 ```cpp
-#ifndef SRULIB_USE_RAND
 inline std::mt19937 &getRNG();
-#endif
 ```
 Returns the random device used for generating random numbers.
 
@@ -603,19 +600,19 @@ Seeds the random device with the given seed or time.
 ```cpp
 inline size_t randomIndex(size_t size);
 ```
-Returns a random index in range [0; size). If size is 0 then 0 is returned.
+Returns a random index in range [0; size). Throws if size is 0.
 
 ### randomInt
 ```cpp
 inline int randomInt(int min, int max);
 ```
-Returns a random integer in range [min; max].
+Returns a random integer in range [min; max]. Throws if min is larger than max.
 
 ### randomFloat
 ```cpp
 inline float randomFloat(float min, float max);
 ```
-Returns a random real number in range [min; max].
+Returns a random real number in range [min; max]. Throws if min is larger than max.
 
 ### chance
 ```cpp
@@ -649,7 +646,7 @@ Returns a vector with all values being a random real number in range [min; max].
 template<class T>
 inline auto &randomElement(T &range);
 ```
-Returns a random element from a container. The container must implement **size()** and **operator[size_t]** functions, like **std::vector** does. Calling this on an empty container will index 0 and cause undefined behavior.
+Returns a random element from a container. The container must implement **size()** and **operator[size_t]** functions, like **std::vector** does. Calling this on an empty container will throw.
 
 # render.hpp
 Responsible for providing screen, size and position math utilities as well as drawing utilities.
@@ -1429,35 +1426,6 @@ constexpr inline Color HSV(float h, float s, float v);
 constexpr inline Color HSVA(float h, float s, float v, float a);
 ```
 Returns a HSV color. **H** must be in range [0; 360], **S** in range [0; 1], **V** in range [0; 1] and **A** in range [0; 1].
-
-# Macros
-This section will document all macros present and their usage in one place. There are two ways to use these macros - either define them before including a header or define them in CMake. Defining them in CMake is safer since it protects you from ODR violations. You can include any macro in your project with this CMake function:
-```cmake
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-   "SRULIB_MIN_PITCH=0.9f"
-   "SRULIB_MAX_PITCH=1.1f" # macro with a value
-   "SRULIB_USE_RAND" # macro without a value
-   # define as many as needed
-)
-```
-
----
-```cpp
-#define SRULIB_MIN_PITCH 0.925f
-```
-Defines the default minimum pitch used in *playSound*. Default is 0.925. Used in [audio.hpp](#audiohpp).
-
----
-```cpp
-#define SRULIB_MAX_PITCH 1.075f
-```
-Defines the default maximum pitch used in *playSound*. Default is 1.075. Used in [audio.hpp](#audiohpp).
-
----
-```cpp
-#define SRULIB_USE_RAND
-```
-If defined, C *rand()* function will be used instead of *std::mt19937*. When defined, the random must be seeded manually. Used in [random.hpp](#randomhpp).
 
 ## Credits
 This project was made by Daniel Vishnevsky and is licensed under MIT License.

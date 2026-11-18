@@ -37,7 +37,7 @@ std::string getFileContents(const std::string &path) {
 void getLinesFromFileInPlace(std::vector<std::string> &output, const std::string &path, int type, const std::string &comment) {
    std::ifstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::getLinesFromFileInPlace/srulib::getLinesFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::getLinesFromFileInPlace/srulib::getLinesFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return;
    }
 
@@ -64,7 +64,7 @@ void getLinesFromFileInPlace(std::vector<std::string> &output, const std::string
 void getRandomLineFromFileInPlace(std::string &output, const std::string &path, int type, const std::string &comment) {
    std::ifstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::getRandomLineFromFileInPlace/srulib::getRandomLineFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::getRandomLineFromFileInPlace/srulib::getRandomLineFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return;
    }
    std::string line;
@@ -92,7 +92,7 @@ void getRandomLineFromFileInPlace(std::string &output, const std::string &path, 
 void getKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string> &output, const std::string &path, const std::string &delimiter, int type, const std::string &comment) {
    std::ifstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::getKeyValuePairFromFileInPlace/srulib::getKeyValuePairFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::getKeyValuePairFromFileInPlace/srulib::getKeyValuePairFromFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return;
    }
 
@@ -139,7 +139,7 @@ void getKeyValuePairFromFileInPlace(std::unordered_map<std::string, std::string>
 void getFileContentsInPlace(std::string &output, const std::string &path) {
    std::ifstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::getFileContentsInPlace/srulib::getFileContents: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::getFileContentsInPlace/srulib::getFileContents: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return;
    }
    output = {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
@@ -149,7 +149,7 @@ void getFileContentsInPlace(std::string &output, const std::string &path) {
 bool writeKeyValuePairToFile(const std::string &path, const std::unordered_map<std::string, std::string> &map, const std::string &delimiter) {
    std::ofstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::writeKeyValuePairToFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::writeKeyValuePairToFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return false;
    }
 
@@ -162,7 +162,7 @@ bool writeKeyValuePairToFile(const std::string &path, const std::unordered_map<s
 bool writeFile(const std::string &path, const std::string &contents) {
    std::ofstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::writeFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::writeFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return false;
    }
 
@@ -173,7 +173,7 @@ bool writeFile(const std::string &path, const std::string &contents) {
 bool writeFile(const std::string &path, const std::vector<std::string> &lines) {
    std::ofstream file (path);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::writeFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::writeFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return false;
    }
 
@@ -186,7 +186,7 @@ bool writeFile(const std::string &path, const std::vector<std::string> &lines) {
 bool appendFile(const std::string &path, const std::string &contents) {
    std::ofstream file (path, std::ios::app);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::appendFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::appendFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return false;
    }
 
@@ -197,7 +197,7 @@ bool appendFile(const std::string &path, const std::string &contents) {
 bool appendFile(const std::string &path, const std::vector<std::string> &lines) {
    std::ofstream file (path, std::ios::app);
    if (!file.is_open()) {
-      SRULibWarning(TextFormat("srulib::appendFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path)));
+      SRULibWarning("srulib::appendFile: Could not open file '%s'. Path exists: %d. Path is file: %d. If both are true check your permissions.\n", path.c_str(), std::filesystem::exists(path), std::filesystem::is_regular_file(path));
       return false;
    }
 
@@ -222,7 +222,7 @@ bool deleteFile(const std::string &path) {
       return std::filesystem::remove_all(path) > 0;
    }
    catch (...) {
-      SRULibWarning(TextFormat("srulib::deleteFile: Could not delete file '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), std::filesystem::exists(path)));
+      SRULibWarning("srulib::deleteFile: Could not delete file '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), std::filesystem::exists(path));
       return false;
    }
 }
@@ -233,7 +233,7 @@ bool copyFile(const std::string &path, const std::string &destination) {
       return true;
    }
    catch (...) {
-      SRULibWarning(TextFormat("srulib::copyFile: Could not copy file '%s' to '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), destination.c_str(), std::filesystem::exists(path)));
+      SRULibWarning("srulib::copyFile: Could not copy file '%s' to '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), destination.c_str(), std::filesystem::exists(path));
       return false;
    }
 }
@@ -244,7 +244,7 @@ bool moveFile(const std::string &path, const std::string &destination) {
       return true;
    }
    catch (...) {
-      SRULibWarning(TextFormat("srulib::moveFile: Could not move file '%s' to '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), destination.c_str(), std::filesystem::exists(path)));
+      SRULibWarning("srulib::moveFile: Could not move file '%s' to '%s'. Path exists: %d. If it is true check your permissions.\n", path.c_str(), destination.c_str(), std::filesystem::exists(path));
       return false;
    }
 }
@@ -304,7 +304,7 @@ std::vector<Header> getHeadersFromConfig(const std::string &path, const std::str
 
       size_t delim = line.find(delimiter);
       if (delim == std::string::npos) {
-         SRULibWarning(TextFormat("srulib::getHeadersFromConfig: Malformed line: '%s'. Expected 'FIELD%cVALUE' or '%sNAME%s'.\n", line.c_str(), delimiter, headerStart.c_str(), headerEnd.c_str()));
+         SRULibWarning("srulib::getHeadersFromConfig: Malformed line: '%s'. Expected 'FIELD%cVALUE' or '%sNAME%s'.\n", line.c_str(), delimiter, headerStart.c_str(), headerEnd.c_str());
          continue;
       }
       std::string field = line.substr(0, delim);
@@ -326,7 +326,7 @@ int getIntValue(const std::string &value, bool *ok) {
       return std::stoi(value);
    } catch (...) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getIntValue: Expected integer, got '%s' instead. Returning default - %d.\n", value.c_str(), 0));
+      SRULibWarning("srulib::getIntValue: Expected integer, got '%s' instead. Returning default - %d.\n", value.c_str(), 0);
       return 0;
    }
 }
@@ -337,7 +337,7 @@ float getFloatValue(const std::string &value, bool *ok) {
       return std::stof(value);
    } catch (...) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getFloatValue: Expected float, got '%s' instead. Returning default - %f.\n", value.c_str(), 0.0f));
+      SRULibWarning("srulib::getFloatValue: Expected float, got '%s' instead. Returning default - %f.\n", value.c_str(), 0.0f);
       return 0.0f;
    }
 }
@@ -345,7 +345,7 @@ float getFloatValue(const std::string &value, bool *ok) {
 bool getBoolValue(const std::string &value, bool *ok) {
    if (value != "true" && value != "false") {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getBoolValue: Expected true/false, got '%s' instead. Returning default - %s.\n", value.c_str(), "false"));
+      SRULibWarning("srulib::getBoolValue: Expected true/false, got '%s' instead. Returning default - %s.\n", value.c_str(), "false");
       return false;
    }
    if (ok) *ok = true;
@@ -361,7 +361,7 @@ Vector2 getV2Value(const std::string &value, char delimiter, bool *ok) {
    std::vector<std::string> values = getArrayValue(value, delimiter);
    if (values.size() != 2) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getV2Value: Expected Vector2 {float,float}, got '%s' instead. Returning default - {%f, %f}.\n", value.c_str(), 0.0f, 0.0f));
+      SRULibWarning("srulib::getV2Value: Expected Vector2 {float,float}, got '%s' instead. Returning default - {%f, %f}.\n", value.c_str(), 0.0f, 0.0f);
       return V2();
    }
    bool ok1, ok2;
@@ -374,7 +374,7 @@ Vector3 getV3Value(const std::string &value, char delimiter, bool *ok) {
    std::vector<std::string> values = getArrayValue(value, delimiter);
    if (values.size() != 3) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getV3Value: Expected Vector3 {float,float,float}, got '%s' instead. Returning default - {%f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f));
+      SRULibWarning("srulib::getV3Value: Expected Vector3 {float,float,float}, got '%s' instead. Returning default - {%f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f);
       return V3();
    }
    bool ok1, ok2, ok3;
@@ -387,7 +387,7 @@ Vector4 getV4Value(const std::string &value, char delimiter, bool *ok) {
    std::vector<std::string> values = getArrayValue(value, delimiter);
    if (values.size() != 4) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getV4Value: Expected Vector4 {float,float,float,float}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 0.0f));
+      SRULibWarning("srulib::getV4Value: Expected Vector4 {float,float,float,float}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 0.0f);
       return V4();
    }
    bool ok1, ok2, ok3, ok4;
@@ -400,7 +400,7 @@ Color getColorValue(const std::string &value, char delimiter, bool *ok) {
    std::vector<std::string> values = getArrayValue(value, delimiter);
    if (values.size() != 4 && values.size() != 3) {
       if (ok) *ok = false;
-      SRULibWarning(TextFormat("srulib::getColorValue: Expected Color {float,float,float,float?}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 1.0f));
+      SRULibWarning("srulib::getColorValue: Expected Color {float,float,float,float?}, got '%s' instead. Returning default - {%f, %f, %f, %f}.\n", value.c_str(), 0.0f, 0.0f, 0.0f, 1.0f);
       return BLACK;
    }
    bool ok1, ok2, ok3, ok4 = true; // intended
@@ -466,7 +466,7 @@ std::vector<Line> getDictionaryValue(const std::string &value, char delimiter, c
       size_t equals = val.find(keyValueDelimiter);
       if (equals == std::string::npos) {
          if (ok) *ok = false;
-         SRULibWarning(TextFormat("srulib::getDictionaryValue: Expected dictionary, but there's no '%c' in '%s'.\n", keyValueDelimiter, val.c_str()));
+         SRULibWarning("srulib::getDictionaryValue: Expected dictionary, but there's no '%c' in '%s'.\n", keyValueDelimiter, val.c_str());
          continue;
       }
 
