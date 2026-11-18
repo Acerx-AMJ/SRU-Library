@@ -310,10 +310,10 @@ constexpr inline Color HSL(float h, float s, float l) {
 
    float q = (l < 0.5f ? l * (s + 1.0f) : l + s - l * s);
    float p = 2.0f * l - q;
-   return RGB(
-      hue(p, q, h + 1.0f / 3.0f) * 255.0f,
-      hue(p, q, h) * 255.0f,
-      hue(p, q, h - 1.0f / 3.0f) * 255.0f
+   return RGBF(
+      hue(p, q, h + 1.0f / 3.0f),
+      hue(p, q, h),
+      hue(p, q, h - 1.0f / 3.0f)
    );
 }
 
@@ -332,12 +332,12 @@ constexpr inline Color HSV(float h, float s, float v) {
    float t = v * (1.0f - (1.0f - f) * s);
 
    switch (i % 6) {
-      case 0: return RGB(v * 255.0f, t * 255.0f, p * 255.0f);
-      case 1: return RGB(q * 255.0f, v * 255.0f, p * 255.0f);
-      case 2: return RGB(p * 255.0f, v * 255.0f, t * 255.0f);
-      case 3: return RGB(p * 255.0f, q * 255.0f, v * 255.0f);
-      case 4: return RGB(t * 255.0f, p * 255.0f, v * 255.0f);
-      case 5: return RGB(v * 255.0f, p * 255.0f, q * 255.0f);
+      case 0: return RGBF(v, t, p);
+      case 1: return RGBF(q, v, p);
+      case 2: return RGBF(p, v, t);
+      case 3: return RGBF(p, q, v);
+      case 4: return RGBF(t, p, v);
+      case 5: return RGBF(v, p, q);
       default: return {};
    }
 }
